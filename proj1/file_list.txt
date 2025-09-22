@@ -1,1 +1,5 @@
-p1a1.pdf contains our submission for project 1 activity 1
+proj1/
+├── p1a1.pdf                     # submission for project 1 activity 1
+├── p1b1.pdf                     # submission for project 1 activity 2
+├── 510 project 1c1.PDF          # submission for project 1 activity 3
+└── p1d1.pdf                     # submission for project 1 activity 4
