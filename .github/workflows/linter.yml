@@ -29,7 +29,6 @@ jobs:
           # Enable linters for your specific languages:
           VALIDATE_PYTHON: true       # For Python/Flask backend (uses linters like Flake8, Black)
           VALIDATE_JAVASCRIPT_ES: true # For React/JavaScript frontend (uses linters like ESLint)
-          VALIDATE_JAVASCRIPT_STANDARD: false # Set to true if you use JavaScript Standard Style
           VALIDATE_CSS: true          # For React styles (uses linters like Stylelint)
           VALIDATE_DOCKERFILE: true   # For Docker configuration (uses Hadolint)
           VALIDATE_YAML: true         # For GitHub Actions/Docker Compose (uses Yamllint)
