@@ -1,10 +1,10 @@
 "use client";
 import { create } from "zustand";
-import type { CartItem, MenuItem } from "./types";
+import type { CartItem, Purchasable } from "./types";
 
 type CartState = {
   items: CartItem[];
-  add(item: MenuItem, qty?: number): void;
+  add(item: Purchasable, qty?: number): void;
   decrement(id: string, qty?: number): void;
   remove(id: string): void;
   clear(): void;

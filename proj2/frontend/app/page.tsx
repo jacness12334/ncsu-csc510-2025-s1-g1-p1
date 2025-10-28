@@ -1,3 +1,4 @@
+// app/page.tsx
 import Link from "next/link";
 
 export default function Home() {
@@ -10,22 +11,13 @@ export default function Home() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/order"
-            className="rounded-xl border border-gray-300 px-5 py-2 text-sm"
-          >
+          <Link href="/order" className="rounded-xl border border-gray-300 px-5 py-2 text-sm">
             Continue as Guest
           </Link>
-          <button
-            disabled
-            className="rounded-xl border border-gray-300 px-5 py-2 text-sm text-gray-500 cursor-not-allowed"
-          >
+          <button disabled className="rounded-xl border border-gray-300 px-5 py-2 text-sm text-gray-500 cursor-not-allowed">
             Log In
           </button>
-          <button
-            disabled
-            className="rounded-xl bg-black px-5 py-2 text-sm text-white opacity-80 cursor-not-allowed"
-          >
+          <button disabled className="rounded-xl bg-black px-5 py-2 text-sm text-white opacity-80 cursor-not-allowed">
             Sign Up
           </button>
         </div>

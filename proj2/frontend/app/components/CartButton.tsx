@@ -1,29 +1,18 @@
+// app/components/CartButton.tsx
 "use client";
-
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useCartStore } from "@/lib/cartStore";
 
 export default function CartButton() {
-	const [count, setCount] = useState<number>(0);
-
-	useEffect(() => {
-		try {
-			const raw = localStorage.getItem("cartCount");
-			if (raw) setCount(Number(raw));
-		} catch (e) {
-			// ignore (SSR or privacy)
-		}
-	}, []);
-
-	return (
-		<Link href="/cart" className="relative inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 hover:text-gray-900">
-			🛒
-			{count > 0 && (
-				<span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white">
-					{count}
-				</span>
-			)}
-		</Link>
-	);
+  const count = useCartStore((s) => s.items.reduce((n, i) => n + i.qty, 0));
+  return (
+    <Link href="/cart" className="relative">
+      Cart
+      {count > 0 && (
+        <span className="absolute -right-3 -top-2 rounded-full bg-black px-2 text-xs text-white">
+          {count}
+        </span>
+      )}
+    </Link>
+  );
 }
-
