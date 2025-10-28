@@ -1,0 +1,3 @@
+ignored:
+  - DL3008 # Don't warn about 'apt-get install' missing '-y'
+  - DL3018 # Don't warn about pin versions in 'apk add'
