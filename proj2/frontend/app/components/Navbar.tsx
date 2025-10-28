@@ -1,22 +1,21 @@
 "use client";
-
 import Link from "next/link";
+import CartButton from "./CartButton";
 
 export default function Navbar() {
-	return (
-		<nav className="bg-gray-800 text-white">
-			<div className="mx-auto max-w-6xl px-4 py-4">
-				<div className="flex items-center justify-between">
-					<div className="text-xl font-bold">Movie Munchers</div>
-					<div className="flex space-x-6">
-						<Link href="/" className="hover:text-gray-300">Home</Link>
-						<Link href="/menu" className="hover:text-gray-300">Menu</Link>
-						<Link href="/bundles" className="hover:text-gray-300">Bundles</Link>
-						<Link href="/cart" className="hover:text-gray-300">Cart</Link>
-					</div>
-				</div>
-			</div>
-		</nav>
-	);
-}
+  return (
+    <header className="sticky top-0 z-50 border-b bg-white/70 backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <Link href="/" className="font-bold tracking-tight">
+          🍿 Movie Munchers
+        </Link>
 
+        <div className="flex gap-5 text-sm">
+          <Link href="/menu">Menu</Link>
+          <Link href="/track/12345">Track Order</Link>
+          <CartButton />
+        </div>
+      </nav>
+    </header>
+  );
+}
