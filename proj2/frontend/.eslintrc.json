@@ -1,0 +1,54 @@
+{
+    "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+    },
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        // Required for the Babel parser to work with React
+        "requireConfigFile": false
+    },
+    "settings": {
+        "react": {
+            // Tells ESLint to automatically detect the React version
+            "version": "detect"
+        }
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ],
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        // Basic formatting and style rules
+        "indent": [
+            "error",
+            2
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "comma-dangle": [
+            "error",
+            "always-multiline"
+        ],
+        "no-unused-vars": "warn",
+        "no-console": "off",
+        // React specific rules
+        "react/prop-types": "off", // Often disabled when using TypeScript or relying on default props
+        "react/react-in-jsx-scope": "off" // Disabled for modern React (since React 17's new JSX transform)
+    }
+}
