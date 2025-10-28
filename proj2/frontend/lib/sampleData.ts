@@ -1,29 +1,144 @@
-export type MenuItem = {
-	id: string;
-	name: string;
-	description?: string;
-	price: number;
-	image?: string;
-};
+import type { MenuItem } from "./types";
 
 export const MENU: MenuItem[] = [
-	{
-		id: "popcorn-small",
-		name: "Classic Popcorn (Small)",
-		description: "Lightly salted, buttery popcorn",
-		price: 3.5,
-	},
-	{
-		id: "soda-regular",
-		name: "Soda (Regular)",
-		description: "Refreshing cola or lemon-lime",
-		price: 2.0,
-	},
-	{
-		id: "nachos",
-		name: "Nachos",
-		description: "Tortilla chips with cheese and jalapeños",
-		price: 4.75,
-	},
+  {
+    id: "1",
+    name: "Classic Butter Popcorn",
+    description: "Freshly popped golden corn tossed in rich, melted butter.",
+    price: 6.99,
+    image: "/images/popcorn.jpg",
+    nutrition: {
+      calories: 420,
+      carbs: 45,
+      fat: 22,
+      protein: 6,
+    },
+    category: "Snacks",
+  },
+  {
+    id: "2",
+    name: "Nachos with Cheese Dip",
+    description: "Crispy tortilla chips served with creamy cheddar cheese dip.",
+    price: 7.49,
+    image: "/images/nachos.jpg",
+    nutrition: {
+      calories: 480,
+      carbs: 54,
+      fat: 23,
+      protein: 8,
+    },
+    category: "Snacks",
+  },
+  {
+    id: "3",
+    name: "Pretzel Bites",
+    description: "Soft baked pretzel bites served with warm cheese sauce.",
+    price: 5.99,
+    image: "/images/pretzel.jpg",
+    nutrition: {
+      calories: 390,
+      carbs: 42,
+      fat: 17,
+      protein: 9,
+    },
+    category: "Snacks",
+  },
+  {
+    id: "4",
+    name: "Hot Dog Combo",
+    description: "All-beef hot dog served with fries and a small drink.",
+    price: 9.99,
+    image: "/images/hotdog.jpg",
+    nutrition: {
+      calories: 720,
+      carbs: 58,
+      fat: 35,
+      protein: 25,
+    },
+    category: "Meals",
+  },
+  {
+    id: "5",
+    name: "Cheese Pizza Slice",
+    description: "Oven-baked personal pizza slice with mozzarella and tomato sauce.",
+    price: 5.49,
+    image: "/images/pizza.jpg",
+    nutrition: {
+      calories: 480,
+      carbs: 52,
+      fat: 20,
+      protein: 15,
+    },
+    category: "Meals",
+  },
+  {
+    id: "6",
+    name: "Chocolate Chip Cookie",
+    description: "Freshly baked cookie with melted chocolate chips.",
+    price: 3.49,
+    image: "/images/cookie.jpg",
+    nutrition: {
+      calories: 260,
+      carbs: 34,
+      fat: 12,
+      protein: 3,
+    },
+    category: "Desserts",
+  },
+  {
+    id: "7",
+    name: "Brownie Sundae",
+    description: "Warm brownie topped with vanilla ice cream and chocolate drizzle.",
+    price: 6.49,
+    image: "/images/brownie.jpg",
+    nutrition: {
+      calories: 610,
+      carbs: 67,
+      fat: 28,
+      protein: 7,
+    },
+    category: "Desserts",
+  },
+  {
+    id: "8",
+    name: "Soda (Medium)",
+    description: "Choose from Coke, Diet Coke, Sprite, or Fanta.",
+    price: 3.99,
+    image: "/images/soda.jpg",
+    nutrition: {
+      calories: 190,
+      carbs: 52,
+      fat: 0,
+      protein: 0,
+    },
+    category: "Beverages",
+  },
+  {
+    id: "9",
+    name: "Bottled Water",
+    description: "Refreshing purified bottled water (16.9 fl oz).",
+    price: 2.49,
+    image: "/images/water.jpg",
+    nutrition: {
+      calories: 0,
+      carbs: 0,
+      fat: 0,
+      protein: 0,
+    },
+    category: "Beverages",
+  },
+  {
+    id: "10",
+    name: "Iced Coffee",
+    description: "Chilled coffee with cream and sugar served over ice.",
+    price: 4.49,
+    image: "/images/icedcoffee.jpg",
+    nutrition: {
+      calories: 150,
+      carbs: 18,
+      fat: 5,
+      protein: 2,
+    },
+    category: "Beverages",
+  },
 ];
-
