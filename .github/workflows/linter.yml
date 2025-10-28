@@ -1,0 +1,37 @@
+name: Lint Code Base
+
+on:
+  push:
+    branches: [ main, frontend ]
+  pull_request:
+    branches: [ main, frontend ]
+
+jobs:
+  linter_job:
+    runs-on: ubuntu-latest
+    name: Run Super-Linter
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history for linter to check all files
+          fetch-depth: 0
+
+      - name: Run Super-Linter
+        uses: super-linter/super-linter/slim@v6 # Use the 'slim' version for faster execution
+        env:
+          # Configuration to validate your specific languages/files
+          VALIDATE_ALL_CODEBASE: false # Only lint changed files on PRs, or whole repo on push (default behavior)
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Enable linters for your specific languages:
+          VALIDATE_PYTHON: true       # For Python/Flask backend (uses linters like Flake8, Black)
+          VALIDATE_JAVASCRIPT_ES: true # For React/JavaScript frontend (uses linters like ESLint)
+          VALIDATE_JAVASCRIPT_STANDARD: false # Set to true if you use JavaScript Standard Style
+          VALIDATE_CSS: true          # For React styles (uses linters like Stylelint)
+          VALIDATE_DOCKERFILE: true   # For Docker configuration (uses Hadolint)
+          VALIDATE_YAML: true         # For GitHub Actions/Docker Compose (uses Yamllint)
+          VALIDATE_SQL: true
+          
