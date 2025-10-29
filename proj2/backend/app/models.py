@@ -1,5 +1,4 @@
 from app import db
-from sqlalchemy import text
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT, SMALLINT, DECIMAL
 from sqlalchemy.sql import func, expression
 
