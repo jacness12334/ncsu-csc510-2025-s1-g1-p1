@@ -4,10 +4,10 @@
 3) Edit ```app.py```, if necessary (if you have a ```MYSQL``` password, insert into empty ```password``` string)
 5) Run your model's ```.py``` file (i.e., ```drivers.py```)
 
-## Notes
+### Notes
 * ```.env.example``` can be used to store your personal ```MYSQL``` data for reference
 * Recommended to make sub-branches from backend for each model (i.e., ```backend-drivers```)
 
-## Helpful Functions
+### Helpful Functions
 - ```db.session.add()``` (adding instance of model to session)
 - ```db.session.commit()``` (committing all session changes to database)
