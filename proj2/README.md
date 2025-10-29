@@ -7,6 +7,7 @@
 ### Notes
 * ```.env.example``` can be used to store your personal ```MYSQL``` data for reference
 * Recommended to make sub-branches from backend for each model (i.e., ```backend-drivers```)
+* Review ```models.py``` to confirm model structure and data types
 
 ### Helpful Functions
 - ```db.session.add()``` (adding instance of model to session)
