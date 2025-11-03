@@ -14,7 +14,7 @@ class StaffService:
     
 
     # Admin functionality - add staff member
-    def add_staff(self, name, email, phone, birthday, password_hash, theatre_id, role):
+    def add_staff(self, name, email, phone, birthday, password, theatre_id, role):
         admin = Staff.query.filter_by(user_id=self.user_id).first()
         if not admin or admin.role != 'admin':
             return {"error":"Unauthorized User - Not an admin"}, 403
@@ -26,7 +26,7 @@ class StaffService:
             return {"error": "Invalid role. Must be 'admin' or 'runner'."}, 400
         
         # Hash password
-        user = Users(name=name, email=email, phone=phone, birthday=birthday, password_hash=password_hash, role='staff', account_status='active')
+        user = Users(name=name, email=email, phone=phone, birthday=birthday, password_hash=password, role='staff', account_status='active')
         db.session.add(user)
         db.session.flush()
 
@@ -49,7 +49,7 @@ class StaffService:
         db.session.delete(staff)
         # Maybe delete user too
         db.session.commit()
-        return {"message":"Staff successfully removed"}
+        return {"message":"Staff successfully removed"}, 200
     
 
     # Admin functionality - Set theatre status
@@ -77,10 +77,45 @@ class StaffService:
         db.session.add(movie)
         db.session.commit()
         return {"message":"Movie added successfully", "movie_id": movie.id}, 201
+    
+
+    # Admin functionality - edit movie
+    def edit_movie(self, movie_id, title, genre, length_mins, release_year, keywords, rating):
+        admin = Staff.query.filter_by(user_id=self.user_id).first()
+        if not admin or admin.role != 'admin':
+            return {"error":"Unauthorized User - Not an admin"}, 403
+        
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            return {"error":"Movie not found"}, 404
+
+        movie.title = title
+        movie.genre = genre
+        movie.length_mins = length_mins
+        movie.release_year = release_year
+        movie.keywords = keywords
+        movie.rating = rating
+        db.session.commit()
+        return {"message":"Movie details changed successfully", "movie_id": movie.id}, 200
+    
+
+    # Admin functionality - remove movie
+    def remove_movie(self, movie_id):
+        admin = Staff.query.filter_by(user_id=self.user_id).first()
+        if not admin or admin.role != 'admin':
+            return {"error":"Unauthorized User - Not an admin"}, 403
+        
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            return {"error":"Movie not found"}, 404
+        
+        db.session.delete(movie)
+        db.session.commit()
+        return {"message":"Movie successfully removed"}, 200
 
 
     # Admin functionality - create movie showing
-    def create_showing(self, movie_id, auditorium_id, start_time):
+    def add_showing(self, movie_id, auditorium_id, start_time):
         admin = Staff.query.filter_by(user_id=self.user_id).first()
         if not admin or admin.role != 'admin':
             return {"error":"Unauthorized User - Not an admin"}, 403
@@ -96,6 +131,45 @@ class StaffService:
         db.session.add(showing)
         db.session.commit()
         return {"message":"Movie Showing created successfully", "showing_id": showing.id}, 201
+    
+
+    # Admin functionality - edit movie showing
+    def edit_showing(self, showing_id, movie_id, auditorium_id, start_time):
+        admin = Staff.query.filter_by(user_id=self.user_id).first()
+        if not admin or admin.role != 'admin':
+            return {"error":"Unauthorized User - Not an admin"}, 403
+
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            return {"error":"Movie not found"}, 404
+        auditorium = Auditoriums.query.filter_by(id=auditorium_id).first()
+        if not auditorium:
+            return {"error":"Auditorium not found"}, 404
+        
+        showing = MovieShowings.query.filter_by(id=showing_id).first()
+        if not showing:
+            return {"error":"Movie Showing not found"}, 404
+        
+        showing.movie_id = movie_id
+        showing.auditorium_id = auditorium_id
+        showing.start_time = start_time
+        db.session.commit()
+        return {"message":"Movie Showing details changed successfully", "showing_id": showing.id}, 200
+    
+
+    # Admin functionality - remove movie
+    def remove_showing(self, showing_id):
+        admin = Staff.query.filter_by(user_id=self.user_id).first()
+        if not admin or admin.role != 'admin':
+            return {"error":"Unauthorized User - Not an admin"}, 403
+        
+        showing = MovieShowings.query.filter_by(id=showing_id).first()
+        if not showing:
+            return {"error":"Movie Showing not found"}, 404
+        
+        db.session.delete(showing)
+        db.session.commit()
+        return {"message":"Movie Showing successfully removed"}, 200
 
 
     # Staff functionality - set availability
@@ -119,7 +193,7 @@ class StaffService:
         if delivery_status not in valid:
             return {"error": "Invalid status"}, 400
 
-        delivery = Deliveries.query.filter_by(id=delivery_id, staff_id=self.user_id).first()
+        delivery = Deliveries.query.filter_by(id=delivery_id, staff_id=staff.id).first()
         if not delivery:
             return {"error": "Delivery not found"}, 404
 
@@ -141,7 +215,7 @@ class StaffService:
         if delivery.delivery_status != 'pending':
             return {"error": "Delivery not available to accept"}, 400
 
-        delivery.staff_id = self.user_id
+        delivery.staff_id = staff.id
         delivery.delivery_status = 'accepted'
         db.session.commit()
         return {"message": "Delivery accepted successfully"}, 200
