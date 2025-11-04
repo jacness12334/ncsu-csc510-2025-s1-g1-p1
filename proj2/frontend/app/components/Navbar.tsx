@@ -13,6 +13,7 @@ export default function Navbar() {
           <Link href="/">Home</Link>
           <Link href="/order">Order</Link>
           <Link href="/track/12345">Track Order</Link>
+          <Link href="/userdetails">User Details</Link>
           <CartButton />
 
           {/* Placeholder auth buttons */}
