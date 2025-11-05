@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from ..services.customer_service import CustomerService
-from flask_login import logout_user, login_required
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/api/customers')
 customer_service = CustomerService()
