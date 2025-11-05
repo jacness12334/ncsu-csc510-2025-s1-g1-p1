@@ -1,10 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from app.routes.staff_routes import bp
 
 db = SQLAlchemy()
 
 def get_app(config_name):
     app = Flask(__name__)
+    app.register_blueprint(bp)
+
     user = 'root'
     password = ''
     host = 'localhost'
