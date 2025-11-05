@@ -3,9 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 db = SQLAlchemy()
+login_manager = LoginManager()
 
 def get_app(config_name):
     app = Flask(__name__)
+
+    app.config['SECRET_KEY'] = 'faedda1dcedc8a54042c86aaa6caf6b8'
+
     user = 'root'
     password = ''
     host = 'localhost'
@@ -19,11 +23,10 @@ def get_app(config_name):
         app.config['TESTING'] = True
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
     db.init_app(app)
-
-    login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'user.login'
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -31,9 +34,9 @@ def get_app(config_name):
         return Users.query.get(int(user_id))
     
     from routes.customer_routes import customer_bp
-    # from routes.user_routes import user_bp
+    from routes.user_routes import user_bp
 
     app.register_blueprint(customer_bp)
-    # app.register_blueprint(user_bp)
+    app.register_blueprint(user_bp)
 
     return app

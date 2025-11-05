@@ -1,13 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from ..services.user_service import UserService
-from app import get_app
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/users')
 user_service = UserService()
-
-config_name = 'development'
-app = get_app(config_name=config_name)
 
 @user_bp.route('/register', methods=['POST'])
 def register():
@@ -19,7 +15,7 @@ def register():
             phone=data.get('phone'),
             birthday=data.get('birthday'),
             password=data.get('password'),
-            role = data.get('role')
+            role=data.get('role')
         )
         return jsonify({
             'message': 'User registered successfully',
@@ -81,28 +77,6 @@ def get_current_user():
         'birthday': str(current_user.birthday),
         'role': current_user.role
     }), 200
-
-@user_bp.route('/<int:user_id>', methods=['GET'])
-@login_required
-def get_user(user_id):
-    try:
-        if current_user.id != user_id:
-            return jsonify({'error': 'Unauthorized'}), 403
-        
-        user = user_service.get_user(user_id)
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        return jsonify({
-            'user_id': user.id,
-            'name': user.name,
-            'email': user.email,
-            'phone': user.phone,
-            'birthday': str(user.birthday),
-            'role': user.role
-        }), 200
-        
-    except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
     
 @user_bp.route('/me', methods=['PUT'])
 @login_required

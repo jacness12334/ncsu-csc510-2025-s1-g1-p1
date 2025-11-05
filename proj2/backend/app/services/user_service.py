@@ -51,7 +51,7 @@ class UserService:
         return user
     
     def delete_user(self, user_id):
-        user = Users.query.get(user_id)
+        user = self.get_user(user_id=user_id)
         if not user:
             raise ValueError(f"User {user_id} not found")
         
@@ -66,7 +66,7 @@ class UserService:
         return user
         
     def update_user_profile(self, user_id, name, email, phone, birthday):
-        user = Users.query.get(user_id)
+        user = self.get_user(user_id=user_id)
         if not user:
             raise ValueError("User not found")
         
@@ -87,7 +87,7 @@ class UserService:
         return user
     
     def change_password(self, user_id, current_password, new_password):
-        user = Users.query.get(user_id)
+        user = self.get_user(user_id=user_id)
         if not user:
             raise ValueError(f"User {user_id} not found")
         
