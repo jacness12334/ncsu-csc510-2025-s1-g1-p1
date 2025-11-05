@@ -1,15 +1,3 @@
-# import sys
-# import os
-
-# # Add parent directory
-# current_dir = os.path.dirname(__file__)
-# parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
-# sys.path.insert(0, parent_dir)
-
-# print(f"Current directory: {current_dir}")
-# print(f"Parent directory: {parent_dir}")
-# print(f"sys.path: {sys.path}")
-
 from models import *
 from app import db
 from services.user_service import UserService
