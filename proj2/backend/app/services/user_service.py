@@ -1,7 +1,6 @@
 from models import Users
 from app import db
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 
 class UserService:
 
