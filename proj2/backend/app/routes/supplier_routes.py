@@ -3,7 +3,7 @@ from models import *
 from app import db, get_app
 from app.services.supplier_service import SupplierService
 
-bp = Blueprint("suppliers", __name__, url_prefix="/api")
+supplier_bp = Blueprint("suppliers", __name__, url_prefix="/api")
 
 config_name = 'development'
 app = get_app(config_name)
@@ -13,7 +13,7 @@ def get_user_id():
     return data.get('user_id')
 
 
-@bp.route('/suppliers', methods=['PUT'])
+@supplier_bp.route('/suppliers', methods=['PUT'])
 def edit_supplier():
     user_id = get_user_id()
     service = SupplierService(user_id)
@@ -30,7 +30,7 @@ def edit_supplier():
     return jsonify(response), status
 
 
-@bp.route('/suppliers/status', methods=['PUT'])
+@supplier_bp.route('/suppliers/status', methods=['PUT'])
 def set_availability():
     user_id = get_user_id()
     service = SupplierService(user_id)
@@ -41,7 +41,7 @@ def set_availability():
     return jsonify(response), status
 
 
-@bp.route('/products', methods=['POST'])
+@supplier_bp.route('/products', methods=['POST'])
 def add_product():
     user_id = get_user_id()
     service = SupplierService(user_id)
@@ -61,7 +61,7 @@ def add_product():
     return jsonify(response), status
 
 
-@bp.route('/products/<int:product_id>', methods=['PUT'])
+@supplier_bp.route('/products/<int:product_id>', methods=['PUT'])
 def edit_movie(product_id):
     user_id = get_user_id()
     service = SupplierService(user_id)
@@ -82,11 +82,11 @@ def edit_movie(product_id):
     return jsonify(response), status
 
 
-@bp.route('/products/<int:product_id>', methods=['DELETE'])
+@supplier_bp.route('/products/<int:product_id>', methods=['DELETE'])
 def remove_product(product_id):
     user_id = get_user_id()
     service = SupplierService(user_id)
     response, status = service.remove_product(product_id)
     return jsonify(response), status
 
-app.register_blueprint(bp)
+app.register_blueprint(supplier_bp)

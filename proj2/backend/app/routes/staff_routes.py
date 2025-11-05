@@ -3,7 +3,7 @@ from models import *
 from app import db, get_app
 from app.services.staff_service import StaffService
 
-bp = Blueprint("staff", __name__, url_prefix="/api")
+staff_bp = Blueprint("staff", __name__, url_prefix="/api")
 
 config_name = 'development'
 app = get_app(config_name)
@@ -12,7 +12,7 @@ def get_user_id():
     data = request.json
     return data.get('user_id')
 
-@bp.route('/staff', methods=['POST'])
+@staff_bp.route('/staff', methods=['POST'])
 def add_staff():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -34,7 +34,7 @@ def add_staff():
     return jsonify(response), status
 
 
-@bp.route('/staff/<int:staff_user_id>', methods=['DELETE'])
+@staff_bp.route('/staff/<int:staff_user_id>', methods=['DELETE'])
 def remove_staff(staff_user_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -42,7 +42,7 @@ def remove_staff(staff_user_id):
     return jsonify(response), status
 
 
-@bp.route('/theatres', methods=['PUT'])
+@staff_bp.route('/theatres', methods=['PUT'])
 def set_theatre_status():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -53,7 +53,7 @@ def set_theatre_status():
     return jsonify(response), status
 
 
-@bp.route('/movies', methods=['POST'])
+@staff_bp.route('/movies', methods=['POST'])
 def add_movie():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -72,7 +72,7 @@ def add_movie():
     return jsonify(response), status
 
 
-@bp.route('/movies/<int:movie_id>', methods=['PUT'])
+@staff_bp.route('/movies/<int:movie_id>', methods=['PUT'])
 def edit_movie(movie_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -92,7 +92,7 @@ def edit_movie(movie_id):
     return jsonify(response), status
 
 
-@bp.route('/movies/<int:movie_id>', methods=['DELETE'])
+@staff_bp.route('/movies/<int:movie_id>', methods=['DELETE'])
 def remove_movie(movie_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -100,7 +100,7 @@ def remove_movie(movie_id):
     return jsonify(response), status
 
 
-@bp.route('/showings', methods=['POST'])
+@staff_bp.route('/showings', methods=['POST'])
 def add_showing():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -116,7 +116,7 @@ def add_showing():
     return jsonify(response), status
 
 
-@bp.route('/showings/<int:showing_id>', methods=['PUT'])
+@staff_bp.route('/showings/<int:showing_id>', methods=['PUT'])
 def edit_showing(showing_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -133,7 +133,7 @@ def edit_showing(showing_id):
     return jsonify(response), status
 
 
-@bp.route('/showings/<int:showing_id>', methods=['DELETE'])
+@staff_bp.route('/showings/<int:showing_id>', methods=['DELETE'])
 def remove_showing(showing_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -141,7 +141,7 @@ def remove_showing(showing_id):
     return jsonify(response), status
 
 
-@bp.route('/staff', methods=['PUT'])
+@staff_bp.route('/staff', methods=['PUT'])
 def set_availability():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -152,7 +152,7 @@ def set_availability():
     return jsonify(response), status
 
 
-@bp.route('/deliveries/<int:delivery_id>/status', methods=['PUT'])
+@staff_bp.route('/deliveries/<int:delivery_id>/status', methods=['PUT'])
 def update_delivery_status(delivery_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -163,7 +163,7 @@ def update_delivery_status(delivery_id):
     return jsonify(response), status
 
 
-@bp.route('/deliveries/<int:delivery_id>/accept', methods=['PUT'])
+@staff_bp.route('/deliveries/<int:delivery_id>/accept', methods=['PUT'])
 def accept_delivery(delivery_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -171,4 +171,4 @@ def accept_delivery(delivery_id):
     return jsonify(response), status
 
 
-app.register_blueprint(bp)
+app.register_blueprint(staff_bp)
