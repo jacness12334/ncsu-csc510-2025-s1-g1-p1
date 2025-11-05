@@ -1,6 +1,7 @@
 from app import db
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT, SMALLINT, DECIMAL
 from sqlalchemy.sql import func, expression
+from flask_login import UserMixin
 
 class Theatres(db.Model):
     __tablename__ = 'theatres'
@@ -36,7 +37,7 @@ class Seats(db.Model):
     def __repr__(self):
         return f'<Seat id = {self.id} aisle = {self.aisle} number = {self.number} auditorium = {self.auditorium_id}>'
 
-class Users(db.Model):
+class Users(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
     name = db.Column(db.String(128), nullable = False)
@@ -51,6 +52,10 @@ class Users(db.Model):
 
     def __repr__(self):
         return f'<User id = {self.id} email = {self.email!r} role = {self.role} status = {self.account_status}>'
+    
+    @property
+    def is_active(self):
+        return self.account_status == 'active'
 
 class Staff(db.Model):
     __tablename__ = 'staff'

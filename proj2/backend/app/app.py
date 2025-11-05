@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
@@ -26,12 +26,17 @@ def create_app(config_name):
     
     db.init_app(app)
     login_manager.init_app(app)
-    login_manager.login_view = 'user.login'
+    login_manager.login_view = None 
+    login_manager.session_protection = None
 
     @login_manager.user_loader
     def load_user(user_id):
         from models import Users
         return Users.query.get(int(user_id))
+
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        return jsonify({'error': 'Unauthorized - login required'}), 401
     
     from routes.customer_routes import customer_bp
     from routes.user_routes import user_bp

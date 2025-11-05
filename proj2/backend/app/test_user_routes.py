@@ -224,7 +224,7 @@ class TestUserRoutes:
             'password': 'password123'
         })
         
-        response = client.delete(f'/api/users/{sample_user.id}')
+        response = client.delete(f'/api/users/{sample_user}')
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -234,7 +234,7 @@ class TestUserRoutes:
         assert response.status_code == 401
     
     def test_delete_user_not_authenticated(self, client, sample_user):
-        response = client.delete(f'/api/users/{sample_user.id}')
+        response = client.delete(f'/api/users/{sample_user}')
         
         assert response.status_code == 401  
     
@@ -251,6 +251,7 @@ class TestUserRoutes:
                 password='password123',
                 role='customer'
             )
+            user1_id = user1.id
             
             user2 = user_service.create_user(
                 name='User Two',
@@ -260,13 +261,14 @@ class TestUserRoutes:
                 password='password123',
                 role='customer'
             )
+            user2_id = user2.id
         
         client.post('/api/users/login', json={
             'email': 'user1@example.com',
             'password': 'password123'
         })
         
-        response = client.delete(f'/api/users/{user2.id}')
+        response = client.delete(f'/api/users/{user2_id}')
         
         assert response.status_code == 403  
         data = json.loads(response.data)
