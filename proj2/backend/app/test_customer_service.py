@@ -1,7 +1,6 @@
 import pytest
 from services.customer_service import CustomerService
-from services.user_service import UserService
-from models import Theatres, PaymentMethods, Products, CartItems, MovieShowings, Seats
+from models import Theatres, PaymentMethods, CartItems, MovieShowings, Seats
 from app import db
 
 
