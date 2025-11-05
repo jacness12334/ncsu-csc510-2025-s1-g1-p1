@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from app.routes.staff_routes import bp
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -9,6 +10,7 @@ def create_app(config_name):
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'faedda1dcedc8a54042c86aaa6caf6b8'
+    app.register_blueprint(bp)
 
     user = 'root'
     password = ''
