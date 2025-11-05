@@ -205,7 +205,7 @@ class DeliveryItems(db.Model):
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
     cart_item_id = db.Column(db.BigInteger, db.ForeignKey('cart_items.id'), nullable = False)
     delivery_id = db.Column(db.BigInteger, db.ForeignKey('deliveries.id', ondelete='CASCADE'), nullable = False)
-    __table_args__ = (db.UniqueConstraint('delivery_id', 'cart_item_id', name = 'unique_delivery_item'))
+    __table_args__ = (db.UniqueConstraint('delivery_id', 'cart_item_id', name = 'unique_delivery_item'),)
 
     def __repr__(self):
         return f'<Delivery Items id = {self.id} cart_item_id = {self.cart_item_id} delivery_id = {self.delivery_id}>'
@@ -216,7 +216,7 @@ class CartItems(db.Model):
     customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id'), nullable = False)
     product_id = db.Column(db.BigInteger, db.ForeignKey('products.id', ondelete='CASCADE'), nullable = False)
     quantity = db.Column(INTEGER(unsigned = True), server_default = '1', nullable = False)
-    __tableargs__ = (db.UniqueConstraint('customer_id', 'product_id', name = 'unique_customer_product'), db.CheckConstraint('quantity > 0', name = 'check_cart_quantity'))
+    __table_args__ = (db.UniqueConstraint('customer_id', 'product_id', name = 'unique_customer_product'), db.CheckConstraint('quantity > 0', name = 'check_cart_quantity'))
 
     def __repr__(self):
         return f'<Cart Items id = {self.id} customer_id = {self.customer_id} product id = {self.product_id} quantity = {self.quantity}>'
