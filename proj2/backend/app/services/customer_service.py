@@ -1,35 +1,44 @@
 from models import *
 from app import db
 from services.user_service import UserService
+import decimal
 
-user_service = UserService()
+class CustomerService:
 
-class CustomerService:   
+    def __init__(self):
+        self.user_service = UserService()   
 
     def validate_customer(self, user_id):
-        user = Customers.query.get(user_id)
-        if not user:
+        customer = Customers.query.get(user_id)
+        if not customer:
             raise ValueError(f"Customer {user_id} not found")
-        return user
+        return customer
             
     def create_customer(self, name, email, phone, birthday, password, role, default_theatre_id):
         if role != 'customer':
             raise ValueError("User role is not 'customer'")
         
-        user = user_service.create_user(name=name, email=email, phone=phone, birthday=birthday, password=password, role=role)
+        user = self.user_service.create_user(
+            name=name, 
+            email=email, 
+            phone=phone, 
+            birthday=birthday, 
+            password=password, 
+            role=role
+        )
         
-        try:
-            record_exists = self.get_customer(user_id=user.id)
-            raise ValueError(f"Customer record already exists for user {record_exists.user.id}")
-        except:
-            customer = Customers(user_id=user.id, default_theatre_id=default_theatre_id)
-            db.session.add(customer)
-            db.session.commit()
-            return customer
+        theatre = Theatres.query.get(default_theatre_id)
+        if not theatre:
+            raise ValueError(f"Theatre {default_theatre_id} not found")
+        
+        customer = Customers(user_id=user.id, default_theatre_id=default_theatre_id)
+        db.session.add(customer)
+        db.session.commit()
+        return customer
     
     def delete_customer(self, user_id):
         customer = self.get_customer(user_id=user_id)
-        user_service.delete_user(user_id=customer.user_id)
+        self.user_service.delete_user(user_id=customer.user_id)
 
     def get_customer(self, user_id):
         customer = self.validate_customer(user_id=user_id)
@@ -37,7 +46,7 @@ class CustomerService:
 
     def update_default_theatre(self, user_id, new_theatre_id):
         customer = self.get_customer(user_id=user_id)
-        theatre = Theatres.query.get(theatre_id=new_theatre_id)
+        theatre = Theatres.query.get(new_theatre_id)
         if not theatre:
             raise ValueError(f"Theatre {new_theatre_id} not found")
         
@@ -73,7 +82,7 @@ class CustomerService:
         if not payment_method:
             raise ValueError("Payment method not found")
         
-        payment_method.balance += amount
+        payment_method.balance += decimal.Decimal(amount)
         db.session.commit()
         return payment_method
     
@@ -107,7 +116,7 @@ class CustomerService:
         if quantity <= 0:
             raise ValueError("Quantity to add must be greater than zero")
         
-        customer = self.get_customer(customer_id)
+        customer = self.get_customer(user_id=customer_id)
         product = Products.query.get(product_id)
         if not product:
             raise ValueError(f"Product {product_id} not found")
@@ -115,6 +124,7 @@ class CustomerService:
         existing_item = CartItems.query.filter_by(customer_id=customer_id, product_id=product_id).first()
         if existing_item:
             existing_item.quantity += quantity
+            db.session.commit()
             return existing_item
         
         cart_item = CartItems(customer_id=customer.user_id, product_id=product.id, quantity=quantity)
@@ -142,6 +152,12 @@ class CustomerService:
         db.session.delete(cart_item)
         db.session.commit()
         return
+    
+    def get_cart_items(self, customer_id):
+        cart_items = CartItems.query.filter_by(customer_id=customer_id).all()
+        if not cart_items:
+            return None
+        return cart_items
 
     def charge_payment_method(self, payment_method_id, cart_items):
         payment_method = PaymentMethods.query.get(payment_method_id)
@@ -171,7 +187,7 @@ class CustomerService:
             raise ValueError(f"Customer showing {customer_showing_id} not found")
         self.validate_customer(customer_showing.customer_id)
 
-        payment_method = PaymentMethods.get(payment_method_id)
+        payment_method = PaymentMethods.query.get(payment_method_id)
         if not payment_method:
             raise ValueError(f"Payment method {payment_method_id} not found")
         
@@ -179,11 +195,11 @@ class CustomerService:
         if not staff:
             raise ValueError(f"Staff member {staff_id} not found")
         
-        existing_delivery = Deliveries.query.filter_by(driver_id, customer_showing_id).first()
+        existing_delivery = Deliveries.query.filter_by(driver_id=driver_id, customer_showing_id=customer_showing_id).first()
         if existing_delivery:
             raise ValueError(f"Delivery already exists for driver {driver_id} and customer showing {customer_showing_id}")
         
-        cart_items = CartItems.query.filter(CartItems.customer_id == customer_showing.customer_id).all()
+        cart_items = self.get_cart_items(customer_id=customer_showing.customer_id)
         if not cart_items:
             raise ValueError(f"Cart for {customer_showing.customer_id} is empty")
         
@@ -204,7 +220,7 @@ class CustomerService:
         return delivery
             
     def calculate_total_price(self, cart_items):
-        total_price = 0.00
+        total_price = decimal.Decimal(0.00)
         for item in cart_items:
             if item:
                 product = Products.query.get(item.product_id)

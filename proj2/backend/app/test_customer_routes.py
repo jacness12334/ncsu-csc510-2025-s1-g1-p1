@@ -1,7 +1,7 @@
 import pytest
 import json
 from app import db
-from models import Theatres, Products, Suppliers, MovieShowings, Movies, Auditoriums, Seats
+from models import Theatres, MovieShowings, Movies, Auditoriums, Seats
 
 
 class TestCustomerRoutes:    
@@ -11,28 +11,23 @@ class TestCustomerRoutes:
             theatre = Theatres(name='Test Cinema', address='123 Main St', phone='5551234567', is_open=True)
             db.session.add(theatre)
             db.session.commit()
-            
-            from services.user_service import UserService
-            user_service = UserService()
-            user = user_service.create_user(
-                name='New Customer',
-                email='newcustomer@example.com',
-                phone='5559998888',
-                birthday='1990-01-01',
-                password='password123',
-                role='customer'
-            )
+            theatre_id = theatre.id
         
         response = client.post('/api/customers', json={
-            'user_id': user.id,
-            'default_theatre_id': theatre.id
+            'name': 'New Customer',
+            'email': 'newcustomer@example.com',
+            'phone': '5559998888',
+            'birthday': '1990-01-01',
+            'password': 'password123',
+            'role': 'customer',
+            'default_theatre_id': theatre_id
         })
         
         assert response.status_code == 201
         data = json.loads(response.data)
         assert data['message'] == 'Customer created successfully'
-        assert data['customer']['user_id'] == user.id
-        assert data['customer']['default_theatre_id'] == theatre.id
+        assert 'user_id' in data['customer']
+        assert data['customer']['default_theatre_id'] == theatre_id
     
     def test_create_customer_missing_fields(self, client):
         response = client.post('/api/customers', json={
@@ -44,11 +39,11 @@ class TestCustomerRoutes:
         assert 'error' in data
     
     def test_get_customer_success(self, client, sample_customer):
-        response = client.get(f'/api/customers/{sample_customer.user_id}')
+        response = client.get(f'/api/customers/{sample_customer}')
         
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['user_id'] == sample_customer.user_id
+        assert data['user_id'] == sample_customer
         assert 'default_theatre_id' in data
     
     def test_get_customer_not_found(self, client):
@@ -59,13 +54,13 @@ class TestCustomerRoutes:
         assert 'error' in data
     
     def test_delete_customer_success(self, client, sample_customer):
-        response = client.delete(f'/api/customers/{sample_customer.user_id}')
+        response = client.delete(f'/api/customers/{sample_customer}')
         
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data['message'] == 'Customer deleted successfully'
         
-        response = client.get(f'/api/customers/{sample_customer.user_id}')
+        response = client.get(f'/api/customers/{sample_customer}')
         assert response.status_code == 404
     
     def test_delete_customer_not_found(self, client):
@@ -82,7 +77,7 @@ class TestCustomerRoutes:
             db.session.commit()
             theatre_id = new_theatre.id
         
-        response = client.put(f'/api/customers/{sample_customer.user_id}/theatre', json={
+        response = client.put(f'/api/customers/{sample_customer}/theatre', json={
             'theatre_id': theatre_id
         })
         
@@ -92,7 +87,7 @@ class TestCustomerRoutes:
         assert data['customer']['default_theatre_id'] == theatre_id
     
     def test_update_default_theatre_not_found(self, client, sample_customer):
-        response = client.put(f'/api/customers/{sample_customer.user_id}/theatre', json={
+        response = client.put(f'/api/customers/{sample_customer}/theatre', json={
             'theatre_id': 99999
         })
         
@@ -101,7 +96,7 @@ class TestCustomerRoutes:
         assert 'error' in data
         
     def test_add_payment_method_success(self, client, sample_customer):
-        response = client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        response = client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1234567812345678',
             'expiration_month': 12,
             'expiration_year': 2027,
@@ -116,7 +111,7 @@ class TestCustomerRoutes:
         assert 'payment_method_id' in data
     
     def test_add_payment_method_duplicate(self, client, sample_customer):
-        client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1234567812345678',
             'expiration_month': 12,
             'expiration_year': 2027,
@@ -125,7 +120,7 @@ class TestCustomerRoutes:
             'is_default': True
         })
 
-        response = client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        response = client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1234567812345678',
             'expiration_month': 12,
             'expiration_year': 2027,
@@ -139,7 +134,7 @@ class TestCustomerRoutes:
         assert 'error' in data
     
     def test_get_payment_methods_success(self, client, sample_customer):
-        client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1111222233334444',
             'expiration_month': 6,
             'expiration_year': 2026,
@@ -148,7 +143,7 @@ class TestCustomerRoutes:
             'is_default': True
         })
         
-        client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '5555666677778888',
             'expiration_month': 9,
             'expiration_year': 2028,
@@ -157,7 +152,7 @@ class TestCustomerRoutes:
             'is_default': False
         })
         
-        response = client.get(f'/api/customers/{sample_customer.user_id}/payment-methods')
+        response = client.get(f'/api/customers/{sample_customer}/payment-methods')
         
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -165,14 +160,14 @@ class TestCustomerRoutes:
         assert len(data['payment_methods']) == 2
     
     def test_get_payment_methods_none(self, client, sample_customer):
-        response = client.get(f'/api/customers/{sample_customer.user_id}/payment-methods')
+        response = client.get(f'/api/customers/{sample_customer}/payment-methods')
         
         assert response.status_code == 404
         data = json.loads(response.data)
         assert 'error' in data
     
     def test_delete_payment_method_success(self, client, sample_customer):
-        add_response = client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        add_response = client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1234567812345678',
             'expiration_month': 12,
             'expiration_year': 2027,
@@ -196,7 +191,7 @@ class TestCustomerRoutes:
         assert 'error' in data
     
     def test_add_funds_success(self, client, sample_customer):
-        add_response = client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        add_response = client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1234567812345678',
             'expiration_month': 12,
             'expiration_year': 2027,
@@ -216,7 +211,7 @@ class TestCustomerRoutes:
         assert data['new_balance'] == 150.00
     
     def test_add_funds_invalid_amount(self, client, sample_customer):
-        add_response = client.post(f'/api/customers/{sample_customer.user_id}/payment-methods', json={
+        add_response = client.post(f'/api/customers/{sample_customer}/payment-methods', json={
             'card_number': '1234567812345678',
             'expiration_month': 12,
             'expiration_year': 2027,
@@ -234,53 +229,21 @@ class TestCustomerRoutes:
         data = json.loads(response.data)
         assert 'error' in data
         
-    def test_add_to_cart_success(self, client, app, sample_customer):
-        with app.app_context():
-            from services.user_service import UserService
-            user_service = UserService()
-            supplier_user = user_service.create_user(
-                name='Supplier',
-                email='supplier@example.com',
-                phone='5551112222',
-                birthday='1980-01-01',
-                password='password123',
-                role='supplier'
-            )
-            
-            supplier = Suppliers(
-                user_id=supplier_user.id,
-                company_name='Snacks Inc',
-                company_address='123 Supply St',
-                contact_phone='5553334444'
-            )
-            db.session.add(supplier)
-            db.session.commit()
-            
-            product = Products(
-                supplier_id=supplier.user_id,
-                name='Popcorn',
-                unit_price=5.99,
-                inventory_quantity=100,
-                category='snacks',
-                is_available=True
-            )
-            db.session.add(product)
-            db.session.commit()
-            product_id = product.id
-        
-        response = client.post(f'/api/customers/{sample_customer.user_id}/cart', json={
-            'product_id': product_id,
-            'quantity': 2
-        })
+    def test_add_to_cart_success(self, client, app, sample_customer, sample_product):
+        with app.app_context():                    
+            response = client.post(f'/api/customers/{sample_customer}/cart', json={
+                'product_id': sample_product,
+                'quantity': 2
+            })
         
         assert response.status_code == 201
         data = json.loads(response.data)
         assert data['message'] == 'Item added to cart'
         assert 'cart_item_id' in data
     
-    def test_add_to_cart_invalid_quantity(self, client, sample_customer):
-        response = client.post(f'/api/customers/{sample_customer.user_id}/cart', json={
-            'product_id': 1,
+    def test_add_to_cart_invalid_quantity(self, client, sample_customer, sample_product):
+        response = client.post(f'/api/customers/{sample_customer}/cart', json={
+            'product_id': sample_product,
             'quantity': 0  
         })
         
@@ -288,22 +251,9 @@ class TestCustomerRoutes:
         data = json.loads(response.data)
         assert 'error' in data
     
-    def test_update_cart_item_success(self, client, app, sample_customer):
-        with app.app_context():
-            product = Products(
-                supplier_id=1,
-                name='Soda',
-                unit_price=3.99,
-                inventory_quantity=50,
-                category='beverages',
-                is_available=True
-            )
-            db.session.add(product)
-            db.session.commit()
-            product_id = product.id
-        
-        add_response = client.post(f'/api/customers/{sample_customer.user_id}/cart', json={
-            'product_id': product_id,
+    def test_update_cart_item_success(self, client, sample_customer, sample_product_extra):
+        add_response = client.post(f'/api/customers/{sample_customer}/cart', json={
+            'product_id': sample_product_extra,
             'quantity': 1
         })
         cart_item_id = json.loads(add_response.data)['cart_item_id']
@@ -326,22 +276,9 @@ class TestCustomerRoutes:
         data = json.loads(response.data)
         assert 'error' in data
     
-    def test_delete_cart_item_success(self, client, app, sample_customer):
-        with app.app_context():
-            product = Products(
-                supplier_id=1,
-                name='Candy',
-                unit_price=2.99,
-                inventory_quantity=100,
-                category='candy',
-                is_available=True
-            )
-            db.session.add(product)
-            db.session.commit()
-            product_id = product.id
-        
-        add_response = client.post(f'/api/customers/{sample_customer.user_id}/cart', json={
-            'product_id': product_id,
+    def test_delete_cart_item_success(self, client, sample_customer, sample_product):
+        add_response = client.post(f'/api/customers/{sample_customer}/cart', json={
+            'product_id': sample_product,
             'quantity': 2
         })
         cart_item_id = json.loads(add_response.data)['cart_item_id']
@@ -361,15 +298,16 @@ class TestCustomerRoutes:
         
     def test_create_customer_showing_success(self, client, app, sample_customer):
         with app.app_context():
-            theatre = Theatres(name='Cinema', address='123 St', phone='5551111111', is_open=True)
-            db.session.add(theatre)
-            db.session.commit()
+            from services.customer_service import CustomerService
+            customer_service = CustomerService()
+            customer = customer_service.get_customer(sample_customer)
+            theatre_id = customer.default_theatre_id
             
-            auditorium = Auditoriums(theatre_id=theatre.id, number=1, capacity=100)
+            auditorium = Auditoriums(theatre_id=theatre_id, number=1, capacity=100)
             db.session.add(auditorium)
             db.session.commit()
             
-            seat = Seats(aisle='A', number=10, auditorium_id=auditorium.id)
+            seat = Seats(aisle='A', number=1, auditorium_id=auditorium.id)
             db.session.add(seat)
             db.session.commit()
             
@@ -395,7 +333,7 @@ class TestCustomerRoutes:
             showing_id = showing.id
             seat_id = seat.id
         
-        response = client.post(f'/api/customers/{sample_customer.user_id}/showings', json={
+        response = client.post(f'/api/customers/{sample_customer}/showings', json={
             'movie_showing_id': showing_id,
             'seat_id': seat_id
         })
@@ -406,7 +344,7 @@ class TestCustomerRoutes:
         assert 'customer_showing_id' in data
     
     def test_create_customer_showing_invalid_showing(self, client, sample_customer):
-        response = client.post(f'/api/customers/{sample_customer.user_id}/showings', json={
+        response = client.post(f'/api/customers/{sample_customer}/showings', json={
             'movie_showing_id': 99999,
             'seat_id': 1
         })
@@ -415,12 +353,59 @@ class TestCustomerRoutes:
         data = json.loads(response.data)
         assert 'error' in data
     
-    def test_create_delivery_insufficient_funds(self, client, app, sample_customer):       
+    def test_create_delivery_insufficient_funds(self, client, app, sample_customer_showing, sample_driver, sample_product):    
+        with app.app_context():
+            from services.customer_service import CustomerService
+            from services.user_service import UserService
+            from models import Staff, CartItems, CustomerShowings
+            customer_service = CustomerService()
+            user_service = UserService()
+
+            showing = CustomerShowings.query.get(sample_customer_showing)
+            customer = customer_service.get_customer(showing.customer_id)
+
+            payment_method = customer_service.add_payment_method(
+                user_id=customer.user_id,
+                card_number='4111111111111111',
+                expiration_month=12,
+                expiration_year=2027,
+                billing_address='123 Payment St',
+                balance=2.00,
+                is_default=True
+            )   
+            staff_user = user_service.create_user(
+                name='Test Staff',
+                email='staff@example.com',
+                phone='5554445555',
+                birthday='1987-03-12',
+                password='password123',
+                role='staff'
+            )
+
+            staff = Staff(
+                user_id=staff_user.id,
+                theatre_id=customer.default_theatre_id,
+                role='runner',          
+                is_available=True
+            )
+            db.session.add(staff)
+            db.session.commit()
+
+            cart_item = CartItems(
+                customer_id=customer.user_id,
+                product_id=sample_product,
+                quantity=1
+            )
+            db.session.add(cart_item)
+            db.session.commit()
+
+            payment_method_id = payment_method.id
+            staff_id = staff.user_id
         response = client.post('/api/deliveries', json={
-            'driver_id': 1,
-            'customer_showing_id': 1,
-            'payment_method_id': 1,
-            'staff_id': 1
+            'driver_id': sample_driver,
+            'customer_showing_id': sample_customer_showing,
+            'payment_method_id': payment_method_id,
+            'staff_id': staff_id
         })
         
         assert response.status_code in [400, 402, 500]
@@ -446,25 +431,20 @@ class TestCustomerRoutes:
             theatre = Theatres(name='Cinema', address='123 St', phone='5551111111', is_open=True)
             db.session.add(theatre)
             db.session.commit()
-            
-            from services.user_service import UserService
-            user_service = UserService()
-            user = user_service.create_user(
-                name='Flow Customer',
-                email='flow@example.com',
-                phone='5554445555',
-                birthday='1990-01-01',
-                password='password123',
-                role='customer'
-            )
-            user_id = user.id
             theatre_id = theatre.id
-        
+            
         response = client.post('/api/customers', json={
-            'user_id': user_id,
+            'name': 'Flow Customer',
+            'email': 'flow@example.com',
+            'phone': '5554445555',
+            'birthday': '1990-01-01',
+            'password': 'password123',
+            'role': 'customer',
             'default_theatre_id': theatre_id
         })
         assert response.status_code == 201
+
+        user_id = json.loads(response.data)['customer']['user_id']
         
         response = client.post(f'/api/customers/{user_id}/payment-methods', json={
             'card_number': '1234567812345678',

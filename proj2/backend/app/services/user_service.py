@@ -41,8 +41,8 @@ class UserService:
         if existing_phone:
             raise ValueError("Phone already in use")
         
-        if role not in ['customer', 'driver', 'staff']:
-            raise ValueError("Role must be customer, driver, or staff")
+        if role not in ['customer', 'driver', 'staff', 'supplier']:
+            raise ValueError("Role must be customer, driver, staff, or supplier")
         
         password_hash=self.generate_password_hash(password)
         user = Users(

@@ -8,10 +8,15 @@ customer_service = CustomerService()
 def create_customer():
     try:
         data = request.get_json()
-        user_id = data.get('user_id')
-        default_theatre_id = data.get('default_theatre_id')
-
-        customer = customer_service.create_customer(user_id=user_id, default_theatre_id=default_theatre_id)
+        customer = customer_service.create_customer(
+            name=data.get('name'), 
+            email=data.get('email'),
+            phone=data.get('phone'),
+            birthday=data.get('birthday'),
+            password=data.get('password'),
+            role=data.get('role', 'customer'),
+            default_theatre_id=data.get('default_theatre_id')
+        )
         return jsonify({
             'message': 'Customer created successfully',
             'customer': {
@@ -143,7 +148,7 @@ def add_to_cart(customer_id):
         )
         return jsonify({
             'message': 'Item added to cart',
-            'cart_item_id': cart_item.cart_item_id
+            'cart_item_id': cart_item.id
         }), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
@@ -159,7 +164,7 @@ def update_cart_item(cart_item_id):
         cart_item = customer_service.update_cart_item(cart_item_id, quantity)
         return jsonify({
             'message': 'Cart item updated',
-            'cart_item_id': cart_item.cart_item_id,
+            'cart_item_id': cart_item.id,
             'new_quantity': cart_item.quantity
         }), 200
     except ValueError as e:

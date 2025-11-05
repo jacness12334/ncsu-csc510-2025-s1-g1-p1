@@ -9,11 +9,19 @@ def drop_table(database, table):
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
     cursor.execute(f'DROP TABLE IF EXISTS {table}')
     cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+    database.commit()
     cursor.close()
 
 def drop_all_tables(database):
+    cursor = database.cursor()
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+    cursor.execute("SHOW TABLES")
+    tables = cursor.fetchall()
     for table in tables:
-        drop_table(database, table)
+        cursor.execute(f'DROP TABLE IF EXISTS {table[0]}')
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+    database.commit()
+    cursor.close()
     
 def get_database(db_name):
     my_host = 'localhost'
@@ -27,6 +35,7 @@ def get_database(db_name):
     )
     temp_cursor = root.cursor()
     temp_cursor.execute(f'CREATE DATABASE IF NOT EXISTS {db_name}')
+    root.commit()
     temp_cursor.close()
     root.close()
     connection = mysql.connector.connect(
@@ -259,6 +268,7 @@ def create_tables(db):
     cursor_object.execute(cart_items)
     cursor_object.execute(delivery_items)
 
+    db.commit()
     cursor_object.close()
     db.close()
 

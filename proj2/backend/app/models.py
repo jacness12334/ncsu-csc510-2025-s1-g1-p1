@@ -110,7 +110,7 @@ class Customers(db.Model):
 class CustomerShowings(db.Model):
     __tablename__ = 'customer_showings'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id', ondelete='CASCADE'), nullable = False)
+    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.user_id', ondelete='CASCADE'), nullable = False)
     movie_showing_id = db.Column(db.BigInteger, db.ForeignKey('movie_showings.id', ondelete='CASCADE'), nullable = False)
     seat_id = db.Column(db.BigInteger, db.ForeignKey('seats.id'), nullable = False)
     date_added = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp())
@@ -124,7 +124,7 @@ class CustomerShowings(db.Model):
 class PaymentMethods(db.Model):
     __tablename__ = 'payment_methods'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id', ondelete='CASCADE'), nullable = False)
+    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.user_id', ondelete='CASCADE'), nullable = False)
     card_number = db.Column(db.String(16), nullable = False)
     expiration_month = db.Column(TINYINT(unsigned = True), nullable = False)
     expiration_year = db.Column(SMALLINT(unsigned = True), nullable = False)
@@ -171,7 +171,7 @@ class Suppliers(db.Model):
 class Products(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    supplier_id = db.Column(db.BigInteger, db.ForeignKey('suppliers.id', ondelete='CASCADE'), nullable = False)
+    supplier_id = db.Column(db.BigInteger, db.ForeignKey('suppliers.user_id', ondelete='CASCADE'), nullable = False)
     name = db.Column(db.String(128), nullable = False)
     unit_price = db.Column(DECIMAL(10,2), nullable = False)
     inventory_quantity = db.Column(INTEGER(unsigned = True), server_default = '0', nullable = False)
@@ -190,10 +190,10 @@ class Products(db.Model):
 class Deliveries(db.Model):
     __tablename__ = 'deliveries'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    driver_id = db.Column(db.BigInteger, db.ForeignKey('drivers.id'), nullable = False)
+    driver_id = db.Column(db.BigInteger, db.ForeignKey('drivers.user_id'), nullable = False)
     customer_showing_id = db.Column(db.BigInteger, db.ForeignKey('customer_showings.id', ondelete='CASCADE'), nullable = False)
     payment_method_id = db.Column(db.BigInteger, db.ForeignKey('payment_methods.id'), nullable = False)
-    staff_id = db.Column(db.BigInteger, db.ForeignKey('staff.id'), nullable = False)
+    staff_id = db.Column(db.BigInteger, db.ForeignKey('staff.user_id'), nullable = False)
     payment_status = db.Column(db.Enum('pending', 'completed', 'failed'), server_default = 'pending', nullable = False)
     total_price = db.Column(DECIMAL(12,2), nullable = False)
     delivery_time = db.Column(db.DateTime, server_default = 'CURRENT_TIMESTAMP', server_onupdate = 'CURRENT_TIMESTAMP', nullable = False)
@@ -218,7 +218,7 @@ class DeliveryItems(db.Model):
 class CartItems(db.Model):
     __tablename__ = 'cart_items'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id'), nullable = False)
+    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.user_id'), nullable = False)
     product_id = db.Column(db.BigInteger, db.ForeignKey('products.id', ondelete='CASCADE'), nullable = False)
     quantity = db.Column(INTEGER(unsigned = True), server_default = '1', nullable = False)
     __table_args__ = (db.UniqueConstraint('customer_id', 'product_id', name = 'unique_customer_product'), db.CheckConstraint('quantity > 0', name = 'check_cart_quantity'))
