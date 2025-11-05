@@ -11,18 +11,23 @@ export default function Navbar() {
 
         <div className="flex items-center gap-5 text-sm">
           <Link href="/">Home</Link>
+          <Link href="/customerprofile">Profile</Link>
           <Link href="/order">Order</Link>
           <Link href="/track/12345">Track Order</Link>
-          <Link href="/userdetails">User Details</Link>
           <CartButton />
 
-          {/* Placeholder auth buttons */}
-          <button className="rounded-xl border border-gray-300 px-4 py-1.5 text-sm hover:bg-gray-100 transition" disabled>
+          <Link
+            href="/login"
+            className="rounded-xl border border-gray-300 px-4 py-1.5 text-sm hover:bg-gray-100 transition"
+          >
             Log In
-          </button>
-          <button className="rounded-xl bg-black px-4 py-1.5 text-sm text-white opacity-80" disabled>
+          </Link>
+          <Link
+            href="/signup"
+            className="rounded-xl bg-black px-4 py-1.5 text-sm text-white opacity-80"
+          >
             Sign Up
-          </button>
+          </Link>
         </div>
       </nav>
     </header>
