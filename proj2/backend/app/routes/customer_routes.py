@@ -1,10 +1,14 @@
 from flask import Blueprint, request, jsonify
 from ..services.customer_service import CustomerService
+from app import db, get_app
 
-customer_bp = Blueprint('customer', __name__, url_prefix='/api/customers')
+customer_bp = Blueprint('customer', __name__, url_prefix='/api')
 customer_service = CustomerService()
 
-@customer_bp.route('/', methods=['POST'])
+config_name = 'development'
+app = get_app(config_name=config_name)
+
+@customer_bp.route('/customers', methods=['POST'])
 def create_customer():
     try:
         data = request.get_json()
@@ -24,7 +28,7 @@ def create_customer():
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
     
-@customer_bp.route('/<int:user_id>', method=['GET'])
+@customer_bp.route('/customers/<int:user_id>', methods=['GET'])
 def get_customer(user_id):
     try:
         customer = customer_service.get_customer(user_id=user_id)
@@ -37,7 +41,7 @@ def get_customer(user_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
     
-@customer_bp.route('/<int:user_id>', methods=['DELETE'])
+@customer_bp.route('/customers/<int:user_id>', methods=['DELETE'])
 def delete_customer(user_id):
     try:
         customer_service.delete_customer(user_id)
@@ -47,7 +51,7 @@ def delete_customer(user_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
     
-@customer_bp.route('/<int:user_id>/theatre', methods=['PUT'])
+@customer_bp.route('/customers/<int:user_id>/theatre', methods=['PUT'])
 def update_default_theatre(user_id):
     try:
         data = request.get_json()
@@ -65,7 +69,7 @@ def update_default_theatre(user_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
     
-@customer_bp.route('/<int:user_id>/payment-methods', methods=['POST'])
+@customer_bp.route('/customers/<int:user_id>/payment-methods', methods=['POST'])
 def add_payment_method(user_id):
     try:
         data = request.get_json()
@@ -87,7 +91,7 @@ def add_payment_method(user_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
     
-@customer_bp.route('/<int:customer_id>/payment_methods', methods=['GET'])
+@customer_bp.route('/customers/<int:customer_id>/payment-methods', methods=['GET'])
 def get_payment_methods(customer_id):
     try:
         payment_methods = customer_service.get_customer_payment_methods(customer_id=customer_id)
@@ -132,7 +136,7 @@ def add_funds(payment_method_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
 
-@customer_bp.route('/<int:customer_id>/cart', methods=['POST'])
+@customer_bp.route('/customers/<int:customer_id>/cart', methods=['POST'])
 def add_to_cart(customer_id):
     try:
         data = request.get_json()
@@ -177,7 +181,7 @@ def delete_cart_item(cart_item_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
     
-@customer_bp.route('/<int:user_id>/showings', methods=['POST'])
+@customer_bp.route('/customers/<int:user_id>/showings', methods=['POST'])
 def create_customer_showing(user_id):
     try:
         data = request.get_json()
