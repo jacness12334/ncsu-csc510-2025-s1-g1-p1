@@ -12,18 +12,17 @@ class CustomerService:
             raise ValueError(f"Customer {user_id} not found")
         return user
             
-    def create_customer(self, user_id, default_theatre_id):
-        user = user_service.get_user(user_id=user_id)
-        if not user:
-            raise ValueError(f"User {user_id} not found")
-        if user.role != 'customer':
+    def create_customer(self, name, email, phone, birthday, password, role, default_theatre_id):
+        if role != 'customer':
             raise ValueError("User role is not 'customer'")
         
+        user = user_service.create_user(name=name, email=email, phone=phone, birthday=birthday, password=password, role=role)
+        
         try:
-            record_exists = self.get_customer(user_id=user_id)
-            raise ValueError(f"Customer record already exists for user {record_exists.user_id}")
+            record_exists = self.get_customer(user_id=user.id)
+            raise ValueError(f"Customer record already exists for user {record_exists.user.id}")
         except:
-            customer = Customers(user_id=user_id, default_theatre_id=default_theatre_id)
+            customer = Customers(user_id=user.id, default_theatre_id=default_theatre_id)
             db.session.add(customer)
             db.session.commit()
             return customer
