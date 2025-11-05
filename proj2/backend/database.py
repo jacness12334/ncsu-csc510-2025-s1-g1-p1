@@ -53,7 +53,7 @@ def create_tables(db):
                     theatre_id BIGINT NOT NULL,
                     number INT UNSIGNED NOT NULL,
                     capacity INT UNSIGNED NOT NULL,
-                    FOREIGN KEY (theatre_id) REFERENCES theatres(id),
+                    FOREIGN KEY (theatre_id) REFERENCES theatres(id) ON DELETE CASCADE,
                     CONSTRAINT unique_theatre_number UNIQUE(theatre_id, number),
                     CONSTRAINT check_auditorium_number CHECK (number > 0),
                     CONSTRAINT check_auditorium_capacity CHECK (capacity > 0)
@@ -64,7 +64,7 @@ def create_tables(db):
             aisle CHAR(1) NOT NULL,
             number INT UNSIGNED NOT NULL,
             auditorium_id BIGINT NOT NULL,
-            FOREIGN KEY (auditorium_id) REFERENCES auditoriums(id),
+            FOREIGN KEY (auditorium_id) REFERENCES auditoriums(id) ON DELETE CASCADE,
             CONSTRAINT unique_auditorium_seat UNIQUE (auditorium_id, aisle, number),
             CONSTRAINT check_seat_number CHECK (number > 0)
             )"""
@@ -89,7 +89,7 @@ def create_tables(db):
             is_available BOOLEAN NOT NULL DEFAULT FALSE,
             date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (theatre_id) REFERENCES theatres(id)
             )"""
 
@@ -112,7 +112,7 @@ def create_tables(db):
                     in_progress BOOLEAN DEFAULT FALSE,
                     date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (movie_id) REFERENCES movies(id),
+                    FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
                     FOREIGN KEY (auditorium_id) REFERENCES auditoriums(id),
                     CONSTRAINT unique_auditorium_showing UNIQUE(auditorium_id, start_time)
                     )"""
@@ -122,7 +122,7 @@ def create_tables(db):
                 default_theatre_id BIGINT NOT NULL,
                 date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (default_theatre_id) REFERENCES theatres(id)
                 )"""
 
@@ -133,8 +133,8 @@ def create_tables(db):
                         seat_id BIGINT NOT NULL,
                         date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (customer_id) REFERENCES customers(user_id),
-                        FOREIGN KEY (movie_showing_id) REFERENCES movie_showings(id),
+                        FOREIGN KEY (customer_id) REFERENCES customers(user_id) ON DELETE CASCADE,
+                        FOREIGN KEY (movie_showing_id) REFERENCES movie_showings(id) ON DELETE CASCADE,
                         FOREIGN KEY (seat_id) REFERENCES seats(id),
                         CONSTRAINT unique_movie_seat UNIQUE(movie_showing_id, seat_id)
                         )"""
@@ -150,7 +150,7 @@ def create_tables(db):
                         is_default BOOLEAN NOT NULL DEFAULT FALSE,
                         date_added TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (customer_id) REFERENCES customers(user_id),
+                        FOREIGN KEY (customer_id) REFERENCES customers(user_id) ON DELETE CASCADE,
                         CONSTRAINT check_expiration_month CHECK (expiration_month BETWEEN 1 AND 12),
                         CONSTRAINT check_expiration_year CHECK (expiration_year >= 2025),
                         CONSTRAINT check_balance CHECK (balance >= 0)
@@ -166,7 +166,7 @@ def create_tables(db):
                 total_deliveries INT NOT NULL DEFAULT 0,
                 date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 CONSTRAINT check_driver_rating CHECK (rating >= 0.00 AND rating <= 5.00)
                 )"""
 
@@ -178,7 +178,7 @@ def create_tables(db):
                 is_open BOOLEAN NOT NULL DEFAULT FALSE,
                 date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id)
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                 )"""
 
     products = """CREATE TABLE IF NOT EXISTS products (
@@ -190,13 +190,15 @@ def create_tables(db):
                 size ENUM('small', 'medium', 'large') DEFAULT NULL,
                 keywords VARCHAR(256),
                 category ENUM('beverages', 'snacks', 'candy', 'food') NOT NULL,
+                discount DECIMAL(10,2) UNSIGNED DEFAULT 0.00 NOT NULL,
                 is_available BOOLEAN NOT NULL DEFAULT FALSE,
                 date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (supplier_id) REFERENCES suppliers(user_id),
+                FOREIGN KEY (supplier_id) REFERENCES suppliers(user_id) ON DELETE CASCADE,
                 CONSTRAINT check_product_price CHECK (unit_price >= 0.00),
                 CONSTRAINT check_product_inventory CHECK (inventory_quantity >= 0),
-                CONSTRAINT unique_supplier_product UNIQUE(supplier_id, name)
+                CONSTRAINT unique_supplier_product UNIQUE(supplier_id, name),
+                CONSTRAINT check_discount_value CHECK (discount >= 0.00)
                 )"""
 
     deliveries = """CREATE TABLE IF NOT EXISTS deliveries (
@@ -205,7 +207,7 @@ def create_tables(db):
             customer_showing_id BIGINT NOT NULL,
             payment_method_id BIGINT NOT NULL,
             staff_id BIGINT NOT NULL,
-            payment_status ENUM('pending', 'completed', 'failed') NOT NULL,
+            payment_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending' NOT NULL,
             total_price DECIMAL(12,2) NOT NULL,
             delivery_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             delivery_status ENUM('pending', 'accepted', 'in_progress', 'ready_for_pickup', 'in_transit', 
@@ -213,7 +215,7 @@ def create_tables(db):
             date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (driver_id) REFERENCES drivers(user_id),
-            FOREIGN KEY (customer_showing_id) REFERENCES customer_showings(id),
+            FOREIGN KEY (customer_showing_id) REFERENCES customer_showings(id) ON DELETE CASCADE,
             FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id),
             FOREIGN KEY (staff_id) REFERENCES staff(user_id),
             CONSTRAINT check_total_price CHECK (total_price >= 0.00)
@@ -221,15 +223,23 @@ def create_tables(db):
 
     delivery_items = """CREATE TABLE IF NOT EXISTS delivery_items (
                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                    product_id BIGINT NOT NULL,
+                    cart_item_id BIGINT NOT NULL,
                     delivery_id BIGINT NOT NULL,
-                    quantity INT UNSIGNED NOT NULL DEFAULT 1,
                     discount DECIMAL(10,2) DEFAULT 0.00 NOT NULL,
-                    FOREIGN KEY (product_id) REFERENCES products(id),
+                    FOREIGN KEY (cart_item_id) REFERENCES cart_items(id),
                     FOREIGN KEY (delivery_id) REFERENCES deliveries(id) ON DELETE CASCADE,
-                    CONSTRAINT unique_delivery_product UNIQUE (delivery_id, product_id),
-                    CONSTRAINT check_item_quantity CHECK (quantity > 0),
-                    CONSTRAINT check_discount_value CHECK (discount >= 0.00)
+                    CONSTRAINT unique_delivery_item UNIQUE (delivery_id, cart_item_id),
+                    )"""
+    
+    cart_items = """CREATE TABLE IF NOT EXISTS cart_items (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    customer_id BIGINT NOT NULL,
+                    product_id BIGINT NOT NULL,
+                    quantity INT UNSIGNED NOT NULL DEFAULT 1,
+                    FOREIGN KEY (customer_id) REFERENCES customers(id),
+                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+                    CONSTRAINT unique_customer_product UNIQUE (customer_id, product_id),
+                    CONSTRAINT check_cart_quantity CHECK (quantity > 0)
                     )"""
 
     cursor_object.execute(theatres)
@@ -247,6 +257,7 @@ def create_tables(db):
     cursor_object.execute(products)
     cursor_object.execute(deliveries)
     cursor_object.execute(delivery_items)
+    cursor_object.execute(cart_items)
 
     cursor_object.close()
     db.close()

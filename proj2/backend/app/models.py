@@ -17,7 +17,7 @@ class Theatres(db.Model):
 class Auditoriums(db.Model):
     __tablename__ = 'auditoriums'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    theatre_id = db.Column(db.BigInteger, db.ForeignKey('theatres.id'), nullable = False)
+    theatre_id = db.Column(db.BigInteger, db.ForeignKey('theatres.id', ondelete='CASCADE'), nullable = False)
     number = db.Column(INTEGER(unsigned = True), nullable = False)
     capacity = db.Column(INTEGER(unsigned = True), nullable = False)
     __table_args__ = (db.UniqueConstraint('theatre_id', 'number', name = 'unique_theatre_number'), db.CheckConstraint('number > 0', name = 'check_auditorium_number'), db.CheckConstraint('capacity > 0', name = 'check_auditorium_capacity'))
@@ -30,7 +30,7 @@ class Seats(db.Model):
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
     aisle = db.Column(db.String(1), nullable = False)
     number = db.Column(INTEGER(unsigned = True), nullable = False)
-    auditorium_id = db.Column(db.BigInteger, db.ForeignKey('auditoriums.id'), nullable = False)
+    auditorium_id = db.Column(db.BigInteger, db.ForeignKey('auditoriums.id', ondelete='CASCADE'), nullable = False)
     __table_args__ = (db.UniqueConstraint('auditorium_id', 'aisle', 'number', name = 'unique_auditorium_seat'), db.CheckConstraint('number > 0', name = 'check_seat_number'))
 
     def __repr__(self):
@@ -54,7 +54,7 @@ class Users(db.Model):
 
 class Staff(db.Model):
     __tablename__ = 'staff'
-    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), primary_key = True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id', ondelete='CASCADE'), primary_key = True)
     theatre_id = db.Column(db.BigInteger, db.ForeignKey('theatres.id'), nullable = False)
     role = db.Column(db.Enum('admin', 'runner', name = 'staff_role'), nullable = False)
     is_available = db.Column(db.Boolean, nullable = False, server_default = expression.false())
@@ -81,7 +81,7 @@ class Movies(db.Model):
 class MovieShowings(db.Model):
     __tablename__ = 'movie_showings'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    movie_id = db.Column(db.BigInteger, db.ForeignKey('movies.id'),  nullable = False)
+    movie_id = db.Column(db.BigInteger, db.ForeignKey('movies.id', ondelete='CASCADE'),  nullable = False)
     auditorium_id = db.Column(db.BigInteger, db.ForeignKey('auditoriums.id'), nullable = False)
     start_time = db.Column(db.DateTime, nullable = False)
     in_progress = db.Column(db.Boolean, server_default = expression.false())
@@ -94,7 +94,7 @@ class MovieShowings(db.Model):
 
 class Customers(db.Model):
     __tablename__ = 'customers'
-    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), primary_key = True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id', ondelete='CASCADE'), primary_key = True)
     default_theatre_id = db.Column(db.BigInteger, db.ForeignKey('theatres.id'), nullable = False)
     date_added = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp())
     last_updated = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp(), server_onupdate = func.current_timestamp())
@@ -105,8 +105,8 @@ class Customers(db.Model):
 class CustomerShowings(db.Model):
     __tablename__ = 'customer_showings'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id'), nullable = False)
-    movie_showing_id = db.Column(db.BigInteger, db.ForeignKey('movie_showings.id'), nullable = False)
+    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id', ondelete='CASCADE'), nullable = False)
+    movie_showing_id = db.Column(db.BigInteger, db.ForeignKey('movie_showings.id', ondelete='CASCADE'), nullable = False)
     seat_id = db.Column(db.BigInteger, db.ForeignKey('seats.id'), nullable = False)
     date_added = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp())
     last_updated = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp(), server_onupdate = func.current_timestamp())
@@ -119,12 +119,12 @@ class CustomerShowings(db.Model):
 class PaymentMethods(db.Model):
     __tablename__ = 'payment_methods'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id'), nullable = False)
+    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id', ondelete='CASCADE'), nullable = False)
     card_number = db.Column(db.String(16), nullable = False)
     expiration_month = db.Column(TINYINT(unsigned = True), nullable = False)
     expiration_year = db.Column(SMALLINT(unsigned = True), nullable = False)
     billing_address = db.Column(db.String(256), nullable = False)
-    balance = db.Column(DECIMAL(10,2), server_default = u'100.00', nullable = False)
+    balance = db.Column(DECIMAL(10,2), server_default = u'0.00', nullable = False)
     is_default = db.Column(db.Boolean, server_default = expression.false(), nullable = False)
     date_added = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp())
     last_updated = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp(), server_onupdate = func.current_timestamp())
@@ -136,7 +136,7 @@ class PaymentMethods(db.Model):
 
 class Drivers(db.Model):
     __tablename__ = 'drivers'
-    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), primary_key = True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id', ondelete='CASCADE'), primary_key = True)
     license_plate = db.Column(db.String(16), nullable = False)
     vehicle_type = db.Column(db.Enum('car', 'bike', 'scooter', 'other'), nullable = False)
     vehicle_color = db.Column(db.String(16), nullable = False)
@@ -152,7 +152,7 @@ class Drivers(db.Model):
 
 class Suppliers(db.Model):
     __tablename__ = 'suppliers'
-    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), primary_key = True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id', ondelete='CASCADE'), primary_key = True)
     company_name = db.Column(db.String(64), nullable = False)
     company_address = db.Column(db.String(256), nullable = False)
     contact_phone = db.Column(db.String(32), nullable = False)
@@ -166,17 +166,18 @@ class Suppliers(db.Model):
 class Products(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    supplier_id = db.Column(db.BigInteger, db.ForeignKey('suppliers.id'), nullable = False)
+    supplier_id = db.Column(db.BigInteger, db.ForeignKey('suppliers.id', ondelete='CASCADE'), nullable = False)
     name = db.Column(db.String(128), nullable = False)
     unit_price = db.Column(DECIMAL(10,2), nullable = False)
     inventory_quantity = db.Column(INTEGER(unsigned = True), server_default = '0', nullable = False)
-    size = db.Column(db.Enum('small', 'medium', 'large'), server_default = None)
+    size = db.Column(db.Enum(None, 'small', 'medium', 'large'), server_default = None)
     keywords = db.Column(db.String(256))
     category = db.Column(db.Enum('beverages', 'snacks', 'candy', 'food'), nullable = False)
-    is_available = db.Column(db.Boolean, server_default = expression.false(), nullable = False)
+    discount = db.Column(DECIMAL(10,2), server_default = u'0.00', nullable = False)
+    is_available = db.Column(db.Boolean, server_default = expression.true(), nullable = False)
     date_added = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp())
     last_updated = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp(), server_onupdate = func.current_timestamp())
-    __table_args__ = (db.CheckConstraint('unit_price >= 0.00', name = 'check_product_price'), db.CheckConstraint('inventory_quantity >= 0', name = 'check_product_inventory'), db.UniqueConstraint('supplier_id', 'name', name = 'unique_supplier_product'))
+    __table_args__ = (db.CheckConstraint('unit_price >= 0.00', name = 'check_product_price'), db.CheckConstraint('inventory_quantity >= 0', name = 'check_product_inventory'), db.UniqueConstraint('supplier_id', 'name', name = 'unique_supplier_product'), db.CheckConstraint('discount >= 0.00', name = 'check_discount_value'))
 
     def __repr__(self):
         return f'<Products id = {self.id} name = {self.name!r} category = {self.category} supplier_id = {self.supplier_id} unit_price = {self.unit_price} size = {self.size} inventory_quantity = {self.inventory_quantity} is_available = {self.is_available}>'
@@ -185,10 +186,10 @@ class Deliveries(db.Model):
     __tablename__ = 'deliveries'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
     driver_id = db.Column(db.BigInteger, db.ForeignKey('drivers.id'), nullable = False)
-    customer_showing_id = db.Column(db.BigInteger, db.ForeignKey('customer_showings.id'), nullable = False)
+    customer_showing_id = db.Column(db.BigInteger, db.ForeignKey('customer_showings.id', ondelete='CASCADE'), nullable = False)
     payment_method_id = db.Column(db.BigInteger, db.ForeignKey('payment_methods.id'), nullable = False)
     staff_id = db.Column(db.BigInteger, db.ForeignKey('staff.id'), nullable = False)
-    payment_status = db.Column(db.Enum('pending', 'completed', 'failed'), nullable = False)
+    payment_status = db.Column(db.Enum('pending', 'completed', 'failed'), server_default = 'pending', nullable = False)
     total_price = db.Column(DECIMAL(12,2), nullable = False)
     delivery_time = db.Column(db.DateTime, server_default = 'CURRENT_TIMESTAMP', server_onupdate = 'CURRENT_TIMESTAMP', nullable = False)
     delivery_status = db.Column(db.Enum('pending', 'accepted', 'in_progress', 'ready_for_pickup', 'in_transit', 'delivered', 'fulfilled', 'cancelled'), server_default = 'pending', nullable = False)
@@ -202,11 +203,20 @@ class Deliveries(db.Model):
 class DeliveryItems(db.Model):
     __tablename__ = 'delivery_items'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    product_id = db.Column(db.BigInteger, db.ForeignKey('products.id'), nullable = False)
-    delivery_id = db.Column(db.BigInteger, db.ForeignKey('deliveries.id'), nullable = False)
-    quantity = db.Column(INTEGER(unsigned = True), server_default = '1', nullable = False)
-    discount = db.Column(DECIMAL(10,2), server_default = u'0.00', nullable = False)
-    __table_args__ = (db.UniqueConstraint('delivery_id', 'product_id', name = 'unique_delivery_product'), db.CheckConstraint('quantity > 0', name = 'check_item_quantity'), db.CheckConstraint('discount >= 0.00', name = 'check_discount_value'))
+    cart_item_id = db.Column(db.BigInteger, db.ForeignKey('cart_items.id'), nullable = False)
+    delivery_id = db.Column(db.BigInteger, db.ForeignKey('deliveries.id', ondelete='CASCADE'), nullable = False)
+    __table_args__ = (db.UniqueConstraint('delivery_id', 'cart_item_id', name = 'unique_delivery_item'))
 
     def __repr__(self):
-        return f'<Delivery Items id = {self.id} product_id = {self.product_id} delivery_id = {self.delivery_id} quantity = {self.quantity} discount = {self.discount}>'
+        return f'<Delivery Items id = {self.id} cart_item_id = {self.cart_item_id} delivery_id = {self.delivery_id}>'
+
+class CartItems(db.Model):
+    __tablename__ = 'cart_items'
+    id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
+    customer_id = db.Column(db.BigInteger, db.ForeignKey('customers.id'), nullable = False)
+    product_id = db.Column(db.BigInteger, db.ForeignKey('products.id', ondelete='CASCADE'), nullable = False)
+    quantity = db.Column(INTEGER(unsigned = True), server_default = '1', nullable = False)
+    __tableargs__ = (db.UniqueConstraint('customer_id', 'product_id', name = 'unique_customer_product'), db.CheckConstraint('quantity > 0', name = 'check_cart_quantity'))
+
+    def __repr__(self):
+        return f'<Cart Items id = {self.id} customer_id = {self.customer_id} product id = {self.product_id} quantity = {self.quantity}>'
