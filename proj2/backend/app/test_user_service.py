@@ -41,7 +41,7 @@ class TestUserService:
         with app.app_context():
             user_service = UserService()
             
-            with pytest.raises(ValueError, match="Email or phone already exists"):
+            with pytest.raises(ValueError, match="Email already in use"):
                 user_service.create_user(
                     name='Another User',
                     email='test@example.com',  
@@ -55,7 +55,7 @@ class TestUserService:
         with app.app_context():
             user_service = UserService()
             
-            with pytest.raises(ValueError, match="Email or phone already exists"):
+            with pytest.raises(ValueError, match="Phone already in use"):
                 user_service.create_user(
                     name='Another User',
                     email='different@example.com',
@@ -101,10 +101,10 @@ class TestUserService:
     def test_get_user_success(self, app, sample_user):
         with app.app_context():
             user_service = UserService()
-            user = user_service.get_user(sample_user.id)
+            user = user_service.get_user(sample_user)
             
             assert user is not None
-            assert user.id == sample_user.id
+            assert user.id == sample_user
             assert user.email == 'test@example.com'
             assert user.name == 'Test User'
     
@@ -119,7 +119,7 @@ class TestUserService:
         with app.app_context():
             user_service = UserService()
             updated_user = user_service.update_user_profile(
-                user_id=sample_user.id,
+                user_id=sample_user,
                 name='Updated Name',
                 email='newemail@example.com',
                 phone='9998887777',
@@ -137,7 +137,7 @@ class TestUserService:
             
             with pytest.raises(ValueError, match="Fields cannot be empty"):
                 user_service.update_user_profile(
-                    user_id=sample_user.id,
+                    user_id=sample_user,
                     name='',  
                     email='test@example.com',
                     phone='1234567890',
@@ -193,7 +193,7 @@ class TestUserService:
             user_service = UserService()
             
             user_service.change_password(
-                user_id=sample_user.id,
+                user_id=sample_user,
                 current_password='password123',
                 new_password='newpassword456'
             )
@@ -210,7 +210,7 @@ class TestUserService:
             
             with pytest.raises(ValueError, match="Invalid credentials"):
                 user_service.change_password(
-                    user_id=sample_user.id,
+                    user_id=sample_user,
                     current_password='wrongpassword',
                     new_password='newpassword'
                 )
@@ -229,7 +229,7 @@ class TestUserService:
     def test_delete_user_success(self, app, sample_user):
         with app.app_context():
             user_service = UserService()
-            user_id = sample_user.id
+            user_id = sample_user
             
             result = user_service.delete_user(user_id)
             assert result is True

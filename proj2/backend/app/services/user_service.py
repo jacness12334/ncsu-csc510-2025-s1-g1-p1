@@ -16,9 +16,7 @@ class UserService:
         try:
             self.ph.verify(password_hash, password)
             return True
-        except VerifyMismatchError:
-            return False
-        except Exception:
+        except:
             return False
         
     def validate_credentials(self, email, password):
@@ -33,24 +31,30 @@ class UserService:
         return user
 
     def create_user(self, name, email, phone, birthday, password, role):
-        if not name or not email or not phone or not birthday or not password or not role:
+        if not all([name, email, phone, birthday, password, role]):
             raise ValueError("Fields cannot be empty")
-
-        user = Users.query.filter_by(email=email, phone=phone).first()
-        if user:
-            raise ValueError("Email or phone already exists")
         
-        if not role or role not in ['customer', 'driver', 'staff']:
+        existing_email = Users.query.filter_by(email=email).first()
+        if existing_email:
+            raise ValueError("Email already in use")
+        
+        existing_phone = Users.query.filter_by(phone=phone).first()
+        if existing_phone:
+            raise ValueError("Phone already in use")
+        
+        if role not in ['customer', 'driver', 'staff']:
             raise ValueError("Role must be customer, driver, or staff")
         
+        password_hash=self.generate_password_hash(password)
         user = Users(
             name=name,
             email=email,
             phone=phone,
             birthday=birthday,
-            password_hash=self.generate_password_hash(password),
+            password_hash=password_hash,
             role = role
         )
+
         db.session.add(user)
         db.session.commit()
         return user
