@@ -97,7 +97,7 @@ def populate_db():
             (16, 'Company D', '223 Company Way', '555-0040', False)])
 
    # products
-   insert("""INSERT INTO products (supplier_id, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+   insert("""INSERT INTO products (supplier_id, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
          [(13, 'Pepsi', 3.00, 10, 'medium', 'sweet, refreshing, cold, quick, energy', 'beverages', 0.00, True),
             (14, 'Chips', 4.00, 20, None, 'crispy, salty, bold, quick, shareable', 'snacks', 0.00, True),
             (15, 'Skittles', 5.00, 5, None, 'fun, colorful, tangy, sweet, fruity', 'candy', 0.00, False),
@@ -107,15 +107,16 @@ def populate_db():
    insert("""INSERT INTO deliveries (driver_id, customer_showing_id, payment_method_id, staff_id, payment_status, total_price) VALUES (%s, %s, %s, %s, %s, %s)""",
          [(9, 1, 1, 1, 'completed', 3.00),
             (10, 2, 2, 1, 'completed', 8.00)])
+   
+     
+   # cart_items
+   insert("""INSERT INTO cart_items (customer_id, product_id, quantity) VALUES (%s, %s, %s)""",
+          [(5, 1, 1),
+            (6, 2, 2)])
 
    # delivery_items
    insert("""INSERT INTO delivery_items (cart_item_id, delivery_id) VALUES (%s, %s)""",
          [(1, 1),
             (2, 2)])
-   
-   # cart_items
-   insert("""INSERT INTO cart_items (customer_id, product_id, quantity) VALUES (%s, %s, %s)""",
-          [(5, 1, 1),
-            (6, 2, 2)])
 
 populate_db()

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
-from ..services.user_service import UserService
+from services.user_service import UserService
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/users')
 user_service = UserService()

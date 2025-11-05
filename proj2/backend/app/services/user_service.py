@@ -1,6 +1,7 @@
 from models import Users
 from app import db
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
 class UserService:
 
@@ -12,9 +13,12 @@ class UserService:
         return password_hash
 
     def check_password_hash(self, password_hash, password):
-        if self.ph.verify(password_hash, password):
+        try:
+            self.ph.verify(password_hash, password)
             return True
-        else:
+        except VerifyMismatchError:
+            return False
+        except Exception:
             return False
         
     def validate_credentials(self, email, password):
@@ -22,8 +26,9 @@ class UserService:
             raise ValueError("Fields cannot be empty")
         
         user = Users.query.filter_by(email=email).first()
-        hash = user.password_hash
-        if not self.check_password_hash(password_hash=hash, password=password):
+        if not user: return None
+
+        if not self.check_password_hash(password_hash=user.password_hash, password=password):
             return None
         return user
 
@@ -31,7 +36,7 @@ class UserService:
         if not name or not email or not phone or not birthday or not password or not role:
             raise ValueError("Fields cannot be empty")
 
-        user = Users.query.filer_by(email=email, phone=phone).first()
+        user = Users.query.filter_by(email=email, phone=phone).first()
         if user:
             raise ValueError("Email or phone already exists")
         

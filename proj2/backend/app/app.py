@@ -5,7 +5,7 @@ from flask_login import LoginManager
 db = SQLAlchemy()
 login_manager = LoginManager()
 
-def get_app(config_name):
+def create_app(config_name):
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'faedda1dcedc8a54042c86aaa6caf6b8'
