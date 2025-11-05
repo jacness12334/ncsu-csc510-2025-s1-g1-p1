@@ -1,32 +1,26 @@
 // app/page.tsx
 import Link from "next/link";
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <section className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">
-      <h1 className="text-3xl font-bold mb-10">Movie Munchers</h1>
+    <section className="mt-16 grid place-items-center">
+      <div className="w-full max-w-2xl text-center">
+        <h1 className="text-3xl font-bold">Welcome to Movie Munchers</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Mindful snacks, family bundles, and a theater experience anywhere.
+        </p>
 
-      <div className="flex flex-col gap-4 w-full max-w-xs">
-        <Link
-          href="/login"
-          className="rounded-xl bg-black text-white px-5 py-2 text-sm font-medium hover:bg-gray-800 transition"
-        >
-          Log In
-        </Link>
-
-        <Link
-          href="/signup"
-          className="rounded-xl border border-gray-300 px-5 py-2 text-sm font-medium hover:bg-gray-100 transition"
-        >
-          Sign Up
-        </Link>
-
-        <Link
-          href="/order"
-          className="rounded-xl bg-gray-200 px-5 py-2 text-sm font-medium hover:bg-gray-300 transition"
-        >
-          Continue as Guest
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/order" className="rounded-xl border border-gray-300 px-5 py-2 text-sm">
+            Continue as Guest
+          </Link>
+          <button disabled className="rounded-xl border border-gray-300 px-5 py-2 text-sm text-gray-500 cursor-not-allowed">
+            Log In
+          </button>
+          <button disabled className="rounded-xl bg-black px-5 py-2 text-sm text-white opacity-80 cursor-not-allowed">
+            Sign Up
+          </button>
+        </div>
       </div>
     </section>
   );
