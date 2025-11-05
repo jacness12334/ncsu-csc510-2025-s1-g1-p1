@@ -35,6 +35,9 @@ class UserService:
         if user:
             raise ValueError("Email or phone already exists")
         
+        if not role or role not in ['customer', 'driver', 'staff']:
+            raise ValueError("Role must be customer, driver, or staff")
+        
         user = Users(
             name=name,
             email=email,
