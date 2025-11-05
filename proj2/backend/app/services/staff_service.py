@@ -1,11 +1,14 @@
 from models import *
 from app import db, get_app
+from user_service import UserService
 
 config_name = 'development'
 app = get_app(config_name)
 
 with app.app_context():
     pass
+
+user_service = UserService()
 
 class StaffService:
 
@@ -25,9 +28,7 @@ class StaffService:
         if role not in ['admin', 'runner']:
             return {"error": "Invalid role. Must be 'admin' or 'runner'."}, 400
         
-        # Hash password
-        user = Users(name=name, email=email, phone=phone, birthday=birthday, password_hash=password, role='staff', account_status='active')
-        db.session.add(user)
+        user = user_service.create_user(name, email, phone, birthday, password)
         db.session.flush()
 
         staff = Staff(user_id=user.id, theatre_id=theatre_id, role=role, is_available=True)

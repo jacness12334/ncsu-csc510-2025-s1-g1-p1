@@ -42,7 +42,7 @@ def remove_staff(staff_user_id):
     return jsonify(response), status
 
 
-@bp.route('/theatre', methods=['PUT'])
+@bp.route('/theatres', methods=['PUT'])
 def set_theatre_status():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -53,7 +53,7 @@ def set_theatre_status():
     return jsonify(response), status
 
 
-@bp.route('/movie', methods=['POST'])
+@bp.route('/movies', methods=['POST'])
 def add_movie():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -72,7 +72,7 @@ def add_movie():
     return jsonify(response), status
 
 
-@bp.route('/movie/<int:movie_id>', methods=['PUT'])
+@bp.route('/movies/<int:movie_id>', methods=['PUT'])
 def edit_movie(movie_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -92,7 +92,7 @@ def edit_movie(movie_id):
     return jsonify(response), status
 
 
-@bp.route('/movie/<int:movie_id>', methods=['DELETE'])
+@bp.route('/movies/<int:movie_id>', methods=['DELETE'])
 def remove_movie(movie_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -100,7 +100,7 @@ def remove_movie(movie_id):
     return jsonify(response), status
 
 
-@bp.route('/showing', methods=['POST'])
+@bp.route('/showings', methods=['POST'])
 def add_showing():
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -116,7 +116,7 @@ def add_showing():
     return jsonify(response), status
 
 
-@bp.route('/showing/<int:showing_id>', methods=['PUT'])
+@bp.route('/showings/<int:showing_id>', methods=['PUT'])
 def edit_showing(showing_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -133,7 +133,7 @@ def edit_showing(showing_id):
     return jsonify(response), status
 
 
-@bp.route('/showing/<int:showing_id>', methods=['DELETE'])
+@bp.route('/showings/<int:showing_id>', methods=['DELETE'])
 def remove_showing(showing_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -152,7 +152,7 @@ def set_availability():
     return jsonify(response), status
 
 
-@bp.route('/delivery/<int:delivery_id>/status', methods=['PUT'])
+@bp.route('/deliveries/<int:delivery_id>/status', methods=['PUT'])
 def update_delivery_status(delivery_id):
     user_id = get_user_id()
     service = StaffService(user_id)
@@ -163,7 +163,7 @@ def update_delivery_status(delivery_id):
     return jsonify(response), status
 
 
-@bp.route('/delivery/<int:delivery_id>/accept', methods=['PUT'])
+@bp.route('/deliveries/<int:delivery_id>/accept', methods=['PUT'])
 def accept_delivery(delivery_id):
     user_id = get_user_id()
     service = StaffService(user_id)
