@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [birthday, setBirthday] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,52 +23,75 @@ export default function SignupPage() {
     }
 
     try {
-      let response = await fetch("http://localhost:5000/api/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          phone: phone,
-          birthday: birthday,
-          password: password,
-          role: 'customer'
-        })
-      });
+      switch (userType) {
+        case 'customer':
+          let response = await fetch("http://localhost:5000/api/users/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              phone: phone,
+              birthday: birthday,
+              password: password,
+              role: 'customer',
+              default_theatre_id: -1
+            })
+          });
 
-      if (!response.ok) {
-        // If server responds with 400/500 code, get the specific message
-        const errorData = await response.json();
-        throw new Error(errorData.message || response.statusText);
+          if (!response.ok) {
+            // If server responds with 400/500 code, get the specific message
+            const errorData = await response.json();
+            throw new Error(errorData.message || response.statusText);
+          }
+
+          // Success path:
+          router.push("/login");
+          alert("Registration successful!");
+
+          break;
+
+        case 'staff-runner':
+        case 'staff-admin':
+          response = await fetch("http://localhost:5000/api/staff", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              phone: phone,
+              birthday: birthday,
+              password: password,
+              role: userType.split('-')[1],
+              theatre_id: -1
+            })
+          });
+
+          if (!response.ok) {
+            // If server responds with 400/500 code, get the specific message
+            const errorData = await response.json();
+            throw new Error(errorData.message || response.statusText);
+          }
+
+          // Success path:
+          router.push("/login");
+          alert("Registration successful!");
+          break;
+
+        case 'supplier':
+          break;
+
+        case 'driver':
+          break;
+
+        default:
+          alert("Error: User type not registered. Please contact admin for details.");
+          break;
       }
-
-      response = await fetch("http://localhost:5000/api/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          phone: phone,
-          birthday: birthday,
-          password: password,
-          role: 'customer',
-          default_theatre_id: -1
-        })
-      });
-
-      if (!response.ok) {
-        // If server responds with 400/500 code, get the specific message
-        const errorData = await response.json();
-        throw new Error(errorData.message || response.statusText);
-      }
-
-      // Success path:
-      router.push("/login");
-      alert("Registration successful!");
 
     } catch (error: unknown) {
       // This catches network errors AND the error thrown above
@@ -84,6 +108,23 @@ export default function SignupPage() {
       <p className="text-sm text-gray-600 mb-6">Create an account to start ordering.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium mb-1">
+            User Type
+          </label>
+          <select
+            id="name"
+            value={userType}
+            onChange={(e) => setUserType(e.target.value)}
+            required
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+            <option value='customer'>Customer</option>
+            <option value='staff-runner'>Staff (runner)</option>
+            <option value='staff-admin'>Staff (admin)</option>
+            <option value='driver'>Driver</option>
+            <option value='supplier'>Supplier</option>
+          </select>
+        </div>
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">
             Full Name

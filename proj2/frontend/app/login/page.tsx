@@ -19,7 +19,7 @@ export default function LoginPage() {
 
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      let response = await fetch("http://localhost:5000/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,10 +37,11 @@ export default function LoginPage() {
         throw new Error(errorData.message || response.statusText);
       }
 
-      console.log(await response.text());
+      let rj = await response.json();
+      console.log(rj);
 
       // Success path:
-      // setCookie('sessionToken', '', 1);
+      setCookie('user_id', rj.user_id, 1);
       // router.push("/order");
       alert("Login successful!");
 
