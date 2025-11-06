@@ -10,8 +10,9 @@ authors:
   given-names: "Janelle"
 - family-names: "?"
   given-names: "Galav"
-- family-names: "?"
+- family-names: "Rajoju"
   given-names: "Aarya"
+  orcid: "https://orcid.org/0009-0000-0211-4210"
 title: "ncsu-csc510-2025-s1-g1-p1"
 version: 1.0.0
 // doi: 10.5281/zenodo.1234
