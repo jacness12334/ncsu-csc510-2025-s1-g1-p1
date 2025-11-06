@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app.services.user_service import UserService
+from datetime import timedelta
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/users')
 user_service = UserService()
@@ -28,7 +29,7 @@ def register():
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'User registration failed'}), 500
+        return jsonify({'error': 'User registration failed: ' + str(e)}), 500
     
 @user_bp.route('/login', methods=['POST'])
 def login():
@@ -45,7 +46,7 @@ def login():
         if not user:
             return jsonify({'error': 'Invalid email or password'}), 401
         
-        login_user(user)
+        login_user(user, remember=True, duration=timedelta(days=1))
         
         return jsonify({
             'message': 'Logged in successfully',

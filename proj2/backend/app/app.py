@@ -1,14 +1,19 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_cors import CORS
+from datetime import timedelta
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 
 def create_app(config_name):
     app = Flask(__name__)
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://localhost:3000"])
 
     app.config['SECRET_KEY'] = 'faedda1dcedc8a54042c86aaa6caf6b8'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+    app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=1)
 
     user = 'root'
     password = ''
