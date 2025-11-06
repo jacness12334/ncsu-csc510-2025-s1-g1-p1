@@ -7,7 +7,7 @@ extends: default
 rules:
   # General Style Rules
   comments-indentation: enable
-  
+
   # Ensure comments start with a space
   comments:
     level: warning
@@ -15,10 +15,10 @@ rules:
     require-starting-space: true
 
   # Enforce consistent indentation (2 spaces is standard for YAML/CI)
-  indentation: 
+  indentation:
     spaces: 2
     level: error
-  
+
   # Maximum line length (consistent with Prettier 80)
   line-length:
     max: 80
@@ -27,24 +27,24 @@ rules:
 
   # Requires one blank line before top-level elements for readability
   new-line-after-last-line: enable
-  
+
   # Disallow trailing whitespace
   trailing-spaces: enable
 
   # Document Structure Rules
-  document-start: disable  # Allows omission of '---' at the top of small files
+  document-start: disable # Allows omission of '---' at the top of small files
   document-content:
     level: error
 
   # Key/Value Rules
   key-ordering: disable # Don't enforce alphabetical order of keys
-  
+
   # Force space after colon in key-value pairs (e.g., 'key: value')
-  colons: enable 
-  
+  colons: enable
+
   # Prevent trailing empty lines
-  empty-lines: enable 
-  
+  empty-lines: enable
+
   # Use single quotes unless necessary
   quoted-strings:
     quote-type: single

@@ -2,54 +2,54 @@ name: 🎨 Style Checks
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   style_checks:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: ⬇️ Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    # --- 1. Prettier Formatting Check (Markdown, JSON, YAML, etc.) ---
-    
-    - name: ⚙️ Setup Node.js for Prettier
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      # --- 1. Prettier Formatting Check (Markdown, JSON, YAML, etc.) ---
 
-    - name: 📥 Install Prettier
-      run: npm install --global prettier
+      - name: ⚙️ Setup Node.js for Prettier
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: 🔎 Prettier Check on Configuration and Documentation
-      run: |
-        prettier --check .
+      - name: 📥 Install Prettier
+        run: npm install --global prettier
 
-    # --- 2. YAML Linting (using a direct, reliable method) ---
-    # FIX: Replaced the non-resolvable 'ibi/yamllint-action' with a direct pip installation.
-    - name: 🐍 Setup Python and Install Yamllint
-      # Since yamllint is a Python package, we set up Python for stability.
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      - name: 🔎 Prettier Check on Configuration and Documentation
+        run: |
+          prettier --check .
 
-    - name: 📜 Run Yamllint Check
-      run: |
-        pip install yamllint
-        # The 'yamllint' command automatically looks for '.yamllint.yaml' in the root.
-        # We specify the directories to check, as configuration files are the primary focus.
-        yamllint -c .yamllint.yaml .github/workflows/*.yml *.yml *.yaml
+      # --- 2. YAML Linting (using a direct, reliable method) ---
+      # FIX: Replaced the non-resolvable 'ibi/yamllint-action' with a direct pip installation.
+      - name: 🐍 Setup Python and Install Yamllint
+        # Since yamllint is a Python package, we set up Python for stability.
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-    # --- 3. Dockerfile Linting (Hadolint) ---
-    - name: 🐳 Run Hadolint (Dockerfile Linter)
-      # This action is generally stable, but confirm its existence if issues persist.
-      uses: reviewdog/action-hadolint@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        dockerfile-path: ./Dockerfile
+      - name: 📜 Run Yamllint Check
+        run: |
+          pip install yamllint
+          # The 'yamllint' command automatically looks for '.yamllint.yaml' in the root.
+          # We specify the directories to check, as configuration files are the primary focus.
+          yamllint -c .yamllint.yaml .github/workflows/*.yml *.yml *.yaml
+
+      # --- 3. Dockerfile Linting (Hadolint) ---
+      - name: 🐳 Run Hadolint (Dockerfile Linter)
+        # This action is generally stable, but confirm its existence if issues persist.
+        uses: reviewdog/action-hadolint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dockerfile-path: ./Dockerfile

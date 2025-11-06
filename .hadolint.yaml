@@ -1,7 +1,7 @@
 # .hadolint.yaml - Configuration for Hadolint
 # Configures Hadolint to ignore specific rules, prioritizing security and size.
 
-# Example: Ignore rules for using explicit base image tags (DL3006) 
+# Example: Ignore rules for using explicit base image tags (DL3006)
 # and setting a maintainer label (DL4000), as these are often managed externally.
 ignored:
   - DL3006
@@ -11,7 +11,7 @@ ignored:
 trustedRegistries:
   - docker.io
   - registry.access.redhat.com
-  
+
 # Customize severity levels
 severity:
   # Treat instruction rules as errors for strict adherence to best practices

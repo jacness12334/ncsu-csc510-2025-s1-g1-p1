@@ -14,8 +14,8 @@ Movie Munchers is a full-stack web application. Before contributing code, please
 
 ### **Project Stack**
 
-* **Frontend:** React, Node.js, npm (using Next.js for routing).  
-* **Backend:** Flask, SQL.
+- **Frontend:** React, Node.js, npm (using Next.js for routing).
+- **Backend:** Flask, SQL.
 
 ## **💡 Types of Contributions**
 
@@ -23,14 +23,14 @@ We appreciate all forms of help, though we primarily anticipate **Code, Bug Repo
 
 ### **🐛 Bug Reports**
 
-1. **Search** the existing issues to ensure the bug hasn't already been reported.  
-2. **Open a new Issue**, clearly titled (e.g., "Bug: Checkout total is calculated incorrectly").  
+1. **Search** the existing issues to ensure the bug hasn't already been reported.
+2. **Open a new Issue**, clearly titled (e.g., "Bug: Checkout total is calculated incorrectly").
 3. Include detailed steps to reproduce the issue, what you expected to happen, and what actually happened.
 
 ### **✨ Feature Requests & Design Suggestions**
 
-1. **Search** existing feature requests.  
-2. **Open a new Issue** with the label enhancement.  
+1. **Search** existing feature requests.
+2. **Open a new Issue** with the label enhancement.
 3. Describe the feature's goal and how it would benefit users (the "why"). If it's a design suggestion, include clear descriptions of the proposed changes.
 
 ### **💻 Code Contributions (Bug Fixes and Features)**
@@ -55,16 +55,16 @@ This adds the line Signed-off-by: Your Name \<your-email@example.com\>.
 
 ### **4\. Create a Pull Request (PR)**
 
-1. Push your branch to your fork.  
-2. Open a Pull Request from your fork's branch to the upstream main branch of Movie Munchers.  
+1. Push your branch to your fork.
+2. Open a Pull Request from your fork's branch to the upstream main branch of Movie Munchers.
 3. Ensure your PR description clearly explains the changes.
 
 ### **5\. Review and Merge**
 
 **All contributions require review by at least one of the 5 Core Team members before merging.**
 
-* A Core Team member will review your code and may request changes.  
-* Once approved and all tests pass, a Core Team member will merge your contribution.
+- A Core Team member will review your code and may request changes.
+- Once approved and all tests pass, a Core Team member will merge your contribution.
 
 ## **📐 Style and Standards**
 
@@ -72,32 +72,32 @@ We require consistent formatting across the codebase. Please ensure all code pas
 
 ### **Backend (Python/Flask)**
 
-* **Formatting:** We use the **Black** code formatter to ensure all Python code adheres to a consistent style, primarily following **PEP 8**.  
-* **Linting:** We use **Flake8** to catch style errors and potential bugs.
+- **Formatting:** We use the **Black** code formatter to ensure all Python code adheres to a consistent style, primarily following **PEP 8**.
+- **Linting:** We use **Flake8** to catch style errors and potential bugs.
 
 ### **Frontend (React/Next.js)**
 
-* **Formatting:** We use **Prettier** for automated code formatting.  
-* **Linting:** We use **ESLint** to enforce JavaScript/React best practices.
+- **Formatting:** We use **Prettier** for automated code formatting.
+- **Linting:** We use **ESLint** to enforce JavaScript/React best practices.
 
 ### **Testing**
 
-* Any new feature or substantial bug fix must include relevant unit and/or integration tests.  
-* All existing tests must pass before a PR can be merged.
+- Any new feature or substantial bug fix must include relevant unit and/or integration tests.
+- All existing tests must pass before a PR can be merged.
 
 ## **⚖️ Legal & Governance**
 
 ### **Intellectual Property (IP) and Licensing**
 
-* **License:** Movie Munchers is distributed under the **MIT License**.  
-* **Contributor IP:** **Contributors retain the Intellectual Property (IP) rights** to their original code contributions. By submitting a contribution with a **DCO signature**, you are confirming that your work is licensed under the MIT License and that you are authorized to submit it.
+- **License:** Movie Munchers is distributed under the **MIT License**.
+- **Contributor IP:** **Contributors retain the Intellectual Property (IP) rights** to their original code contributions. By submitting a contribution with a **DCO signature**, you are confirming that your work is licensed under the MIT License and that you are authorized to submit it.
 
 ### **Project Governance (The Core Team)**
 
 Movie Munchers is maintained and governed by the original 5 developers, who collectively form the **Core Team**.
 
-* **Decision Making:** Decisions are made by **consensus among the 5 Core Team members**. Any one of the five members has the authority to review and approve code.  
-* **PR Approval:** Only a Core Team member has the authority to approve and merge Pull Requests into the main branch.
+- **Decision Making:** Decisions are made by **consensus among the 5 Core Team members**. Any one of the five members has the authority to review and approve code.
+- **PR Approval:** Only a Core Team member has the authority to approve and merge Pull Requests into the main branch.
 
 ### 🎯 Future Feature Suggestions (High Priority)
 
