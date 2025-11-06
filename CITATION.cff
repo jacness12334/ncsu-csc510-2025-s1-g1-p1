@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Phillips"
+  given-names: "Jacob"
+  orcid: "https://orcid.org/0009-0004-8870-3145"
+- family-names: "Maurya"
+  given-names: "Aadya"
+- family-names: "Correia"
+  given-names: "Janelle"
+- family-names: "?"
+  given-names: "Galav"
+- family-names: "?"
+  given-names: "Aarya"
+title: "ncsu-csc510-2025-s1-g1-p1"
+version: 1.0.0
+// doi: 10.5281/zenodo.1234
+date-released: 2025-11-06
+url: "https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1"
