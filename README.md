@@ -1,6 +1,8 @@
 # Movie Munchers 🍿
 
-#DOI Badges
+## DOI Badges
+
+[![DOI](https://zenodo.org/badge/1044470915.svg)](https://doi.org/10.5281/zenodo.17546938)
 
 ## Mission Statement
 Movie Munchers brings the joy of dining and entertainment together by letting you order food straight to your theater seat. Partnering with local restaurants and nonprofits, the app delivers convenience, community, and care, all in one experience. Future updates will add personalization and expanded partnerships for an even smoother movie night.
