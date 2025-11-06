@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
+// Product interface matching backend API response structure
 interface Product {
   id: number;
   name: string;
@@ -10,19 +11,23 @@ interface Product {
   size: 'small' | 'medium' | 'large' | null;
   keywords: string;
   category: 'beverages' | 'snacks' | 'candy' | 'food';
+  discount: number;
   is_available: boolean;
 }
 
 export default function ManageProductsPage() {
-  // Backend integration ready - replace with API calls
+  // Core state management
   const [products, setProducts] = useState<Product[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // UI state management  
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("");
 
-  // New/Edit Product Form State
+  // Form state for adding/editing products (matches backend API requirements)
   const [formData, setFormData] = useState({
     name: "",
     unit_price: 0,
@@ -30,9 +35,70 @@ export default function ManageProductsPage() {
     size: null as 'small' | 'medium' | 'large' | null,
     keywords: "",
     category: "beverages" as 'beverages' | 'snacks' | 'candy' | 'food',
+    discount: 0,
     is_available: true
   });
 
+  /**
+   * Retrieves user ID from sessionToken cookie set during login
+   * @returns user ID as number or null if not found
+   */
+  const getUserIdFromCookie = () => {
+    const cookies = document.cookie.split(';');
+    const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('sessionToken='));
+    if (sessionCookie) {
+      const tokenValue = sessionCookie.split('=')[1];
+      return parseInt(tokenValue) || null;
+    }
+    return null;
+  };
+
+  /**
+   * Initialize user authentication and load products on component mount
+   */
+  useEffect(() => {
+    const id = getUserIdFromCookie();
+    if (id) {
+      setUserId(id);
+      loadProducts(id);
+    } else {
+      alert("Please log in to access supplier features");
+    }
+  }, []);
+
+  /**
+   * Loads all products for the authenticated supplier
+   * Calls GET /api/products endpoint from backend
+   * @param userIdParam - The authenticated user's ID
+   */
+  const loadProducts = async (userIdParam: number) => {
+    setIsLoading(true);
+    try {
+      // Call backend GET /api/products endpoint (available in backend branch)
+      const response = await fetch(`http://localhost:5000/api/products?user_id=${userIdParam}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        // Backend returns {products: [...]} format
+        setProducts(responseData.products || []);
+      } else {
+        console.error("Failed to load products");
+      }
+    } catch (error) {
+      console.error("Error loading products:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Resets the product form to initial empty state
+   */
   const resetForm = () => {
     setFormData({
       name: "",
@@ -41,51 +107,149 @@ export default function ManageProductsPage() {
       size: null,
       keywords: "",
       category: "beverages",
+      discount: 0,
       is_available: true
     });
     setEditingProduct(null);
     setShowAddForm(false);
   };
 
-  const handleAddProduct = () => {
+  /**
+   * Handles adding a new product
+   * Calls POST /api/products endpoint
+   */
+  const handleAddProduct = async () => {
     if (!formData.name || formData.unit_price < 0 || formData.inventory_quantity < 0) {
       alert("Please fill in all required fields with valid values.");
       return;
     }
 
-    const newProduct: Product = {
-      id: Date.now(), // In real app, backend would generate this
-      ...formData
-    };
+    if (!userId) {
+      alert("User not authenticated");
+      return;
+    }
 
-    // TODO: Backend integration - POST /api/products
-    console.log("Adding product:", newProduct);
-    setProducts([...products, newProduct]);
-    resetForm();
+    setIsLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          ...formData
+        })
+      });
+
+      if (response.ok) {
+        alert("Product added successfully!");
+        loadProducts(userId); // Reload products list
+        resetForm();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to add product'}`);
+      }
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Error adding product. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditProduct = () => {
+  /**
+   * Handles editing an existing product
+   * Calls PUT /api/products/{id} endpoint
+   */
+  const handleEditProduct = async () => {
     if (!editingProduct || !formData.name || formData.unit_price < 0 || formData.inventory_quantity < 0) {
       alert("Please fill in all required fields with valid values.");
       return;
     }
 
-    // TODO: Backend integration - PUT /api/products/{productId}
-    console.log("Editing product:", editingProduct.id, formData);
-    setProducts(products.map(p => 
-      p.id === editingProduct.id ? { ...editingProduct, ...formData } : p
-    ));
-    resetForm();
-  };
+    if (!userId) {
+      alert("User not authenticated");
+      return;
+    }
 
-  const handleDeleteProduct = (productId: number) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      // TODO: Backend integration - DELETE /api/products/{productId}
-      console.log("Deleting product:", productId);
-      setProducts(products.filter(p => p.id !== productId));
+    setIsLoading(true);
+    try {
+      // Call backend PUT /api/products/{id} endpoint
+      const response = await fetch(`http://localhost:5000/api/products/${editingProduct.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          ...formData
+        })
+      });
+
+      if (response.ok) {
+        alert("Product updated successfully!");
+        loadProducts(userId); // Reload products list
+        resetForm();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to update product'}`);
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("Error updating product. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  /**
+   * Handles deleting a product with user confirmation
+   * Calls DELETE /api/products/{id} endpoint
+   * @param productId - ID of the product to delete
+   */
+  const handleDeleteProduct = async (productId: number) => {
+    if (!confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
+
+    if (!userId) {
+      alert("User not authenticated");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call backend DELETE /api/products/{id} endpoint
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId
+        })
+      });
+
+      if (response.ok) {
+        alert("Product deleted successfully!");
+        loadProducts(userId); // Reload products list
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to delete product'}`);
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Error deleting product. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Prepares the form for editing an existing product
+   * @param product - The product to edit
+   */
   const startEdit = (product: Product) => {
     setEditingProduct(product);
     setFormData({
@@ -95,11 +259,13 @@ export default function ManageProductsPage() {
       size: product.size,
       keywords: product.keywords,
       category: product.category,
+      discount: product.discount,
       is_available: product.is_available
     });
     setShowAddForm(true);
   };
 
+  // Filter products based on search term and category selection
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.keywords.toLowerCase().includes(searchTerm.toLowerCase());
@@ -125,9 +291,10 @@ export default function ManageProductsPage() {
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800 transition"
+          disabled={isLoading}
+          className="rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800 transition disabled:opacity-50"
         >
-          Add New Product
+          {isLoading ? "Loading..." : "Add New Product"}
         </button>
       </div>
 
@@ -204,6 +371,19 @@ export default function ManageProductsPage() {
             </div>
 
             <div>
+              <label className="mb-1 block text-sm font-medium">Discount</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.discount}
+                onChange={(e) => setFormData({...formData, discount: parseFloat(e.target.value) || 0})}
+                placeholder="0.00"
+                className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+
+            <div>
               <label className="mb-1 block text-sm font-medium">Inventory Quantity *</label>
               <input
                 type="number"
@@ -258,13 +438,15 @@ export default function ManageProductsPage() {
           <div className="mt-6 flex gap-3">
             <button
               onClick={editingProduct ? handleEditProduct : handleAddProduct}
-              className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 transition"
+              disabled={isLoading}
+              className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 transition disabled:opacity-50"
             >
-              {editingProduct ? 'Save Changes' : 'Add Product'}
+              {isLoading ? "Processing..." : editingProduct ? 'Save Changes' : 'Add Product'}
             </button>
             <button
               onClick={resetForm}
-              className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-100 transition"
+              disabled={isLoading}
+              className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-100 transition disabled:opacity-50"
             >
               Cancel
             </button>

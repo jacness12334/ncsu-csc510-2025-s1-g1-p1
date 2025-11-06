@@ -1,26 +1,146 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function SuppliersPage() {
-  const [isOpen, setIsOpen] = useState(false);
+// Product interface matching backend API response
+interface Product {
+  id: number;
+  name: string;
+  unit_price: number;
+  inventory_quantity: number;
+  size: 'small' | 'medium' | 'large' | null;
+  keywords: string;
+  category: 'beverages' | 'snacks' | 'candy' | 'food';
+  discount: number;
+  is_available: boolean;
+}
 
-  // Backend integration ready - replace with API calls
-  const metrics = {
+export default function SuppliersPage() {
+  // State for store status and UI
+  const [isOpen, setIsOpen] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Dashboard metrics calculated from products
+  const [metrics, setMetrics] = useState({
     totalProducts: 0,
     availableProducts: 0,
     outOfStock: 0,
     lowStock: 0
+  });
+  
+  // Recent products for dashboard table
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
+
+  /**
+   * Retrieves user ID from sessionToken cookie set during login
+   * @returns user ID as number or null if not found
+   */
+  const getUserIdFromCookie = () => {
+    const cookies = document.cookie.split(';');
+    const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('sessionToken='));
+    if (sessionCookie) {
+      const tokenValue = sessionCookie.split('=')[1];
+      return parseInt(tokenValue) || null;
+    }
+    return null;
   };
 
-  const recentProducts: Array<{
-    id: number;
-    name: string;
-    category: string;
-    price: number;
-    inventory: number;
-    isAvailable: boolean;
-  }> = [];
+  /**
+   * Initialize user authentication and load dashboard data on component mount
+   */
+  useEffect(() => {
+    const id = getUserIdFromCookie();
+    if (id) {
+      setUserId(id);
+      loadDashboardData(id);
+    } else {
+      alert("Please log in to access supplier features");
+    }
+  }, []);
+
+  /**
+   * Loads dashboard data including products and calculates metrics
+   * Calls GET /api/products endpoint from backend
+   * @param userIdParam - The authenticated user's ID
+   */
+  const loadDashboardData = async (userIdParam: number) => {
+    setIsLoading(true);
+    try {
+      // Call backend GET /api/products endpoint (available in backend branch)
+      const response = await fetch(`http://localhost:5000/api/products?user_id=${userIdParam}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        // Backend returns {products: [...]} format
+        const products = responseData.products || [];
+        setRecentProducts(products.slice(0, 5)); // Show first 5 as recent products
+        
+        // Calculate dashboard metrics from products array
+        const totalProducts = products.length;
+        const availableProducts = products.filter((p: Product) => p.is_available).length;
+        const outOfStock = products.filter((p: Product) => p.inventory_quantity === 0).length;
+        const lowStock = products.filter((p: Product) => p.inventory_quantity > 0 && p.inventory_quantity <= 5).length;
+        
+        setMetrics({
+          totalProducts,
+          availableProducts,
+          outOfStock,
+          lowStock
+        });
+      } else {
+        console.error("Failed to load dashboard data");
+      }
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Handles store open/closed status toggle
+   * Calls PUT /api/suppliers/status endpoint
+   */
+  const handleToggleStore = async () => {
+    if (!userId) {
+      alert("User not authenticated");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call backend PUT /api/suppliers/status endpoint
+      const response = await fetch("http://localhost:5000/api/suppliers/status", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          is_open: !isOpen
+        })
+      });
+
+      if (response.ok) {
+        setIsOpen(!isOpen);
+        alert(`Store ${!isOpen ? 'opened' : 'closed'} successfully!`);
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to update store status'}`);
+      }
+    } catch (error) {
+      console.error("Error updating store status:", error);
+      alert("Error updating store status. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
@@ -39,14 +159,15 @@ export default function SuppliersPage() {
           <div className="flex items-center gap-3">
             <span className={`h-3 w-3 rounded-full ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}></span>
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              onClick={handleToggleStore}
+              disabled={isLoading}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${
                 isOpen 
                   ? 'bg-red-100 text-red-700 hover:bg-red-200' 
                   : 'bg-green-100 text-green-700 hover:bg-green-200'
               }`}
             >
-              {isOpen ? 'Close Store' : 'Open Store'}
+              {isLoading ? 'Updating...' : isOpen ? 'Close Store' : 'Open Store'}
             </button>
           </div>
         </div>
@@ -119,20 +240,20 @@ export default function SuppliersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                      ${product.price.toFixed(2)}
+                      ${product.unit_price.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`font-medium ${product.inventory === 0 ? 'text-red-600' : product.inventory <= 5 ? 'text-yellow-600' : 'text-green-600'}`}>
-                        {product.inventory}
+                      <span className={`font-medium ${product.inventory_quantity === 0 ? 'text-red-600' : product.inventory_quantity <= 5 ? 'text-yellow-600' : 'text-green-600'}`}>
+                        {product.inventory_quantity}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                        product.isAvailable 
+                        product.is_available 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {product.isAvailable ? 'Available' : 'Unavailable'}
+                        {product.is_available ? 'Available' : 'Unavailable'}
                       </span>
                     </td>
                   </tr>
