@@ -1,28 +1,67 @@
 "use client";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import Link from "next/link";
 
 export default function SupplierProfilePage() {
-  // Company Information (from Suppliers model) - Backend integration ready
+  // Company Information (matches backend Suppliers model)
   const [companyName, setCompanyName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // Personal Information (from Users model) - Backend integration ready
+  // Personal Information (matches backend Users model)
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [birthday, setBirthday] = useState("");
 
-  // Password Change
+  // Password change form fields
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  // Application state management
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  /**
+   * Retrieves user ID from sessionToken cookie set during login
+   * @returns user ID as number or null if not found
+   */
+  const getUserIdFromCookie = () => {
+    const cookies = document.cookie.split(';');
+    const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('sessionToken='));
+    if (sessionCookie) {
+      const tokenValue = sessionCookie.split('=')[1];
+      return parseInt(tokenValue) || null;
+    }
+    return null;
+  };
+
+  /**
+   * Initialize user authentication on component mount
+   * Note: Would also load existing profile data when GET endpoints are available
+   */
+  useEffect(() => {
+    const id = getUserIdFromCookie();
+    if (id) {
+      setUserId(id);
+      // TODO: Load existing supplier and user data when GET /api/suppliers endpoint is enabled
+      // loadProfileData(id);
+    } else {
+      alert("Please log in to access supplier features");
+    }
+  }, []);
+
+  /**
+   * Handles profile form submission
+   * Note: PUT /api/suppliers endpoint excluded as requested
+   * Form structure ready for future backend integration
+   */
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
+    // Validate password fields if attempting to change password
     if (newPassword && newPassword !== confirmNewPassword) {
       alert("New passwords do not match.");
       return;
@@ -33,23 +72,42 @@ export default function SupplierProfilePage() {
       return;
     }
 
-    // Here you would call the backend APIs:
-    // PUT /api/suppliers - for company info
-    // PUT /api/users/{id} - for personal info (if available)
-    
-    // TODO: Backend integration
-    // PUT /api/suppliers - for company info
-    // PUT /api/users/{id} - for personal info (if available)
-    console.log("Form data ready for backend:", {
-      company: { companyName, companyAddress, contactPhone, isOpen },
-      personal: { name, email, phone, birthday }
-    });
-    
-    alert("Profile updated successfully!");
+    if (!userId) {
+      alert("User not authenticated");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Profile form data is structured and ready for backend integration
+      // PUT /api/suppliers endpoint available but excluded per request
+      // Personal info updates would require user routes integration
+      
+      console.log("Profile data structured for backend:", {
+        supplier: { 
+          user_id: userId,
+          company_name: companyName, 
+          company_address: companyAddress, 
+          contact_phone: contactPhone, 
+          is_open: isOpen 
+        },
+        user: { name, email, phone, birthday },
+        password_change: newPassword ? { current_password: currentPassword, new_password: newPassword } : null
+      });
+      
+      alert("Profile form ready for backend integration! (PUT /api/suppliers excluded as requested)");
+    } catch (error) {
+      console.error("Error preparing profile data:", error);
+      alert("Error processing profile form. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  /* Profile Page Layout */
   return (
     <section className="mx-auto mt-10 max-w-2xl">
+      {/* Header Section with Navigation */}
       <div className="mb-6">
         <div className="mb-4">
           <Link
@@ -63,6 +121,7 @@ export default function SupplierProfilePage() {
         <p className="text-sm text-gray-600">Update your company and personal information.</p>
       </div>
 
+      {/* Profile Update Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
         
         {/* Company Information Section */}
@@ -134,6 +193,7 @@ export default function SupplierProfilePage() {
         <fieldset className="rounded-lg border p-6">
           <legend className="px-2 text-lg font-semibold">Personal Information</legend>
           
+          {/* Personal details grid layout */}
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="name" className="mb-1 block text-sm font-medium">
@@ -200,6 +260,7 @@ export default function SupplierProfilePage() {
         <fieldset className="rounded-lg border p-6">
           <legend className="px-2 text-lg font-semibold">Change Password (Optional)</legend>
           
+          {/* Password fields grid layout */}
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div>
               <label htmlFor="currentPassword" className="mb-1 block text-sm font-medium">
@@ -247,13 +308,14 @@ export default function SupplierProfilePage() {
           </div>
         </fieldset>
 
-        {/* Submit Button */}
+        {/* Form Submit Button */}
         <div className="flex items-center justify-end">
           <button
             type="submit"
-            className="rounded-xl bg-black px-6 py-2 text-sm text-white hover:bg-gray-800 transition"
+            disabled={isLoading}
+            className="rounded-xl bg-black px-6 py-2 text-sm text-white hover:bg-gray-800 transition disabled:opacity-50"
           >
-            Save Changes
+            {isLoading ? "Processing..." : "Save Changes"}
           </button>
         </div>
       </form>
