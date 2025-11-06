@@ -134,3 +134,30 @@ class DriverService:
         db.session.commit()
         return best_driver, delivery
     
+    def update_driver_rating(self, driver_user_id, new_score):
+        driver = Drivers.query.filter_by(user_id=driver_user_id).first()
+        if not driver:
+            raise ValueError(f"Driver {driver_user_id} not found")
+        
+        try:
+            new_score = float(new_score)
+        except ValueError:
+            raise ValueError("New score must be a number")
+        
+        if not (0.00 <= new_score <= 5.00):
+            raise ValueError("Rating must be between 0.00 and 5.00")
+
+        current_rating = float(driver.rating)
+        total_ratings = driver.total_deliveries
+
+        if total_ratings == 0:
+            new_average = new_score
+        else:
+            total_points = current_rating * total_ratings
+            new_average = (total_points + new_score) / (total_ratings + 1)
+
+        driver.rating = round(new_average, 2)
+        driver.total_deliveries += 1
+        db.session.commit()
+        return driver
+

@@ -180,3 +180,26 @@ def assign_delivery_to_driver(delivery_id):
         print(f"Error auto-assigning delivery: {e}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
 
+@bp.route('/drivers/<int:driver_user_id>/rating', methods=['PUT'])
+def update_driver_rating(driver_user_id):
+    try:
+        user_id = get_user_id()
+        service = DriverService(user_id)
+        data = request.json
+
+        if 'rating' not in data:
+            return jsonify({"error": "Missing rating field"}), 400
+        
+        driver = service.update_driver_rating(driver_user_id, data['rating'])
+        
+        return jsonify({
+            "message": f"Driver {driver_user_id} rating updated successfully.",
+            "driver_id": driver.user_id,
+            "new_rating": float(driver.rating)
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        print(f"Error updating driver rating: {e}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
+    
