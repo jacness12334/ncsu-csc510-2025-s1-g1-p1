@@ -1,5 +1,6 @@
 "use client";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 type PaymentMethod = {
   id: string;
@@ -11,18 +12,20 @@ type PaymentMethod = {
 };
 
 export default function EditDetailsPage() {
+  const router = useRouter();
   // Original values (simulate fetched from backend)
-  const [originalName] = useState("");
-  const [originalEmail] = useState("");
-  const [originalPhone] = useState("");
-  const [originalBirthday] = useState("");
-  const [originalTheatreId] = useState("");
+  const [originalName, setOriginalName] = useState("");
+  const [originalEmail, setOriginalEmail] = useState("");
+  const [originalPhone, setOriginalPhone] = useState("");
+  const [originalBirthday, setOriginalBirthday] = useState("");
+  const [originalTheatreId, setOriginalTheatreId] = useState("");
+  const [userId, setUserId] = useState("");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [birthday, setBirthday] = useState("");
-  const [defaultTheatreId, setDefaultTheatreId] = useState("");
+  const [TheatreId, setTheatreId] = useState("");
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -38,12 +41,57 @@ export default function EditDetailsPage() {
   const [newExpYear, setNewExpYear] = useState("");
   const [newBillingAddress, setNewBillingAddress] = useState("");
 
+  const deleteUser = async () => {
+
+    try {
+      var response = await fetch("http://localhost:5000/api/users/" + userId, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        // If server responds with 400/500 code, get the specific message
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      console.log(await response.text());
+
+      response = await fetch("http://localhost:5000/api/customers/" + userId, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        // If server responds with 400/500 code, get the specific message
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      // Success path:
+      // setCookie('sessionToken', '', 1);
+      alert("User successfully deleted");
+      router.push("/");
+
+    } catch (error: any) {
+      // This catches network errors AND the error thrown above
+      console.error(error);
+      alert("Error: " + error.message);
+    }
+  }
+
   const handleAddPayment = () => {
     if (!newCardNumber || !newExpMonth || !newExpYear || !newBillingAddress) {
       alert("Please fill in all payment fields.");
       return;
     }
-    const newMethod: PaymentMethod = {
+    const newPaymentMethod: PaymentMethod = {
       id: Date.now().toString(),
       cardNumber: newCardNumber,
       expirationMonth: newExpMonth,
@@ -51,12 +99,15 @@ export default function EditDetailsPage() {
       billingAddress: newBillingAddress,
       isDefault: paymentMethods.length === 0,
     };
-    setPaymentMethods([...paymentMethods, newMethod]);
+    setPaymentMethods([...paymentMethods, newPaymentMethod]);
     setNewCardNumber("");
     setNewExpMonth("");
     setNewExpYear("");
     setNewBillingAddress("");
     setShowAddPayment(false);
+
+
+
   };
 
   const handleEditPayment = (id: string) => {
@@ -80,12 +131,12 @@ export default function EditDetailsPage() {
       paymentMethods.map((m) =>
         m.id === editingPaymentId
           ? {
-              ...m,
-              cardNumber: newCardNumber,
-              expirationMonth: newExpMonth,
-              expirationYear: newExpYear,
-              billingAddress: newBillingAddress,
-            }
+            ...m,
+            cardNumber: newCardNumber,
+            expirationMonth: newExpMonth,
+            expirationYear: newExpYear,
+            billingAddress: newBillingAddress,
+          }
           : m
       )
     );
@@ -107,13 +158,94 @@ export default function EditDetailsPage() {
     );
   };
 
+  useEffect(() => {
+    const f = async () => {
+      try {
+        var response = await fetch("http://localhost:5000/api/users/me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          // If server responds with 400/500 code, get the specific message
+          const errorData = await response.json();
+          throw new Error(errorData.message || response.statusText);
+        }
+
+        var rt = await response.json();
+        console.log(rt);
+
+        // Success path:
+        setOriginalBirthday(rt.birthday);
+        setOriginalEmail(rt.email);
+        setOriginalName(rt.name);
+        setOriginalPhone(rt.phone);
+        setUserId(rt.user_id);
+        setBirthday(rt.birthday);
+        setEmail(rt.email);
+        setName(rt.name);
+        setPhone(rt.phone);
+
+
+        response = await fetch("http://localhost:5000/api/customers/" + userId, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          // If server responds with 400/500 code, get the specific message
+          const errorData = await response.json();
+          throw new Error(errorData.message || response.statusText);
+        }
+
+        rt = await response.json();
+        console.log(rt);
+        setTheatreId(rt.default_theatre_id);
+        setOriginalTheatreId(rt.default_theatre_id);
+
+        response = await fetch("http://localhost:5000/api/customers/" + rt.user_id + "/payment-methods", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          // If server responds with 400/500 code, get the specific message
+          const errorData = await response.json();
+          throw new Error(errorData.message || response.statusText);
+        }
+
+        rt = await response.json();
+        console.log(rt);
+
+      } catch (error: any) {
+        // This catches network errors AND the error thrown above
+        console.error(error);
+        alert("Error: " + error.message);
+      }
+
+
+
+    }
+    f();
+
+  }, []);
+
   // Check if any form fields have changed
   const hasChanges =
     name !== originalName ||
     email !== originalEmail ||
     phone !== originalPhone ||
     birthday !== originalBirthday ||
-    defaultTheatreId !== originalTheatreId ||
+    TheatreId !== originalTheatreId ||
     currentPassword !== "" ||
     newPassword !== "" ||
     confirmNewPassword !== "";
@@ -130,9 +262,14 @@ export default function EditDetailsPage() {
         return;
       }
     }
-    console.log({ name, email, phone, birthday, defaultTheatreId });
+    console.log({
+      name, email, phone, birthday,
+      TheatreId
+    });
     alert("Details saved (placeholder). Backend integration to be added.");
   };
+
+
 
   return (
     <section className="mx-auto mt-10 max-w-2xl">
@@ -194,8 +331,8 @@ export default function EditDetailsPage() {
           <label htmlFor="defaultTheatre" className="mb-1 block text-sm font-medium">Default Theatre</label>
           <select
             id="defaultTheatre"
-            value={defaultTheatreId}
-            onChange={(e) => setDefaultTheatreId(e.target.value)}
+            value={TheatreId}
+            onChange={(e) => setTheatreId(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">Select a theatre</option>
@@ -380,17 +517,22 @@ export default function EditDetailsPage() {
           </div>
         </fieldset>
 
-        {hasChanges && (
-          <div className="flex items-center justify-end">
-            <button
-              type="submit"
-              className="rounded-xl bg-black px-5 py-2 text-sm text-white hover:bg-gray-800 transition"
-            >
-              Save Changes
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-end">
+          <button
+            className="rounded-xl bg-white px-5 py-2 text-sm text-black hover:bg-gray-700 transition border-2 border-black border-solid mr-[5%]"
+            onClick={() => { confirm("Really delete user?") ? deleteUser : undefined }}
+          >
+            Delete User
+          </button>
+          <button
+            type="submit"
+            className="rounded-xl bg-black px-5 py-2 text-sm text-white hover:bg-gray-800 transition border-2 border-black border-solid"
+          >
+            Save Changes
+          </button>
+        </div>
+
       </form>
-    </section>
+    </section >
   );
 }

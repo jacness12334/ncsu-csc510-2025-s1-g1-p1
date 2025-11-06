@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     // TODO: Add validation and actual signup logic when backend is ready
     // For now, just navigate to order page
@@ -20,8 +20,63 @@ export default function SignupPage() {
       alert("Passwords do not match!");
       return;
     }
-    router.push("/order");
+
+    try {
+      var response = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          phone: phone,
+          birthday: birthday,
+          password: password,
+          role: 'customer'
+        })
+      });
+
+      if (!response.ok) {
+        // If server responds with 400/500 code, get the specific message
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      response = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          phone: phone,
+          birthday: birthday,
+          password: password,
+          role: 'customer',
+          default_theatre_id: -1
+        })
+      });
+
+      if (!response.ok) {
+        // If server responds with 400/500 code, get the specific message
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      // Success path:
+      router.push("/login");
+      alert("Registration successful!");
+
+    } catch (error: any) {
+      // This catches network errors AND the error thrown above
+      console.error(error);
+      alert("Error: " + error.message);
+    }
   };
+
+
 
   return (
     <section className="max-w-md mx-auto mt-10">

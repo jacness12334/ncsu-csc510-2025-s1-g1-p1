@@ -8,11 +8,48 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const setCookie = (name: string, value: string, days: number) => {
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + days); // Set expiration in days
+    document.cookie = `${name}=${value}; expires=${expirationDate.toUTCString()}; path=/`;
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // TODO: Add actual authentication logic here when backend is ready
-    // For now, just navigate to order page
-    router.push("/order");
+
+
+    try {
+      const response = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        }),
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        // If server responds with 400/500 code, get the specific message
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      console.log(await response.text());
+
+      // Success path:
+      // setCookie('sessionToken', '', 1);
+      // router.push("/order");
+      alert("Login successful!");
+
+    } catch (error: any) {
+      // This catches network errors AND the error thrown above
+      console.error(error);
+      alert("Error: " + error.message);
+    }
+
   };
 
   return (
