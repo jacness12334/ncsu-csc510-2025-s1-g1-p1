@@ -104,9 +104,9 @@ def populate_db():
             (16, 'Hot Dog', 7.00, 8, None, 'savory, filling, classic, flavorful', 'food', 0.00, True)])
 
    # deliveries 
-   insert("""INSERT INTO deliveries (driver_id, customer_showing_id, payment_method_id, staff_id, payment_status, total_price) VALUES (%s, %s, %s, %s, %s, %s)""",
-         [(9, 1, 1, 1, 'completed', 3.00),
-            (10, 2, 2, 1, 'completed', 8.00)])
+   insert("""INSERT INTO deliveries (driver_id, customer_showing_id, payment_method_id, staff_id, payment_status, total_price, is_rated) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+         [(9, 1, 1, 1, 'completed', 3.00, False),
+            (10, 2, 2, 1, 'completed', 8.00, False)])
    
      
    # cart_items
