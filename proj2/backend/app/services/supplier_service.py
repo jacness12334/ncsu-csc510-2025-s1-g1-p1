@@ -1,5 +1,5 @@
 from app.models import *
-from app.app import db, get_app
+from app.app import db
 
 class SupplierService:
 

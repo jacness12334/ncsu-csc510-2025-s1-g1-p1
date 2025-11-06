@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.models import *
-from app.app import db, get_app
+from app.app import db
 from app.services.supplier_service import SupplierService
 
 supplier_bp = Blueprint("suppliers", __name__, url_prefix="/api")
