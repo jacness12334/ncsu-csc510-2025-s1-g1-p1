@@ -1,6 +1,5 @@
 name: 🎨 Style Checks
 
-# Controls when the action will run.
 on:
   push:
     branches: [ main ]
@@ -19,10 +18,8 @@ jobs:
         fetch-depth: 0
 
     # --- 1. Prettier Formatting Check (Markdown, JSON, YAML, etc.) ---
-    # We will use the direct Node.js setup, which is cleaner without a .pre-commit-config.yaml.
     
     - name: ⚙️ Setup Node.js for Prettier
-      # This line must be correctly indented under 'steps:'
       uses: actions/setup-node@v4
       with:
         node-version: '20'
@@ -31,23 +28,27 @@ jobs:
       run: npm install --global prettier
 
     - name: 🔎 Prettier Check on Configuration and Documentation
-      # This step ensures all files covered by .prettierrc.json conform.
       run: |
         prettier --check .
 
-    # --- 2. YAML Linting (for CI/CD, Yaml Configuration) ---
-    - name: 📜 Run Yamllint
-      uses: ibi/yamllint-action@v1.0.0
+    # --- 2. YAML Linting (using a direct, reliable method) ---
+    # FIX: Replaced the non-resolvable 'ibi/yamllint-action' with a direct pip installation.
+    - name: 🐍 Setup Python and Install Yamllint
+      # Since yamllint is a Python package, we set up Python for stability.
+      uses: actions/setup-python@v5
       with:
-        # **CORRECTED LINE 31 AREA:** This structure is now correct.
-        config_file: .yamllint.yaml
-        files: |
-          .github/workflows
-          *.yml
-          *.yaml
+        python-version: '3.x'
+
+    - name: 📜 Run Yamllint Check
+      run: |
+        pip install yamllint
+        # The 'yamllint' command automatically looks for '.yamllint.yaml' in the root.
+        # We specify the directories to check, as configuration files are the primary focus.
+        yamllint -c .yamllint.yaml .github/workflows/*.yml *.yml *.yaml
 
     # --- 3. Dockerfile Linting (Hadolint) ---
     - name: 🐳 Run Hadolint (Dockerfile Linter)
+      # This action is generally stable, but confirm its existence if issues persist.
       uses: reviewdog/action-hadolint@v1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
