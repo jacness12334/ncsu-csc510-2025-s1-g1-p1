@@ -11,7 +11,8 @@ export default function SignupPage() {
   const [birthday, setBirthday] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState("");
+  const [userType, setUserType] = useState("customer");
+  const [theatre, setTheatre] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,7 +26,7 @@ export default function SignupPage() {
     try {
       switch (userType) {
         case 'customer':
-          let response = await fetch("http://localhost:5000/api/users/register", {
+          let response = await fetch("http://localhost:5000/api/customers", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -37,7 +38,7 @@ export default function SignupPage() {
               birthday: birthday,
               password: password,
               role: 'customer',
-              default_theatre_id: -1
+              default_theatre_id: 1
             })
           });
 
@@ -67,7 +68,7 @@ export default function SignupPage() {
               birthday: birthday,
               password: password,
               role: userType.split('-')[1],
-              theatre_id: -1
+              theatre_id: theatre
             })
           });
 
@@ -83,12 +84,39 @@ export default function SignupPage() {
           break;
 
         case 'supplier':
+          response = await fetch("http://localhost:5000/api/suppliers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              phone: phone,
+              birthday: birthday,
+              password: password,
+              company_name: '',
+              company_address: '',
+              contact_phone: ''
+            })
+          });
+
+          if (!response.ok) {
+            // If server responds with 400/500 code, get the specific message
+            const errorData = await response.json();
+            throw new Error(errorData.message || response.statusText);
+          }
+
+          // Success path:
+          router.push("/login");
+          alert("Registration successful!");
           break;
 
         case 'driver':
           break;
 
         default:
+          console.log(userType);
           alert("Error: User type not registered. Please contact admin for details.");
           break;
       }
@@ -119,10 +147,10 @@ export default function SignupPage() {
             required
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
             <option value='customer'>Customer</option>
-            <option value='staff-runner'>Staff (runner)</option>
-            <option value='staff-admin'>Staff (admin)</option>
-            <option value='driver'>Driver</option>
-            <option value='supplier'>Supplier</option>
+            <option value='staff-runner'>Staff - Runner (Must be logged in as admin)</option>
+            <option value='staff-admin'>Staff - Admin (Must be logged in as admin)</option>
+            <option value='driver'>Driver (Must be logged in as admin)</option>
+            <option value='supplier'>Supplier (Must be logged in as admin)</option>
           </select>
         </div>
         <div>
@@ -183,6 +211,24 @@ export default function SignupPage() {
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           />
         </div>
+
+        {userType == 'customer' && (
+          <div>
+            <label htmlFor="theatre" className="block text-sm font-medium mb-1">
+              Movie Theatre ID
+            </label>
+            <input
+              type="number"
+              id="theatre"
+              value={theatre}
+              onChange={(e) => setTheatre(e.target.value)}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="1"
+            />
+
+          </div>
+        )}
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium mb-1">
