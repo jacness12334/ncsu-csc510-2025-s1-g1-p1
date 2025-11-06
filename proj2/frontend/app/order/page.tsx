@@ -24,7 +24,7 @@ export default function OrderPage() {
         <div className="rounded-2xl border p-6 text-center opacity-60 cursor-not-allowed">
           <h3 className="text-lg font-semibold mb-2">🍔 Local Restaurants</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Coming soon — partner eateries for “Dinner + Movie” bundles.
+            Coming soon — partner eateries for complete meals.
           </p>
           <button className="rounded-xl border px-5 py-2 text-sm cursor-not-allowed" disabled>
             Coming Soon
