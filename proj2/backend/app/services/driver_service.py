@@ -107,3 +107,30 @@ class DriverService:
         delivery.delivery_status = delivery_status
         db.session.commit()
         return delivery
+    
+    def assign_delivery_to_driver(self, delivery_id):
+        delivery = Deliveries.query.get(delivery_id)
+
+        if not delivery:
+            raise ValueError(f"Delivery {delivery_id} not found")
+        
+        if delivery.delivery_status != 'pending' and delivery.delivery_status != 'accepted':
+            raise ValueError(f"Delivery is already in status '{delivery.delivery_status}' and cannot be auto-assigned.")
+        
+        best_driver = Drivers.query.filter(
+            Drivers.duty_status == 'available'
+        ).order_by(
+            Drivers.rating.desc()
+        ).first()
+
+        if not best_driver:
+            raise ValueError("No available drivers found to assign the delivery")
+
+        delivery.driver_id = best_driver.user_id
+        delivery.delivery_status = 'accepted'
+        
+        best_driver.duty_status = 'on_delivery'
+
+        db.session.commit()
+        return best_driver, delivery
+    

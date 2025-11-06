@@ -160,3 +160,23 @@ def update_delivery_status_by_driver(delivery_id):
     except Exception as e:
         print(f"Error updating delivery status by driver: {e}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
+    
+@bp.route('/deliveries/<int:delivery_id>/assign_driver', methods=['PUT'])
+def assign_delivery_to_driver(delivery_id):
+    try:
+        user_id = get_user_id()
+        service = DriverService(user_id)
+        best_driver, delivery = service.assign_delivery_to_driver(delivery_id)
+        
+        return jsonify({
+            "message": f"Delivery {delivery_id} successfully assigned to driver {best_driver.user_id} ({best_driver.rating} rating).",
+            "delivery_id": delivery.id,
+            "assigned_driver_id": best_driver.user_id,
+            "new_delivery_status": delivery.delivery_status
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        print(f"Error auto-assigning delivery: {e}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
+
