@@ -88,8 +88,6 @@ class CustomerService:
     
     def get_customer_payment_methods(self, customer_id):
         payment_methods = PaymentMethods.query.filter(PaymentMethods.customer_id == customer_id).all()
-        if not payment_methods:
-            raise ValueError(f"Payment methods for customer {customer_id} not found")
         
         return payment_methods
 

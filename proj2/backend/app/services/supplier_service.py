@@ -17,6 +17,23 @@ class SupplierService:
         self.user_id = user_id
 
 
+    # Admin functionality - add supplier member
+    def add_supplier(self, name, email, phone, birthday, password, company_name, company_address, contact_phone, is_open=False):
+        admin = Staff.query.filter_by(user_id=self.user_id).first()
+        if not admin or admin.role != 'admin':
+            return {"error":"Unauthorized User - Not an admin"}, 403
+        
+        if Users.query.filter((Users.email == email) | (Users.phone == phone)).first():
+            return {"error": "User already exists"}, 400
+        
+        user = user_service.create_user(name, email, phone, birthday, password)
+        db.session.flush()
+
+        supplier = Suppliers(user_id=user.id, company_name=company_name, company_address=company_address, contact_phone=contact_phone, is_open=is_open)
+        db.session.add(supplier)
+        db.session.commit()
+        return {"message": "Supplier created successfully", "user_id": user.id}, 201
+
     def validate_supplier(self):
         supplier = Suppliers.query.filter_by(user_id=self.user_id).first()
         if not supplier:

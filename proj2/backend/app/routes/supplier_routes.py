@@ -12,6 +12,29 @@ def get_user_id():
     data = request.json
     return data.get('user_id')
 
+@bp.route('/suppliers', methods=['POST'])
+def create_supplier():
+    user_id = get_user_id()
+    service = SupplierService(user_id)
+
+    data = request.json
+    required_fields = ['name', 'email', 'phone', 'birthday', 'password', 'company_name', 'company_address', 'contact_phone', 'is_open']
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    response, status = service.add_supplier(
+        name=data['name'],
+        email=data['email'],
+        phone=data['phone'],
+        birthday=data['birthday'],
+        password=data['password'],
+        company_name=data['company_name'],
+        company_address=data['company_address'],
+        contact_phone=data['contact_phone'],
+        is_open=False
+    )
+    return jsonify(response), status
+
 
 @bp.route('/suppliers', methods=['PUT'])
 def edit_supplier():
@@ -21,7 +44,7 @@ def edit_supplier():
     required_fields = ['company_name', 'company_address', 'contact_phone', 'is_open']
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
-    response, status = service.edit_movie(
+    response, status = service.edit_supplier(
         company_name=data['company_name'],
         company_address=data['company_address'],
         contact_phone=data['contact_phone'],

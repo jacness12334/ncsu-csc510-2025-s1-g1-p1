@@ -90,7 +90,7 @@ def add_payment_method(user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': 'An error occurred: ' + str(e)}), 500
     
 @customer_bp.route('/customers/<int:customer_id>/payment-methods', methods=['GET'])
 def get_payment_methods(customer_id):
@@ -103,7 +103,8 @@ def get_payment_methods(customer_id):
                 'expiration_month': pm.expiration_month,
                 'expiration_year': pm.expiration_year,
                 'balance': float(pm.balance),
-                'is_default': pm.is_default
+                'is_default': pm.is_default,
+                'billing_address': pm.billing_address
             } for pm in payment_methods]
         }), 200
     except ValueError as e:
