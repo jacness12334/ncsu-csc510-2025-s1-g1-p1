@@ -44,10 +44,10 @@ export default function LoginPage() {
       // router.push("/order");
       alert("Login successful!");
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // This catches network errors AND the error thrown above
       console.error(error);
-      alert("Error: " + error.message);
+      alert("Error: " + (error instanceof Error ? error.message : String(error)));
     }
 
   };

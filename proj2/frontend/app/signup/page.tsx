@@ -22,7 +22,7 @@ export default function SignupPage() {
     }
 
     try {
-      var response = await fetch("http://localhost:5000/api/users/register", {
+      let response = await fetch("http://localhost:5000/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,10 +69,10 @@ export default function SignupPage() {
       router.push("/login");
       alert("Registration successful!");
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // This catches network errors AND the error thrown above
       console.error(error);
-      alert("Error: " + error.message);
+      alert("Error: " + (error instanceof Error ? error.message : String(error)));
     }
   };
 
