@@ -15,8 +15,11 @@ Movie Munchers brings the joy of dining and entertainment together by letting yo
 
 ## 👥 Team
 Group 1 — Janelle Correia, Aadya Maurya, Jacob Philips, Aarya Rajoju, Galav Sharma  
+
 Frontend: Next.js, React, TypeScript, Tailwind CSS, PostCSS
+
 Backend: Flask, SQLAlchemy
+
 Database: MySQL
 
 ## 🎥 Demo
