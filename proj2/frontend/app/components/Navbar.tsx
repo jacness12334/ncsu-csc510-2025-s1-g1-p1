@@ -14,6 +14,7 @@ export default function Navbar() {
           <Link href="/editdetails">Edit Details</Link>
           <Link href="/order">Order</Link>
           <Link href="/track/12345">Track Order</Link>
+          <Link href="/suppliers">Suppliers</Link>
           <CartButton />
 
           <Link
