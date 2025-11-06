@@ -1,0 +1,20 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run nightly tasks
+        run: |
+          echo "Running nightly build tasks..."
+          # Add your nightly build commands here
+          # For example:
+          # npm install
+          # npm test
+          # build-script.sh
