@@ -1,3 +1,20 @@
+# .hadolint.yaml - Configuration for Hadolint
+# Configures Hadolint to ignore specific rules, prioritizing security and size.
+
+# Example: Ignore rules for using explicit base image tags (DL3006) 
+# and setting a maintainer label (DL4000), as these are often managed externally.
 ignored:
-  - DL3008 # Don't warn about 'apt-get install' missing '-y'
-  - DL3018 # Don't warn about pin versions in 'apk add'
+  - DL3006
+  - DL4000
+
+# Specify preferred base images (optional but good practice)
+trustedRegistries:
+  - docker.io
+  - registry.access.redhat.com
+  
+# Customize severity levels
+severity:
+  # Treat instruction rules as errors for strict adherence to best practices
+  DL3008: error # Pinning versions in apk add
+  DL3018: error # Pinning versions in apt-get install
+  DL3042: error # Use COPY for adding files instead of ADD (unless unzipping is needed)
