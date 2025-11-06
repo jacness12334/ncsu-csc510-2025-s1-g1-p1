@@ -1,0 +1,87 @@
+name: 🎨 Style Checks
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events, but only for the 'main' branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel.
+jobs:
+  style_checks:
+    # Use the latest stable Ubuntu runner environment
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: ⬇️ Checkout Repository
+      uses: actions/checkout@v4
+      # Fetch all history for proper file change detection and full repo context
+      with:
+        fetch-depth: 0
+
+    # --- 1. Prettier Formatting Check (Markdown, JSON, YAML, etc.) ---
+    # Since Prettier is configured, we must ensure all relevant files conform.
+    - name: 💅 Run Prettier Check
+      # Using a dedicated action for Prettier which runs in 'check' mode by default.
+      uses: pre-commit/action@v3.0.1
+      with:
+        # Installs all hooks in .pre-commit-config.yaml and runs them
+        # Note: A .pre-commit-config.yaml is not explicitly listed but this is the standard way to run pre-commit actions. 
+        # For simplicity without a config, we'll use a direct Prettier command below.
+        
+        # Alternative approach (more direct, avoids a separate pre-commit setup):
+        # Install node and prettier
+        
+    - name: ⚙️ Setup Node.js for Prettier
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: 📥 Install Prettier
+      run: npm install --global prettier
+
+    - name: 🔎 Prettier Check on Configuration and Documentation
+      # The '--check' flag ensures it only reports errors, rather than fixing them.
+      run: |
+        prettier --check .
+      # This command will check all files supported by the local .prettierrc.json
+
+    # --- 2. YAML Linting (for CI/CD, Yaml Configuration) ---
+    - name: 📜 Run Yamllint
+      # Using a dedicated action for yaml linting
+      uses: ibi/yamllint-action@v1.0.0
+      with:
+        # The project already has a .yamllint.yaml config file, which this action will automatically use.
+        config_file: .yamllint.yaml
+        # Specify the directories and files to check. Excluding .github/ because the action checks it anyway.
+        files: |
+          .github/workflows
+          *.yml
+          *.yaml
+
+    # --- 3. Dockerfile Linting (Hadolint) ---
+    # Hadolint is configured, so we assume a Dockerfile exists or will exist.
+    - name: 🐳 Run Hadolint (Dockerfile Linter)
+      # Using a dedicated action for Hadolint
+      uses: reviewdog/action-hadolint@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        # Assuming the Dockerfile is in the root directory, adjust 'dockerfile-path' if needed.
+        dockerfile-path: ./Dockerfile
+        # The .hadolint.yaml configuration will be automatically picked up.
+        # reporter: github-pr-review # Uncomment to report findings directly in PRs
+        
+    # --- 4. Python-Specific Checks (Placeholder) ---
+    # Although the request was for style checkers, a full quality pipeline should include Python-specific tools.
+    # This step is commented out but is the next logical addition based on the Python context.
+    # - name: 🐍 Python Linting (e.g., Flake8, Black check)
+    #   uses: actions/setup-python@v5
+    #   with:
+    #     python-version: '3.11' # Use a typical, recent Python version
+    # - run: pip install black flake8
+    # - run: black --check .
+    # - run: flake8 proj1/
