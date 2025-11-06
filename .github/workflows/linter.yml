@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, frontend ]
 
+  workflow_dispatch:
+
 jobs:
   linter_job:
     runs-on: ubuntu-latest
