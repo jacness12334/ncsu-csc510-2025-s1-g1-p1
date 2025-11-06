@@ -98,3 +98,39 @@ Movie Munchers is maintained and governed by the original 5 developers, who coll
 
 * **Decision Making:** Decisions are made by **consensus among the 5 Core Team members**. Any one of the five members has the authority to review and approve code.  
 * **PR Approval:** Only a Core Team member has the authority to approve and merge Pull Requests into the main branch.
+
+### 🎯 Future Feature Suggestions (High Priority)
+
+Based on core team feedback, these are high-impact features we would like to implement to enhance user experience and operational efficiency:
+
+Predictive Ordering (Machine Learning Integration): Develop an ML model (using Python and Flask) that can analyze movie genre, run time, and showtime to suggest specific snack combinations to the user before they even start browsing. This feature will improve conversion rates and streamline the user's ordering process by anticipating their preferences.
+
+Inventory Waste Prevention Forecasting: Build a dedicated backend module to forecast concession demand based on historical sales data, weather, and current show schedules. This forecasting model will allow theaters to optimize inventory procurement, significantly reducing food waste and lowering operational costs.
+
+Food Bank Surplus Integration: Create a simple administrative dashboard and API endpoint that allows theater staff to log end-of-night surplus concession inventory that is still safe for donation. This system would integrate with local food bank partners via email or API, facilitating timely pickups and minimizing waste impact.
+
+In-Seat Feedback & Rating System: Implement a client-side rating mechanism in the React frontend that allows customers to quickly provide feedback on food quality or delivery experience post-purchase. This data should be captured and stored in the SQL database to provide theater management with continuous, actionable quality control metrics.
+
+Real-time Order Status Tracker: Enhance the user interface with a real-time order status bar (e.g., "Confirmed" -> "Preparing" -> "Delivering" -> "Delivered") powered by a persistent connection (e.g., WebSockets or long polling) handled by the Flask backend. This dramatically improves customer experience by reducing anxiety and providing transparency after the order is placed.
+
+### 💡 Tips for Extending Movie Munchers Robustly
+
+1. Extending the SQL Database Schema
+
+When adding a new table (e.g., promotions) or a column to an existing table, first design the migration script carefully. Never directly modify the production database structure; define the schema changes in an Alembic or equivalent migration file to ensure atomic, reversible updates. Before running the migration, always check that the Flask-SQLAlchemy models reflect the new schema fields and that default values or NOT NULL constraints are handled gracefully.
+
+2. Adding New Flask API Endpoints
+
+To introduce a new endpoint (e.g., /api/order-history), ensure it is protected by appropriate authentication and authorization checks immediately upon entry, especially if it handles user-specific data. Structure the view function to strictly separate the business logic (which should reside in service modules) from the HTTP request/response handling. Always use Flask's built-in JSON utilities to serialize responses, and validate incoming data using a library like Marshmallow to prevent unexpected data types or security vulnerabilities.
+
+3. Creating New React Components
+
+When developing a new component (e.g., a SeatPicker component), prioritize component reusability and separation of concerns by keeping local state to a minimum. Use props to pass data and callbacks from its parent component, following a one-way data flow to maintain predictability. Ensure the component is fully responsive by utilizing Tailwind's utility classes and breakpoints, making it look great on both mobile ordering screens and desktop views.
+
+4. Implementing Complex State Logic in React
+
+For managing application-wide state (like the shopping cart or user session), avoid prop-drilling by leveraging a centralized solution like React Context or a dedicated state management library like Redux/Zustand. When updating complex objects in state (like adding items to the cart array), always use the immutable update pattern by creating a new array or object instead of directly mutating the existing state object. This prevents hard-to-debug side effects and ensures components re-render correctly.
+
+5. Managing Environment Variables
+
+If adding new external services (like a payment gateway key or a new email provider URL), never hardcode sensitive credentials directly into the codebase, even in development files. Use environment variables defined in a .env file for local development and ensure your CI/CD pipeline securely injects them into the Flask backend and the Next.js frontend build process. Access keys on the client-side (frontend) should only be for non-sensitive public IDs; true secrets must remain server-side.
