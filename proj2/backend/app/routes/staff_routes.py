@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.models import *
 from app.app import db
 from app.services.staff_service import StaffService
+from datetime import datetime
 
 staff_bp = Blueprint("staff", __name__, url_prefix="/api")
 
@@ -152,7 +153,7 @@ def add_showing():
         showing = service.add_showing(
             movie_id=data['movie_id'],
             auditorium_id=data['auditorium_id'],
-            start_time=data['start_time']
+            start_time=datetime.fromisoformat(data['start_time'].replace("Z", "+00:00"))
         )
         return jsonify({"message":"Movie Showing created successfully", "showing_id": showing.id}), 201
     except ValueError as e:
@@ -174,7 +175,7 @@ def edit_showing(showing_id):
             showing_id=showing_id,
             movie_id=data['movie_id'],
             auditorium_id=data['auditorium_id'],
-            start_time=data['start_time'],
+            start_time=datetime.fromisoformat(data['start_time'].replace("Z", "+00:00"))
         )
         return jsonify({"message":"Movie Showing details changed successfully", "showing_id": showing.id}), 200
     except ValueError as e:
@@ -212,22 +213,6 @@ def set_availability():
         return jsonify({'error': 'An error occurred'}), 500
 
 
-@staff_bp.route('/deliveries/<int:delivery_id>/status', methods=['PUT'])
-def update_delivery_status(delivery_id):
-    try:
-        user_id = get_user_id()
-        service = StaffService(user_id)
-        data = request.json
-        if 'delivery_status' not in data:
-            return jsonify({"error": "Missing delivery_status"}), 400
-        delivery = service.update_delivery_status(delivery_id, data['delivery_status'])
-        return jsonify({"message": f"Delivery status updated to {delivery.delivery_status}"}), 200
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 404
-    except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
-
-
 @staff_bp.route('/deliveries/<int:delivery_id>/accept', methods=['PUT'])
 def accept_delivery(delivery_id):
     try:
@@ -235,6 +220,22 @@ def accept_delivery(delivery_id):
         service = StaffService(user_id)
         delivery = service.accept_delivery(delivery_id)
         return jsonify({"message": "Delivery accepted successfully"}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': 'An error occurred'}), 500
+
+
+
+
+@staff_bp.route('/deliveries/<int:delivery_id>/fulfill', methods=['PUT'])
+def fulfill_delivery(delivery_id):
+    try:
+        user_id = get_user_id()
+        service = StaffService(user_id)
+        data = request.json
+        delivery = service.fulfill_delivery(delivery_id)
+        return jsonify({"message": f"Delivery fulfilled"}), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:

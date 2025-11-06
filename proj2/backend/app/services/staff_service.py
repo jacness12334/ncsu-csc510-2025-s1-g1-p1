@@ -1,14 +1,17 @@
 from app.models import *
 from app.app import db
 from app.services.user_service import UserService
+from datetime import datetime
 
 class StaffService:
 
+    # Initialize services
     def __init__(self, user_id):
         self.user_id = user_id
         self.user_service = UserService()
     
 
+    # Check that user is admin
     def validate_admin(self):
         admin = Staff.query.filter_by(user_id=self.user_id).first()
         if not admin or admin.role != 'admin':
@@ -16,6 +19,7 @@ class StaffService:
         return admin
 
 
+    # Retrieve the given staff user
     def validate_staff(self):
         staff = Staff.query.filter_by(user_id=self.user_id).first()
         if not staff:
@@ -42,17 +46,16 @@ class StaffService:
     # Admin functionality - remove staff member
     def remove_staff(self, staff_user_id):
         admin = self.validate_admin()
-        
-        user = Users.query.filter_by(id=staff_user_id).first()
+
+                
         staff = Staff.query.filter_by(user_id=staff_user_id).first()
         if not staff:
             raise ValueError(f"User {staff_user_id} not found")
         
-        db.session.delete(staff)
-        db.session.delete(user)
-        db.session.commit()
+        self.user_service.delete_user(staff.user_id)
     
 
+    # Returns a list of all theatres
     def get_theatres(self):
         theatres = Theatres.query.all()
         return theatres
@@ -121,6 +124,8 @@ class StaffService:
         auditorium = Auditoriums.query.filter_by(id=auditorium_id).first()
         if not auditorium:
             raise ValueError(f"Auditorium {auditorium_id} not found")
+        if not isinstance(start_time, datetime):
+            raise ValueError(f"Movie start time must be in DateTime format")
         
         showing = MovieShowings(movie_id=movie_id, auditorium_id=auditorium_id, start_time=start_time)
         db.session.add(showing)
@@ -142,6 +147,9 @@ class StaffService:
         showing = MovieShowings.query.filter_by(id=showing_id).first()
         if not showing:
             raise ValueError(f"Movie Showing {showing_id} not found")
+        
+        if not isinstance(start_time, datetime):
+            raise ValueError(f"Movie start time must be in DateTime format")
         
         showing.movie_id = movie_id
         showing.auditorium_id = auditorium_id
@@ -171,35 +179,57 @@ class StaffService:
         return staff
     
 
-    # Staff functionality - update delivery status
-    def update_delivery_status(self, delivery_id, delivery_status):
-        staff = self.validate_staff()
-
-        valid = ['accepted', 'in_progress', 'ready_for_pickup', 'in_transit', 'delivered', 'fulfilled', 'cancelled']
-        if delivery_status not in valid:
-            raise ValueError("Invalid status")
-
-        delivery = Deliveries.query.filter_by(id=delivery_id, staff_id=staff.id).first()
-        if not delivery:
-            raise ValueError("Delivery not found")
-
-        delivery.delivery_status = delivery_status
-        db.session.commit()
-        return delivery
-    
-
     # Staff functionality - accept delivery
     def accept_delivery(self, delivery_id):
         staff = self.validate_staff()
 
         delivery = Deliveries.query.get(delivery_id)
+
+        if not staff.is_available:
+            raise ValueError("Staff not available")
         if not delivery:
             raise ValueError("Delivery not found")
-
         if delivery.delivery_status != 'pending':
             raise ValueError("Delivery not available to accept")
 
+        self.set_availability(False)
         delivery.staff_id = staff.user_id
         delivery.delivery_status = 'accepted'
         db.session.commit()
         return delivery
+    
+
+    # Fulfill delivery
+    def fulfill_delivery(self, delivery_id):
+        staff = self.validate_staff()
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
+
+        if not delivery:
+            raise ValueError(f"Delivery {delivery_id} not found")
+        if delivery.delivery_status != 'delivered':
+            raise ValueError("Delivery status must be 'delivered' to be fulfilled")
+
+        delivery.delivery_status = 'fulfilled'
+        self.set_availability(True)
+        db.session.commit()
+        return delivery
+    
+    # Get available staff member
+    def get_available_staff(self, theatre_id):
+        staff = Staff.query.filter_by(theatre_id=theatre_id, is_available=True).all()
+        if staff:
+            staff = staff.order_by(Staff.last_updated.asc(), Staff.user_id.asc()).first()
+        return staff
+    
+    # Assign available staff member
+    def try_assign_staff(self, theatre_id, delivery):
+        if not delivery:
+            raise ValueError("Delivery not found")
+        staff = self.get_available_staff(theatre_id=theatre_id)
+        if not staff:
+            return False
+        delivery.staff_id = staff.user_id
+        staff.is_available = self.set_availability(False)
+        db.session.commit()
+        return True
+    
