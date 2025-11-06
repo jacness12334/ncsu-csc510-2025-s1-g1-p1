@@ -1,7 +1,7 @@
 import pytest
 from app.app import create_app, db
 from database import create_tables, drop_all_tables, get_database
-from app.models import Theatres, Suppliers, Products, Drivers, Staff, Movies, MovieShowings, Seats, Auditoriums
+from app.models import *
 
 @pytest.fixture(scope='function')
 def app():
@@ -36,20 +36,11 @@ def sample_user(app):
     return user_id
 
 @pytest.fixture(scope='function')
-def sample_customer(app):
+def sample_customer(app, sample_theatre):
     from app.services.customer_service import CustomerService
     customer_service = CustomerService()
 
     with app.app_context():
-        theatre = Theatres(
-            name='Test Theatre', 
-            address='123 St', 
-            phone='5551111111', 
-            is_open=True
-        )
-        db.session.add(theatre)
-        db.session.commit()
-
         customer = customer_service.create_customer(
             name='Test User',
             email='test@example.com',
@@ -57,7 +48,7 @@ def sample_customer(app):
             birthday='1990-01-01',
             password='password123',
             role='customer',
-            default_theatre_id=theatre.id
+            default_theatre_id=sample_theatre
         )
         customer_id = customer.user_id
     return customer_id
@@ -79,7 +70,8 @@ def sample_supplier(app):
             user_id=supplier_user.id,
             company_name='Snacks Inc', 
             company_address='123 Supply St', 
-            contact_phone='5553334444'
+            contact_phone='5553334444',
+            is_open=True
         )
         db.session.add(supplier)
         db.session.commit()
@@ -147,20 +139,12 @@ def sample_driver(app):
     return driver_id
 
 @pytest.fixture(scope='function')
-def sample_staff(app):
+def sample_staff(app, sample_theatre):
     from app.services.user_service import UserService
     user_service = UserService()
 
     with app.app_context():
         
-        theatre = Theatres(
-                name='Test Theatre', 
-                address='123 St', 
-                phone='5551111111', 
-                is_open=True
-            )
-        db.session.add(theatre)
-        db.session.commit()
         staff_user = user_service.create_user(
             name='Test Staff',
             email='staff@example.com',
@@ -171,7 +155,7 @@ def sample_staff(app):
         )
         staff = Staff(
             user_id=staff_user.id,
-            theatre_id=theatre.id,
+            theatre_id=sample_theatre,
             role='runner',          
             is_available=True
         )
@@ -181,31 +165,105 @@ def sample_staff(app):
     return staff_id
 
 @pytest.fixture(scope='function')
-def sample_customer_showing(app, sample_customer):
-    from app.services.customer_service import CustomerService
-    customer_service = CustomerService()
+def sample_admin(app, sample_theatre):
+    from app.services.user_service import UserService
+    user_service = UserService()
+
     with app.app_context():
-        customer = customer_service.get_customer(sample_customer)
-
-        auditorium = Auditoriums(theatre_id=customer.default_theatre_id, number=1, capacity=100)
-        db.session.add(auditorium)
-        db.session.commit()
-
-        seat = Seats(aisle='A', number=1, auditorium_id=auditorium.id)
-        db.session.add(seat)
-        db.session.commit()
         
+        admin_user = user_service.create_user(
+            name="Admin",
+            email="admin@example.com",
+            phone="9000000001",
+            birthday="2000-01-01",
+            password="password",
+            role="staff"
+        )
+        admin = Staff(user_id=admin_user.id, theatre_id=sample_theatre, role="admin", is_available=True)
+        db.session.add(admin)
+        db.session.commit()
+        admin_id = admin_user.id 
+    return admin_id
+
+@pytest.fixture(scope='function')
+def sample_delivery(app, sample_customer_showing, sample_driver, sample_customer):
+    with app.app_context():
+        
+        payment_method = PaymentMethods(
+            customer_id=sample_customer,
+            card_number="4111111111111111",
+            expiration_month=12,
+            expiration_year=2026,
+            billing_address="123 Test St",
+            balance=500.00,
+            is_default=True
+        )
+        db.session.add(payment_method)
+        db.session.commit()
+
+        delivery = Deliveries(
+            driver_id=sample_driver,
+            customer_showing_id=sample_customer_showing,
+            payment_method_id=payment_method.id,
+            staff_id=None,
+            payment_status="pending",
+            total_price=25.00,
+            delivery_status="pending"
+        )
+        db.session.add(delivery)
+        db.session.commit()
+        delivery_id = delivery.id
+    return delivery_id
+
+@pytest.fixture(scope='function')
+def sample_theatre(app):
+    with app.app_context():
+        theatre = Theatres(name="Theatre 1", address="1 Theatre St", phone="9876543211", is_open=True)
+        db.session.add(theatre)
+        db.session.commit()
+        theatre_id = theatre.id
+    return theatre_id
+
+@pytest.fixture(scope='function')
+def sample_movie(app):
+    with app.app_context():
         movie = Movies(title='Test Movie', genre='Action', length_mins=120, release_year=2024, keywords='test', rating=4.5)
         db.session.add(movie)
         db.session.commit()
+        movie_id = movie.id
+    return movie_id
 
-        showing = MovieShowings(movie_id=movie.id, auditorium_id=auditorium.id, start_time='2025-12-01 19:00:00')
+@pytest.fixture(scope='function')
+def sample_auditorium(app, sample_theatre):
+    with app.app_context():
+        auditorium = Auditoriums(theatre_id=sample_theatre, number=1, capacity=100)
+        db.session.add(auditorium)
+        db.session.commit()
+        
+        auditorium_id = auditorium.id
+    return auditorium_id
+
+@pytest.fixture(scope='function')
+def sample_showing(app, sample_auditorium, sample_movie):
+    with app.app_context():
+        showing = MovieShowings(movie_id=sample_movie, auditorium_id=sample_auditorium, start_time='2025-12-01 19:00:00')
         db.session.add(showing)
+        db.session.commit()
+        showing_id = showing.id
+    return showing_id
+
+@pytest.fixture(scope='function')
+def sample_customer_showing(app, sample_customer, sample_auditorium, sample_showing):
+    from app.services.customer_service import CustomerService
+    customer_service = CustomerService()
+    with app.app_context():
+        seat = Seats(aisle='A', number=1, auditorium_id=sample_auditorium)
+        db.session.add(seat)
         db.session.commit()
 
         customer_showing = customer_service.create_customer_showing(
             user_id=sample_customer,
-            movie_showing_id=showing.id,
+            movie_showing_id=sample_showing,
             seat_id=seat.id
         )
         customer_showing_id = customer_showing.id
