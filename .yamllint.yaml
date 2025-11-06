@@ -1,1 +1,56 @@
+---
+# .yamllint.yaml - Configuration for Yamllint
+# Enforces strict YAML formatting rules required for high-quality software projects.
 
+extends: default
+
+rules:
+  # General Style Rules
+  comments-indentation: enable
+  
+  # Ensure comments start with a space
+  comments:
+    level: warning
+    forbid-spaces-after-comments: false
+    require-starting-space: true
+
+  # Enforce consistent indentation (2 spaces is standard for YAML/CI)
+  indentation: 
+    spaces: 2
+    level: error
+  
+  # Maximum line length (consistent with Prettier 80)
+  line-length:
+    max: 80
+    level: warning
+    max-in-comments: 120 # Allow slightly longer comments
+
+  # Requires one blank line before top-level elements for readability
+  new-line-after-last-line: enable
+  
+  # Disallow trailing whitespace
+  trailing-spaces: enable
+
+  # Document Structure Rules
+  document-start: disable  # Allows omission of '---' at the top of small files
+  document-content:
+    level: error
+
+  # Key/Value Rules
+  key-ordering: disable # Don't enforce alphabetical order of keys
+  
+  # Force space after colon in key-value pairs (e.g., 'key: value')
+  colons: enable 
+  
+  # Prevent trailing empty lines
+  empty-lines: enable 
+  
+  # Use single quotes unless necessary
+  quoted-strings:
+    quote-type: single
+    level: warning
+
+# File filtering and exclusion
+ignore: |
+  .git
+  .venv
