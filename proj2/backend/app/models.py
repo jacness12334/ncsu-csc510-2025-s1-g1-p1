@@ -190,14 +190,15 @@ class Products(db.Model):
 class Deliveries(db.Model):
     __tablename__ = 'deliveries'
     id = db.Column(db.BigInteger, primary_key = True, autoincrement = True)
-    driver_id = db.Column(db.BigInteger, db.ForeignKey('drivers.user_id'), nullable = False)
+    driver_id = db.Column(db.BigInteger, db.ForeignKey('drivers.user_id'))
     customer_showing_id = db.Column(db.BigInteger, db.ForeignKey('customer_showings.id', ondelete='CASCADE'), nullable = False)
     payment_method_id = db.Column(db.BigInteger, db.ForeignKey('payment_methods.id'), nullable = False)
-    staff_id = db.Column(db.BigInteger, db.ForeignKey('staff.user_id'), nullable = False)
+    staff_id = db.Column(db.BigInteger, db.ForeignKey('staff.user_id'))
     payment_status = db.Column(db.Enum('pending', 'completed', 'failed'), server_default = 'pending', nullable = False)
     total_price = db.Column(DECIMAL(12,2), nullable = False)
     delivery_time = db.Column(db.DateTime, server_default = 'CURRENT_TIMESTAMP', server_onupdate = 'CURRENT_TIMESTAMP', nullable = False)
     delivery_status = db.Column(db.Enum('pending', 'accepted', 'in_progress', 'ready_for_pickup', 'in_transit', 'delivered', 'fulfilled', 'cancelled'), server_default = 'pending', nullable = False)
+    is_rated = db.Column(db.Boolean, server_default = expression.false(), nullable = False)
     date_added = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp())
     last_updated = db.Column(db.DateTime(timezone = True), nullable = False, server_default = func.current_timestamp(), server_onupdate = func.current_timestamp())
     __table_args__ = (db.CheckConstraint('total_price >= 0.00', name = 'check_total_price'),)

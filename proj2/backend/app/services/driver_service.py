@@ -5,15 +5,18 @@ import decimal
 
 class DriverService:
 
+    # Initialize services
     def __init__(self):
         self.user_service = UserService()   
     
+    # Validate the given user as a driver
     def validate_driver(self, user_id):
         driver = Drivers.query.get(user_id)
         if not driver:
             raise ValueError(f"Driver {user_id} not found")
         return driver
     
+    # Validate the given license plate
     def validate_license_plate(self, license_plate):
         try:
             str(license_plate)
@@ -25,6 +28,7 @@ class DriverService:
         except:
             raise ValueError("License plate must be a string")
     
+    # Validate the given vehicle type
     def validate_vehicle_type(self, vehicle_type):
         try:
             str(vehicle_type)
@@ -34,6 +38,7 @@ class DriverService:
         except:
             raise ValueError("Vehicle type must be a string")
 
+    # Validate the given vehicle color
     def validate_vehicle_color(self, vehicle_color):
         try:
             str(vehicle_color)
@@ -45,6 +50,7 @@ class DriverService:
         except:
             raise ValueError("Vehicle color must be a string")
         
+    # Validate the given duty status
     def validate_duty_status(self, duty_status):
         try:
             str(duty_status)
@@ -54,6 +60,7 @@ class DriverService:
         except:
             raise ValueError("Duty status must be a string")
     
+    # Validate the given rating
     def validate_rating(self, rating):
         try:
             rating = decimal.Decimal(str(rating))
@@ -63,6 +70,7 @@ class DriverService:
         except:
             raise ValueError("Rating must be a valid decimal number")
     
+    # Validate the given number of total deliveries
     def validate_total_deliveries(self, total_deliveries):
         try:
             total_deliveries = int(total_deliveries)
@@ -72,6 +80,7 @@ class DriverService:
         except:
             raise ValueError("Total deliveries must be an integer")
 
+    # Create driver user using given fields
     def create_driver(self, name, email, phone, birthday, password, role, license_plate, vehicle_type, vehicle_color, duty_status, rating, total_deliveries):
         if role != 'driver':
             raise ValueError("User role must be 'driver'")
@@ -107,47 +116,51 @@ class DriverService:
 
         return driver
     
+    # Update the given driver using the given fields
     def update_driver_details(self, user_id, license_plate, vehicle_type, vehicle_color):
         driver = self.validate_driver(user_id=user_id)
+        # Make sure plate is unique
         driver.license_plate = self.validate_license_plate(license_plate=license_plate)
         driver.vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
         driver.vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
         db.session.commit()
         return driver
     
+    # Update the duty status of the given driver
     def update_driver_status(self, user_id, new_status):
         driver = self.validate_driver(user_id=user_id)
         driver.duty_status = self.validate_duty_status(duty_status=new_status)
         db.session.commit()
         return driver
     
+    # Retrieve list of available drivers
     def get_available_drivers(self):
         return Drivers.query.filter(Drivers.duty_status == 'available').all()
     
+    # Retrieve the best available driver
     def get_best_available_driver(self):
         best_driver = Drivers.query.filter_by(duty_status='available').order_by(Drivers.rating.desc()).first()
-        if not best_driver:
-            raise ValueError("No available drivers at this time")
-    
         return best_driver
     
+    # Attempt to assign a driver to the given delivery
     def try_assign_driver(self, delivery):
-        try:
-            driver = self.get_best_available_driver()
-        except ValueError:
+        if not delivery:
+            raise ValueError("Delievry not found")
+        driver = self.get_best_available_driver()
+        if not driver:
             return False
         delivery.driver_id = driver.user_id
         delivery.delivery_status = 'accepted'
         self.update_driver_status(user_id=delivery.driver_id, new_status='on_delivery')
-        db.session.commit()
         return True
     
+    # Delete the given driver
     def delete_driver(self, user_id):
         driver = self.validate_driver(user_id=user_id)
-        db.session.delete(driver)
-        db.session.commit()
+        self.user_service.delete_user(driver.user_id)
         return True
     
+    # Mark the given delivery as completed
     def complete_delivery(self, delivery_id):
         delivery = Deliveries.query.get(delivery_id)
         if not delivery:
@@ -169,6 +182,7 @@ class DriverService:
         db.session.commit()
         return delivery
     
+    # Rate the driver of the diven delivery
     def rate_driver(self, delivery_id, new_rating):
         delivery = Deliveries.query.get(delivery_id)
         if not delivery:
@@ -196,6 +210,7 @@ class DriverService:
         db.session.commit()
         return driver, delivery
         
+    # Show past deliveries for the given driver
     def show_completed_deliveries(self, driver_id):
         driver = self.validate_driver(driver_id)
         deliveries = Deliveries.query.filter(Deliveries.driver_id == driver.id, Deliveries.delivery_status == 'fulfilled').all()
@@ -203,6 +218,7 @@ class DriverService:
             raise ValueError(f"No previous deliveries found for driver {driver.id}")
         return deliveries
     
+    # Get the given driver's active delivery
     def get_active_delivery(self, driver_id):
         driver = self.validate_driver(driver_id)
         delivery = Deliveries.query.filter_by(driver_id=driver.id).first()

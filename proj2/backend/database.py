@@ -212,15 +212,16 @@ def create_tables(db):
 
     deliveries = """CREATE TABLE IF NOT EXISTS deliveries (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
-            driver_id BIGINT NOT NULL,
+            driver_id BIGINT,
             customer_showing_id BIGINT NOT NULL,
             payment_method_id BIGINT NOT NULL,
-            staff_id BIGINT NOT NULL,
+            staff_id BIGINT,
             payment_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending' NOT NULL,
             total_price DECIMAL(12,2) NOT NULL,
             delivery_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             delivery_status ENUM('pending', 'accepted', 'in_progress', 'ready_for_pickup', 'in_transit', 
                         'delivered', 'fulfilled', 'cancelled') DEFAULT 'pending' NOT NULL,
+            is_rated BOOLEAN NOT NULL DEFAULT FALSE,
             date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (driver_id) REFERENCES drivers(user_id),
