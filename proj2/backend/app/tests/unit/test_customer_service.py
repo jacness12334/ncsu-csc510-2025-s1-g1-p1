@@ -1,7 +1,7 @@
 import pytest
-from services.customer_service import CustomerService
-from models import Theatres, PaymentMethods, CartItems, MovieShowings, Seats
-from app import db
+from app.services.customer_service import CustomerService
+from app.models import Theatres, PaymentMethods, CartItems, MovieShowings, Seats
+from app.app import db
 
 
 class TestCustomerService:
@@ -358,7 +358,7 @@ class TestCustomerService:
             customer_service = CustomerService()
             customer = customer_service.get_customer(sample_customer)
 
-            from models import Auditoriums, Movies
+            from app.models import Auditoriums, Movies
             auditorium = Auditoriums(theatre_id=customer.default_theatre_id, number=1, capacity=100)
             db.session.add(auditorium)
             db.session.commit()

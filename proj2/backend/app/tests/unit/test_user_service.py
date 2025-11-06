@@ -1,5 +1,5 @@
 import pytest
-from services.user_service import UserService
+from app.services.user_service import UserService
 
 class TestUserService:
     

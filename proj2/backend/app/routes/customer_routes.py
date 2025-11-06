@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.customer_service import CustomerService
+from app.services.customer_service import CustomerService
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/api')
 customer_service = CustomerService()

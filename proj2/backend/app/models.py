@@ -1,4 +1,4 @@
-from app import db
+from app.app import db
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT, SMALLINT, DECIMAL
 from sqlalchemy.sql import func, expression
 from flask_login import UserMixin

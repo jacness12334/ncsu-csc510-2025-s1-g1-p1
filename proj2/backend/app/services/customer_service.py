@@ -1,6 +1,6 @@
-from models import *
-from app import db
-from services.user_service import UserService
+from app.models import *
+from app.app import db
+from app.services.user_service import UserService
 import decimal
 
 class CustomerService:

@@ -1,6 +1,6 @@
 import json
-from app import db
-from models import Theatres, MovieShowings, Movies, Auditoriums, Seats
+from app.app import db
+from app.models import Theatres, MovieShowings, Movies, Auditoriums, Seats
 
 
 class TestCustomerRoutes:    
@@ -297,7 +297,7 @@ class TestCustomerRoutes:
         
     def test_create_customer_showing_success(self, client, app, sample_customer):
         with app.app_context():
-            from services.customer_service import CustomerService
+            from app.services.customer_service import CustomerService
             customer_service = CustomerService()
             customer = customer_service.get_customer(sample_customer)
             theatre_id = customer.default_theatre_id
@@ -354,9 +354,9 @@ class TestCustomerRoutes:
     
     def test_create_delivery_insufficient_funds(self, client, app, sample_customer_showing, sample_driver, sample_product):    
         with app.app_context():
-            from services.customer_service import CustomerService
-            from services.user_service import UserService
-            from models import Staff, CartItems, CustomerShowings
+            from app.services.customer_service import CustomerService
+            from app.services.user_service import UserService
+            from app.models import Staff, CartItems, CustomerShowings
             customer_service = CustomerService()
             user_service = UserService()
 

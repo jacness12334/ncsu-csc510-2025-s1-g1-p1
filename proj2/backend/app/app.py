@@ -31,15 +31,15 @@ def create_app(config_name):
 
     @login_manager.user_loader
     def load_user(user_id):
-        from models import Users
+        from app.models import Users
         return Users.query.get(int(user_id))
 
     @login_manager.unauthorized_handler
     def unauthorized():
         return jsonify({'error': 'Unauthorized - login required'}), 401
     
-    from routes.customer_routes import customer_bp
-    from routes.user_routes import user_bp
+    from app.routes.customer_routes import customer_bp
+    from app.routes.user_routes import user_bp
 
     app.register_blueprint(customer_bp)
     app.register_blueprint(user_bp)

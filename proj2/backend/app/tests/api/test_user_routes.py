@@ -179,7 +179,7 @@ class TestUserRoutes:
     
     def test_update_profile_duplicate_email(self, client, app):
         with app.app_context():
-            from services.user_service import UserService
+            from app.services.user_service import UserService
             user_service = UserService()
             
             user1 = user_service.create_user(
@@ -238,7 +238,7 @@ class TestUserRoutes:
     
     def test_delete_user_unauthorized(self, client, app):
         with app.app_context():
-            from services.user_service import UserService
+            from app.services.user_service import UserService
             user_service = UserService()
             
             user1 = user_service.create_user(

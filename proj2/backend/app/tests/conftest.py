@@ -1,7 +1,7 @@
 import pytest
-from app import create_app, db
+from app.app import create_app, db
 from database import create_tables, drop_all_tables, get_database
-from models import Theatres, Suppliers, Products, Drivers, Staff, Movies, MovieShowings, Seats, Auditoriums
+from app.models import Theatres, Suppliers, Products, Drivers, Staff, Movies, MovieShowings, Seats, Auditoriums
 
 @pytest.fixture(scope='function')
 def app():
@@ -20,7 +20,7 @@ def client(app):
 
 @pytest.fixture(scope='function')
 def sample_user(app):
-    from services.user_service import UserService
+    from app.services.user_service import UserService
     user_service = UserService()
     with app.app_context():
         user = user_service.create_user(
@@ -37,7 +37,7 @@ def sample_user(app):
 
 @pytest.fixture(scope='function')
 def sample_customer(app):
-    from services.customer_service import CustomerService
+    from app.services.customer_service import CustomerService
     customer_service = CustomerService()
 
     with app.app_context():
@@ -64,7 +64,7 @@ def sample_customer(app):
 
 @pytest.fixture(scope='function')
 def sample_supplier(app):
-    from services.user_service import UserService
+    from app.services.user_service import UserService
     user_service = UserService()
     with app.app_context():
         supplier_user = user_service.create_user(
@@ -121,7 +121,7 @@ def sample_product_extra(app, sample_supplier):
 
 @pytest.fixture(scope='function')
 def sample_driver(app):
-    from services.user_service import UserService
+    from app.services.user_service import UserService
     user_service = UserService()
     with app.app_context():
         driver_user = user_service.create_user(
@@ -148,7 +148,7 @@ def sample_driver(app):
 
 @pytest.fixture(scope='function')
 def sample_staff(app):
-    from services.user_service import UserService
+    from app.services.user_service import UserService
     user_service = UserService()
 
     with app.app_context():
@@ -182,7 +182,7 @@ def sample_staff(app):
 
 @pytest.fixture(scope='function')
 def sample_customer_showing(app, sample_customer):
-    from services.customer_service import CustomerService
+    from app.services.customer_service import CustomerService
     customer_service = CustomerService()
     with app.app_context():
         customer = customer_service.get_customer(sample_customer)
