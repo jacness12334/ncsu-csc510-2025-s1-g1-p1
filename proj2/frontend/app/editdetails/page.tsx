@@ -44,7 +44,7 @@ export default function EditDetailsPage() {
   const deleteUser = async () => {
 
     try {
-      var response = await fetch("http://localhost:5000/api/users/" + userId, {
+      let response = await fetch("http://localhost:5000/api/users/" + userId, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -79,10 +79,10 @@ export default function EditDetailsPage() {
       alert("User successfully deleted");
       router.push("/");
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // This catches network errors AND the error thrown above
       console.error(error);
-      alert("Error: " + error.message);
+      alert("Error: " + (error instanceof Error ? error.message : String(error)));
     }
   }
 
@@ -161,7 +161,7 @@ export default function EditDetailsPage() {
   useEffect(() => {
     const f = async () => {
       try {
-        var response = await fetch("http://localhost:5000/api/users/me", {
+        let response = await fetch("http://localhost:5000/api/users/me", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -175,7 +175,7 @@ export default function EditDetailsPage() {
           throw new Error(errorData.message || response.statusText);
         }
 
-        var rt = await response.json();
+        let rt = await response.json();
         console.log(rt);
 
         // Success path:
@@ -226,14 +226,11 @@ export default function EditDetailsPage() {
         rt = await response.json();
         console.log(rt);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         // This catches network errors AND the error thrown above
         console.error(error);
-        alert("Error: " + error.message);
+        alert("Error: " + (error instanceof Error ? error.message : String(error)));
       }
-
-
-
     }
     f();
 
