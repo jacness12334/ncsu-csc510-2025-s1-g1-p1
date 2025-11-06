@@ -1,17 +1,8 @@
 {
-  // A configuration file exists, so Prettier will use it.
-  // The 'trailingComma' setting enhances diff clarity in multi-line objects/arrays.
   "trailingComma": "es5", 
-  
-  // Use a common standard indentation for configuration files (2 spaces)
   "tabWidth": 2, 
-  
-  // Use single quotes for strings (common for Python-adjacent configuration)
   "singleQuote": true, 
-  
-  // Enforce a consistent newline character across all supported files
   "endOfLine": "lf",
-  
-  // Maximum line length, useful for consistency, especially in Markdown.
   "printWidth": 80 
 }
+
