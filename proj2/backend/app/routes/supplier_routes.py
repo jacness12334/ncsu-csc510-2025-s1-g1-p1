@@ -10,11 +10,10 @@ def get_user_id():
     return data.get('user_id')
 
 
-@supplier_bp.route('/suppliers', methods=['GET'])
-def get_supplier():
+@supplier_bp.route('/suppliers/<int:supplier_id>', methods=['GET'])
+def get_supplier(supplier_id):
     try:
-        user_id = get_user_id()
-        service = SupplierService(user_id)
+        service = SupplierService(supplier_id)
         supplier = service.get_supplier()
         return jsonify({"supplier": {"user_id": supplier.user_id, "company_name": supplier.company_name, "company_address": supplier.company_address, "contact_phone": supplier.contact_phone, "is_open": supplier.is_open}}), 200
     except ValueError as e:
@@ -61,8 +60,8 @@ def set_availability():
         return jsonify({'error': str(e)}), 500
 
 
-@supplier_bp.route('/products', methods=['GET'])
-def get_products():
+@supplier_bp.route('/products/<int:supplier_id>', methods=['GET'])
+def get_products(supplier_id):
     try:
         user_id = Suppliers.query.first().user_id
         service = SupplierService(user_id)
@@ -143,7 +142,7 @@ def remove_product(product_id):
 @supplier_bp.route('/suppliers/all', methods=['GET'])
 def list_open_suppliers():
     try:
-        service = SupplierService(user_id)  
+        service = SupplierService(Suppliers.query.first().user_id)  
         suppliers = service.get_all_suppliers()
 
         return jsonify({

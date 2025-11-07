@@ -50,11 +50,10 @@ def remove_staff(staff_user_id):
         return jsonify({'error': str(e)}), 500
 
 
-@staff_bp.route('/theatres', methods=['GET'])
-def get_theatres():
+@staff_bp.route('/theatres/<int:staff_user_id>', methods=['GET'])
+def get_theatres(staff_user_id):
     try:
-        user_id = get_user_id()
-        service = StaffService(user_id)
+        service = StaffService(staff_user_id)
         theatres = service.get_theatres()
         return jsonify({"theatres": [{"id": t.id, "name": t.name, "address": t.address, "phone": t.phone, "is_open": t.is_open} for t in theatres]}), 200
     except ValueError as e:
@@ -260,8 +259,7 @@ def list_staff_by_theatre(theatre_id):
 @staff_bp.route('/deliveries/list/<int:theatre_id>', methods=['GET'])
 def list_deliveries_by_theatre(theatre_id):
     try:
-        user_id = get_user_id()
-        service = StaffService(user_id)
+        service = StaffService(Staff.query.first().user_id)
         deliveries = service.show_all_deliveries(theatre_id)
         return jsonify({
             "deliveries": [{
