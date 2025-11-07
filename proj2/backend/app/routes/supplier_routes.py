@@ -60,11 +60,10 @@ def set_availability():
         return jsonify({'error': str(e)}), 500
 
 
-@supplier_bp.route('/products', methods=['GET'])
+@supplier_bp.route('/products/<int:supplier_id>', methods=['GET'])
 def get_products(supplier_id):
     try:
-        user_id = Suppliers.query.first().user_id
-        service = SupplierService(user_id)
+        service = SupplierService(supplier_id)
         products = service.get_products()
         return jsonify({"products": [{"id": p.id, "supplier_id": p.supplier_id, "name": p.name, "unit_price": float(p.unit_price), "inventory_quantity": p.inventory_quantity, "size": p.size, "keywords": p.keywords, "category": p.category, "discount": p.discount, "is_available": p.is_available} for p in products]}), 200
     except ValueError as e:
