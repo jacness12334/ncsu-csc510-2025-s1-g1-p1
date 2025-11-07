@@ -60,7 +60,7 @@ def set_availability():
         return jsonify({'error': str(e)}), 500
 
 
-@supplier_bp.route('/products/<int:supplier_id>', methods=['GET'])
+@supplier_bp.route('/products', methods=['GET'])
 def get_products(supplier_id):
     try:
         user_id = Suppliers.query.first().user_id
