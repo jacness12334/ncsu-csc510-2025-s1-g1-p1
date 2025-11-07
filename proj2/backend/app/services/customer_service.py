@@ -342,6 +342,7 @@ class CustomerService:
             auditorium = (
                 Auditoriums.query.filter_by(id=movie_showing.auditorium_id).first()
             )
+            theatre = Theatres.query.filter_by(id=auditorium.theatre_id).first()
             start_time = None
             if movie_showing and getattr(movie_showing.start_time, "isoformat", None):
                 start_time = movie_showing.start_time.isoformat()
@@ -353,17 +354,10 @@ class CustomerService:
             result.append({
                 "id": showing.id,
                 "movie_title": movie.title if movie else None,
-                "seat": {
-                    "id": seat.id,
-                    "aisle": seat.aisle,
-                    "number": seat.number,
-                } if seat else None,
+                "seat": f"{seat.aisle} {seat.number}",
                 "start_time": start_time,
-                "auditorium": {
-                    "id": auditorium.id,
-                    "number": auditorium.number,
-                    "theatre_id": auditorium.theatre_id,
-                } if auditorium else None,
+                "auditorium": f"Auditorium {auditorium.number}" if auditorium else None,
+                "theatre_name": theatre.name
             })
         return result
     

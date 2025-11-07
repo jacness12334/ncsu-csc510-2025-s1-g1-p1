@@ -471,12 +471,10 @@ class TestCustomerRoutes:
             assert "showings" in data and isinstance(data["showings"], list) 
             assert len(data["showings"]) == 1 
             showing = data["showings"][0]
-            for key in ("id", "movie_title", "seat", "start_time", "auditorium"):
+            for key in ("id", "movie_title", "seat", "start_time", "auditorium", "theatre_name"):
                 assert key in showing  
             from app.models import CustomerShowings
-            sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
             assert showing["id"] == sample_customer_showing 
-            assert showing["seat"]["id"] == sample_showing.seat_id  
 
     # Test getting delivery details for valid delivery
     def test_get_delivery_details_success(self, client, app, sample_delivery):

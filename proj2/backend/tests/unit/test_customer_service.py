@@ -401,9 +401,9 @@ class TestCustomerService:
             assert "start_time" in showing
             assert "auditorium" in showing
             assert "seat" in showing
+            assert 'theatre_name' in showing
             sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
             assert showing["id"] == sample_customer_showing
-            assert showing["seat"]["id"] == sample_showing.seat_id
     
     def test_get_delivery_details_valid(self, app, sample_delivery):
         with app.app_context():

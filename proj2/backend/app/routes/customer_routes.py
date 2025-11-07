@@ -731,6 +731,7 @@ def get_showings_for_customer(user_id):
               "seat": s["seat"],               
               "start_time": s["start_time"],    
               "auditorium": s["auditorium"],   
+              "theatre_name": s["theatre_name"],
             } for s in showings]
         }), 200
     except ValueError as e:
