@@ -726,12 +726,13 @@ def get_showings_for_customer(user_id):
       showings = customer_service.get_all_showings(user_id=user_id)
       return jsonify({
           "showings": [{
-              "id": s.id,
-              "customer_id": s.customer_id,
-              "movie_showing_id": s.movie_showing_id,
-              "seat_id": s.seat_id
-          } for s in showings]
-      }), 200
+              "id": s["id"],
+              "movie_title": s["movie_title"],
+              "seat": s["seat"],               
+              "start_time": s["start_time"],    
+              "auditorium": s["auditorium"],   
+            } for s in showings]
+        }), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 404
     except Exception as e:

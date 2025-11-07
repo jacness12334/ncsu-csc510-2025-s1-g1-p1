@@ -330,8 +330,39 @@ class CustomerService:
         deliveries = Deliveries.query.join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id).filter(CustomerShowings.customer_id == user_id).order_by(Deliveries.id.desc()).all()
         return deliveries
     
-    # Get all showings associated with the given customer
+    # Get all showings associated with the given customer (movie name, seat, start time, auditorium)
     def get_all_showings(self, user_id):
         self.validate_customer(user_id=user_id)
         showings = CustomerShowings.query.filter(CustomerShowings.customer_id == user_id).all()
-        return showings
+        result = []
+        for showing in showings:
+            movie_showing = MovieShowings.query.filter_by(id=showing.movie_showing_id).first()
+            movie = Movies.query.filter_by(id=movie_showing.movie_id).first() 
+            seat = Seats.query.filter_by(id=showing.seat_id).first()
+            auditorium = (
+                Auditoriums.query.filter_by(id=movie_showing.auditorium_id).first()
+            )
+            start_time = None
+            if movie_showing and getattr(movie_showing.start_time, "isoformat", None):
+                start_time = movie_showing.start_time.isoformat()
+            elif movie_showing:
+                start_time = str(movie_showing.start_time)
+            else:
+                start_time = None
+
+            result.append({
+                "id": showing.id,
+                "movie_title": movie.title if movie else None,
+                "seat": {
+                    "id": seat.id,
+                    "aisle": seat.aisle,
+                    "number": seat.number,
+                } if seat else None,
+                "start_time": start_time,
+                "auditorium": {
+                    "id": auditorium.id,
+                    "number": auditorium.number,
+                    "theatre_id": auditorium.theatre_id,
+                } if auditorium else None,
+            })
+        return result
