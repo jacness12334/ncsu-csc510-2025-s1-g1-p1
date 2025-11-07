@@ -84,9 +84,7 @@ class TestStaffRoutes:
         assert 'not found' in data['error'] 
 
     def test_get_theatres_success(self, client, sample_admin, sample_theatre):
-        response = client.get('/api/theatres', json={
-            'user_id': sample_admin
-        })
+        response = client.get(f'/api/theatres/{sample_admin}')
 
         assert response.status_code == 200
         data = json.loads(response.data)

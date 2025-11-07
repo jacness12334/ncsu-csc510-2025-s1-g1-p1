@@ -7,14 +7,14 @@ from decimal import Decimal
 class TestSupplierRoutes:
 
     def test_get_supplier_success(self, client, sample_supplier):
-        response = client.get('/api/suppliers', json={'user_id': sample_supplier})
+        response = client.get(f'/api/suppliers/{sample_supplier}')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data['supplier']['company_name'] == "Snacks Inc"
         assert data['supplier']['is_open'] is True
 
     def test_get_supplier_not_found(self, client):
-        response = client.get('/api/suppliers', json={'user_id': 9999})
+        response = client.get(f'/api/suppliers/{9999}')
         assert response.status_code == 404
         data = json.loads(response.data)
         assert data['error'] == "Supplier 9999 not found"
@@ -63,7 +63,7 @@ class TestSupplierRoutes:
         assert data['error'] == "Missing is_open field"
 
     def test_get_products_success(self, client, sample_supplier, sample_product):
-        response = client.get('/api/products', json={'user_id': sample_supplier})
+        response = client.get(f'/api/products/{sample_supplier}')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert len(data['products']) == 1
@@ -71,7 +71,7 @@ class TestSupplierRoutes:
         assert data['products'][0]['unit_price'] == 5.99
 
     def test_get_products_no_products(self, client, sample_supplier):
-        response = client.get('/api/products', json={'user_id': sample_supplier})
+        response = client.get(f'/api/products/{sample_supplier}')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert len(data['products']) == 0
@@ -162,3 +162,20 @@ class TestSupplierRoutes:
         assert response.status_code == 404
         data = json.loads(response.data)
         assert data['error'] == "Product 9999 not found"
+    
+    def test_get_all_suppliers_success(self, client, sample_supplier, sample_product):
+        response = client.get('/api/suppliers/all')
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'suppliers' in data
+        assert isinstance(data['suppliers'], list)
+        if data['suppliers']:
+            supplier = data['suppliers'][0]
+            assert 'user_id' in supplier
+            assert 'company_name' in supplier
+            assert 'company_address' in supplier
+            assert 'contact_phone' in supplier
+            assert 'is_open' in supplier
+            
+            assert supplier['company_name'] == "Snacks Inc"
+            assert supplier['is_open'] is True
