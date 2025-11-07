@@ -9,7 +9,6 @@ class StaffService:
     def __init__(self, user_id):
         self.user_id = user_id
         self.user_service = UserService()
-    
 
     # Check that user is admin
     def validate_admin(self):
@@ -252,6 +251,12 @@ class StaffService:
         )
         return deliveries
 
+    # Get staff member
+    def get_staff(self, staff_id):
+        self.validate_admin()
+        staff = Staff.query.filter_by(user_id=staff_id).first()
+        return staff
+  
     # # Show all showings
     # def show_all_showings(self, theatre_id):
     #     self.validate_admin()
@@ -260,15 +265,3 @@ class StaffService:
     # # Show all movies
     # def show_all_movies(self):
     #     return Movies.query.order_by(Movies.title.asc()).all()
-
-    # Get staff member
-    def get_staff(self, staff_id):
-        self.validate_admin()
-        staff = Staff.query.filter_by(user_id=staff_id).first()
-        return {
-            "user_id": staff.user_id,
-            "theatre_id": staff.theatre_id,
-            "role": staff.role,
-            "is_available": staff.is_available,
-        }
-
