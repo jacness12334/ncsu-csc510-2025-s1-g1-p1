@@ -1,7 +1,8 @@
 import pytest
 from app.services.customer_service import CustomerService
-from app.models import Theatres, PaymentMethods, CartItems, MovieShowings, Seats
+from app.models import Theatres, PaymentMethods, CartItems, Seats
 from app.app import db
+from decimal import Decimal
 
 
 class TestCustomerService:
@@ -403,3 +404,36 @@ class TestCustomerService:
             sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
             assert showing["id"] == sample_customer_showing
             assert showing["seat"]["id"] == sample_showing.seat_id
+    
+    def test_get_delivery_details_valid(self, app, sample_delivery):
+        with app.app_context():
+            svc = CustomerService()
+            details = svc.get_delivery_details(sample_delivery)
+            assert isinstance(details, dict)
+            assert len(details) == 9
+            assert "id" in details
+            assert "driver_id" in details
+            assert "total_price" in details
+            assert "delivery_time" in details
+            assert "delivery_status" in details
+            assert "items" in details
+            assert "theatre_name" in details
+            assert "theatre_address" in details
+            assert "movie_title" in details
+            assert details["id"] == sample_delivery
+
+    def test_get_delivery_details_invalid(self, app):
+        from app.models import Deliveries
+        with app.app_context():
+            svc = CustomerService()
+            delivery = Deliveries(
+                customer_showing_id=123,   
+                payment_method_id=456,    
+                driver_id=None,
+                staff_id=None,
+                total_price=Decimal("19.99"),
+                payment_status="pending",
+                delivery_status="pending",
+            )
+            with pytest.raises(ValueError, match=f"Delivery {delivery.id} not found"):
+                details = svc.get_delivery_details(delivery.id)
