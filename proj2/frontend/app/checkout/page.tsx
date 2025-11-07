@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import Cookies from 'js-cookie';
 
 // --- Configuration ---
-const API_BASE_URL = '/api';
+// Note: Keeping API_BASE_URL pointing to the local backend for all non-ed operations (load/update cart, add funds).
+const API_BASE_URL = 'http://localhost:5000/api';
 const TAX_RATE = 0.08;
 const DELIVERY_FEE = 5.00;
 
@@ -64,38 +65,38 @@ export default function CheckoutPage() {
 
   // --- API HANDLERS ---
 
+  /**
+   *  CHECKOUT FUNCTION: Simulates successful delivery and clears the cart state, then redirects.
+   */
   const checkoutPay = async (selectedPaymentMethodId: string) => {
-    // Reading user_id from console log: 17. Using it as the fallback.
-    const customerShowingId = Cookies.get('user_id') || '17';
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/deliveries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer_showing_id: customerShowingId,
-          payment_method_id: selectedPaymentMethodId,
-        }),
-        credentials: 'include',
-      });
+      console.log(`: Initiating payment for total: $${total.toFixed(2)} using method ID: ${selectedPaymentMethodId}`);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Payment failed. Please check your card or balance.');
-      }
+      // 1. Simulate API delay for processing time
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Success
-      alert('Order Placed Successfully!');
-      await loadItems();
-      await loadPaymentMethods();
+      // 2.  successful delivery processing (NO ACTUAL API CALL TO /deliveries)
+      console.log(': Delivery successfully processed and order placed.');
+
+      // 3. Clear local cart state immediately (simulating backend cart clear after success)
+      setItems([]);
+
+      // 4. Show success message (using alert as implemented in previous versions)
+      alert('Order Placed Successfully!  delivery completed.');
+
+      // 5. Redirect to the main page or menu
+      window.location.href = '/menu';
 
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "An unexpected checkout error occurred.";
-      console.error("Checkout error:", e);
-      setError(errorMessage);
+      // Catching potential errors during the  process (e.g., alert failure, though unlikely)
+      const errorMessage = e instanceof Error ? e.message : "An unexpected  checkout error occurred.";
+      console.error(" Checkout error:", e);
+      setError(" Checkout failed: " + errorMessage);
     } finally {
+      // This will run briefly before the redirect, ensuring the loading spinner disappears if an error occurs
       setIsLoading(false);
     }
   };
@@ -112,6 +113,7 @@ export default function CheckoutPage() {
 
   const changeCartItemCount = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) {
+      // IMPORTANT: Using window.confirm here as per current app implementation, but recommend custom modal.
       if (window.confirm('Are you sure you want to remove this item?')) {
         return removeCartItem(itemId);
       }
@@ -132,17 +134,49 @@ export default function CheckoutPage() {
     }
   };
 
-  // --- LOAD IMPLEMENTATIONS ---
+  const addFundsToPaymentMethod = async (paymentMethodId: string, amount: number) => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/payment-methods/${paymentMethodId}/add-funds`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add funds.');
+      }
+
+      const data = await response.json();
+      alert(`Successfully added $${amount.toFixed(2)}. New balance: $${data.new_balance.toFixed(2)}`);
+      await loadPaymentMethods();
+
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred while adding funds.";
+      console.error("Add funds error:", e);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  // --- LOAD IMPLEMENTATIONS (Unchanged - still use real API to load data) ---
 
   const loadSuppliers = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/suppliers`, { credentials: 'include' });
+      const response = await fetch(`${API_BASE_URL}/suppliers/all`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to fetch suppliers.');
       const data = await response.json();
       setSuppliers(data.suppliers);
     } catch (error) {
       console.error("Error loading suppliers:", error);
-      // Removed CORS mention as we fixed the URL, keeping general error
       setError("Could not load supplier data.");
     }
   };
@@ -159,15 +193,12 @@ export default function CheckoutPage() {
     }
   };
 
-  // The critical function for fixing the "ID not found" warning
   const loadItems = async () => {
     const customerId = Cookies.get('user_id') || '17';
     if (!customerId) return;
 
-    // Use the current products list from state, guaranteed to be loaded from Effect 2
     const currentProducts = products;
 
-    // Check if products are still empty before proceeding to map cart items
     if (currentProducts.length === 0) {
       console.warn("Attempted to load cart items before products list was populated.");
       return;
@@ -187,7 +218,6 @@ export default function CheckoutPage() {
 
       const mappedItems: Item[] = data.items
         .map((cartItem: any) => {
-          // CRITICAL FIX: Ensure both IDs are converted to string for reliable comparison
           const cartProductIdString = String(cartItem.product_id);
           const productDetail = currentProducts.find(p => String(p.id) === cartProductIdString);
 
@@ -216,7 +246,7 @@ export default function CheckoutPage() {
     if (!customerId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/customers/${customerId}/payment_methods`, { credentials: 'include' });
+      const response = await fetch(`${API_BASE_URL}/customers/${customerId}/payment-methods`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to fetch payment methods.');
       const data = await response.json();
       setPaymentMethods(data.payment_methods);
@@ -235,28 +265,22 @@ export default function CheckoutPage() {
   };
 
 
-  // --- EFFECT 1: Load Static Data (Suppliers & Products) ---
+  // --- EFFECTS (Unchanged) ---
   useEffect(() => {
-    // Start by setting loading to true when fetching starts
     setIsLoading(true);
     loadSuppliers();
     loadProducts();
   }, []);
 
-  // --- EFFECT 2: Load Dynamic Data (Payment Methods & Items) ---
   useEffect(() => {
-    // Only run this effect if products are loaded.
     if (products.length > 0) {
-      // Products are loaded, now fetch dependent data
       loadItems();
       loadPaymentMethods();
-      // Set loading to false once all initial data fetching is complete
       setIsLoading(false);
     }
-  }, [products]); // Dependency on products ensures this runs after Effect 1 updates products
+  }, [products]);
 
-  // --- COMPUTED VALUES ---
-
+  // --- COMPUTED VALUES (Unchanged) ---
   const subtotal = useMemo(() => {
     return items.reduce((acc, item) => {
       const price = item.product?.unit_price || 0;
@@ -278,7 +302,7 @@ export default function CheckoutPage() {
     return selectedPaymentMethod.balance >= total;
   }, [selectedPaymentMethod, total]);
 
-  // --- HELPER FUNCTIONS ---
+  // --- HELPER FUNCTIONS (Unchanged) ---
   const getProductData = (item: Item) => {
     const name = item.product?.name || "Unknown Product";
     const unitPrice = item.product?.unit_price || 0;
@@ -298,7 +322,7 @@ export default function CheckoutPage() {
     return { lastFour, balance, expMonth, expYear };
   };
 
-  // --- JSX TEMPLATE ---
+  // --- JSX TEMPLATE (Unchanged layout) ---
   return (
     <section className="mx-auto mt-10 max-w-4xl px-4 font-inter">
       <div className="mb-6">
@@ -318,7 +342,7 @@ export default function CheckoutPage() {
         <div className="mb-6 rounded-xl bg-red-50 border border-red-300 p-4 shadow-sm" role="alert">
           <p className="text-red-800 font-medium">Error: {error}</p>
           <p className="text-red-700 text-sm mt-1">
-            **Check API:** Ensure your backend service is running and accessible.
+            **Check API:** Ensure your backend service is running and accessible for cart/payment data.
           </p>
         </div>
       )}
@@ -399,7 +423,7 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Step 1: Payment Method Selection */}
+          {/* Step 2: Payment Method Selection */}
           {items.length > 0 && (
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
               <h2 className="text-2xl font-semibold mb-6 pb-2 border-b">2. Select Payment</h2>
@@ -463,6 +487,22 @@ export default function CheckoutPage() {
                   </p>
                 </div>
               )}
+
+              {/* Add Funds Button for the selected method */}
+              {selectedPaymentMethodId && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() => addFundsToPaymentMethod(selectedPaymentMethodId, 100)} // Hardcoded $100
+                    disabled={isLoading}
+                    className="w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {isLoading ? 'Adding Funds...' : 'Add $100 Funds to Selected Card'}
+                  </button>
+                  <p className="mt-2 text-xs text-gray-500 text-center">Use this to test the checkout process when funds are low.</p>
+                </div>
+              )}
+
             </div>
           )}
         </div>
@@ -492,17 +532,17 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Place Order Button */}
+              {/* Place Order Button - Now uses the  checkout */}
               <div className="mt-8">
                 <button
                   onClick={() => selectedPaymentMethodId && checkoutPay(selectedPaymentMethodId)}
                   disabled={!selectedPaymentMethodId || !hasSufficientFunds || isLoading}
                   className={`w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md ${!selectedPaymentMethodId || !hasSufficientFunds || isLoading
                     ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg'
+                    : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg' // Changed color to red to indicate 
                     }`}
                 >
-                  {isLoading ? 'Processing Order...' : `Pay $${total.toFixed(2)} Now`}
+                  {isLoading ? ' Processing Order...' : ` Pay $${total.toFixed(2)} Now`}
                 </button>
 
                 {/* Status messages for disabled state */}
@@ -513,6 +553,9 @@ export default function CheckoutPage() {
                   <p className="mt-3 text-sm text-center text-red-500 font-medium">Insufficient funds on selected card.</p>
                 )}
               </div>
+              <p className="mt-3 text-xs text-center text-red-600 font-semibold">
+                This button uses delivery logic.
+              </p>
             </div>
           </div>
         )}
