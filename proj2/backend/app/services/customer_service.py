@@ -329,3 +329,9 @@ class CustomerService:
         self.validate_customer(user_id=user_id)
         deliveries = Deliveries.query.join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id).filter(CustomerShowings.customer_id == user_id).order_by(Deliveries.id.desc()).all()
         return deliveries
+    
+    # Get all showings associated with the given customer
+    def get_all_showings(self, user_id):
+        self.validate_customer(user_id=user_id)
+        showings = CustomerShowings.query.filter(CustomerShowings.customer_id == user_id).all()
+        return showings
