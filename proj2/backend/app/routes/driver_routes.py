@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import Users, Drivers, Deliveries
+from app.models import *
 from app.app import db
 from app.services.driver_service import DriverService
 from datetime import datetime
@@ -20,7 +20,7 @@ def delivery_to_dict(delivery):
         "payment_status": delivery.payment_status,
         "total_price": float(delivery.total_price),
         "delivery_time": delivery.delivery_time.isoformat() if delivery.delivery_time else None,
-        "delivery_status": delivery.delivery_status
+        "delivery_status": delivery.delivery_status,
     }
 
 
@@ -407,8 +407,29 @@ def get_active_delivery(driver_id):
     try:
         service = DriverService()
         delivery = service.get_active_delivery(driver_id)
-        return jsonify({"active_delivery": delivery_to_dict(delivery)}), 200
+        delivery_items = DeliveryItems.query.filter_by(delivery_id=delivery.id).all()
+        cart_items = [CartItems.query.filter_by(id=item.cart_item_id).first() for item in delivery_items]
+        items = [{"name": Products.query.filter_by(id=item.product_id).first().name, "quantity": item.quantity} for item in cart_items]
+        customer_showing = CustomerShowings.query.filter_by(id=delivery.customer_showing_id).first()
+        showing = MovieShowings.query.filter_by(id=customer_showing.movie_showing_id).first()
+        auditorium = Auditoriums.query.filter_by(id=showing.auditorium_id).first()
+        theatre = Theatres.query.filter_by(id=auditorium.theatre_id).first()
+        return jsonify({"active_delivery": {
+        "id": delivery.id,
+        "driver_id": delivery.driver_id,
+        "customer_showing_id": delivery.customer_showing_id,
+        "payment_method_id": delivery.payment_method_id,
+        "staff_id": delivery.staff_id,
+        "payment_status": delivery.payment_status,
+        "total_price": float(delivery.total_price),
+        "delivery_time": delivery.delivery_time.isoformat() if delivery.delivery_time else None,
+        "delivery_status": delivery.delivery_status,
+        "address": theatre.address,
+        "items": items
+    }}), 200
     except ValueError as e:
+        if "No active delivery found for driver" in str(e):
+            return jsonify({"message": "No active delivery"}), 200
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
@@ -445,6 +466,8 @@ def show_completed_deliveries(driver_id):
             "history": [delivery_to_dict(d) for d in deliveries]
         }), 200
     except ValueError as e:
+        if "No previous deliveries found for driver" in str(e):
+            return jsonify({"message": "No previous deliveries found"}), 200
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
