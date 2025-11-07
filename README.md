@@ -2,20 +2,36 @@
 
 ## Badges
 
-![Licence](https://img.shields.io/github/license/jacness12334/ncsu-csc510-2025-s1-g1-p1) ![repo size](https://img.shields.io/github/repo-size/jacness12334/ncsu-csc510-2025-s1-g1-p1)
+![Licence](https://img.shields.io/github/license/jacness12334/ncsu-csc510-2025-s1-g1-p1) 
+![repo size](https://img.shields.io/github/repo-size/jacness12334/ncsu-csc510-2025-s1-g1-p1) 
+[![GitHub contributors](https://img.shields.io/github/contributors/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/pulls) 
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/pulls)
+
 
 [![DOI](https://zenodo.org/badge/1044470915.svg)](https://doi.org/10.5281/zenodo.17546938)
 
 
 [![🎨 Style Checks](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/actions/workflows/style-check.yml/badge.svg)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/actions/workflows/style-check.yml)
-
 [![codecov](https://codecov.io/gh/jacness12334/ncsu-csc510-2025-s1-g1-p1/branch/right/graph/badge.svg)](https://codecov.io/gh/jacness12334/ncsu-csc510-2025-s1-g1-p1)
 
 
-[![GitHub issues](https://img.shields.io/github/issues/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/issues) [![GitHub issues](https://img.shields.io/github/issues-closed/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/issues)
+[![GitHub issues](https://img.shields.io/github/issues/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/issues) 
+[![GitHub issues](https://img.shields.io/github/issues-closed/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/pulls) 
+[![GitHub pull requests](https://img.shields.io/github/issues-pr-closed/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/pulls) 
 
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/pulls) [![GitHub pull requests](https://img.shields.io/github/issues-pr-closed/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/pulls)
 
+
+![](https://img.shields.io/badge/code_style-prettier-pink)
+
+![](https://img.shields.io/badge/framework-next.js-blue)
+![](https://img.shields.io/badge/node-20+-blue)
+![](https://img.shields.io/badge/typescript-blue)
+
+![](https://img.shields.io/badge/database-mysql-blue)
+![](https://img.shields.io/badge/framework-flask-blue)
+![](https://img.shields.io/badge/python-3.11+-blue)
+![](https://img.shields.io/badge/testing-pytest-blue)
 
 
 ## Mission Statement
