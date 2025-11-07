@@ -59,7 +59,7 @@ export default function EditDetailsPage() {
         throw new Error("Not implemented yet");
       }
 
-      const response = await fetch("http://localhost:5000/api/customers/" + userId, {
+      let response = await fetch("http://localhost:5000/api/customers/" + userId, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export default function EditDetailsPage() {
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/customers/" + userId + "/payment-methods", {
+    let response = await fetch("http://localhost:5000/api/customers/" + userId + "/payment-methods", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export default function EditDetailsPage() {
 
     }
 
-    const rt = await response.json();
+    let rt = await response.json();
 
     // Success path:
     const newPaymentMethod: PaymentMethod = {
@@ -275,7 +275,7 @@ export default function EditDetailsPage() {
         setPhone(rt.phone);
         setUserType(rt.role);
 
-        const user_id = rt.user_id;
+        let user_id = rt.user_id;
 
         response = await fetch("http://localhost:5000/api/customers/" + user_id, {
           method: "GET",

@@ -1,8 +1,212 @@
-export default function MenuPage() {
+"use client";
+import React, { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
+
+/**
+ * ProductCard component to display individual product information.
+ * Uses robust Tailwind styling for a clean, responsive card layout.
+ */
+const ProductCard = ({ product }: any) => (
+  <div className="p-4 bg-white shadow-xl rounded-xl transition hover:shadow-2xl hover:scale-[1.02] duration-300 transform border border-gray-100">
+    <div className="flex justify-between items-start mb-2">
+      <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
+      <span className={`px-3 py-1 text-xs font-medium rounded-full ${product.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+        {product.is_available ? 'Available' : 'Out of Stock'}
+      </span>
+    </div>
+
+    {/* ADD SUPPLIER NAME HERE */}
+    <p className="text-xs text-gray-500 mb-3 font-medium">
+      Supplier: {supplierName}
+    </p>
+
+    {/* Display the price prominently */}
+    <p className="text-3xl font-bold text-indigo-600 mb-3">${product.unit_price.toFixed(2)}</p>
+
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-600">
+      {/* Category */}
+      <div className="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+        <span className="font-medium">Category:</span> {product.category}
+      </div>
+      {/* Size */}
+      <div className="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3-.895-3-2 1.343-2 3-2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 4v4" /></svg>
+        <span className="font-medium">Size:</span> {product.size}
+      </div>
+      {/* Inventory */}
+      <div className="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 1.1.9 2 2 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+        <span className="font-medium">Inventory:</span> {product.inventory_quantity}
+      </div>
+      {/* Discount */}
+      <div className="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 11.5V14m0-2.5v2.5M15 11.5V14m0-2.5v2.5M8 10a1 1 0 011-1h6a1 1 0 011 1v4a1 1 0 01-1 1H9a1 1 0 01-1-1v-4zM7 4h10a2 2 0 012 2v1h-14V6a2 2 0 012-2z" /></svg>
+        <span className="font-medium">Discount:</span> {product.discount * 100}%
+      </div>
+    </div>
+  </div>
+);
+
+/**
+ * Main application component responsible for fetching and displaying the menu.
+ */
+const App = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [supplierName, setSupplierName] = useState("Loading Supplier..."); // <-- ADD THIS LINE
+
+  // Helper function for fetching with exponential backoff
+  const exponentialBackoffFetch = async (url: any, options: any, retries = 3) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response;
+      } catch (e) {
+        if (i < retries - 1) {
+          const delay = Math.pow(2, i) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          throw e;
+        }
+      }
+    }
+  };
+  // Function to fetch the supplier's name
+  const fetchSupplierName = async () => {
+    try {
+      // NOTE: Assuming your backend's /api/suppliers endpoint expects user_id in the body for GET
+      const response = await exponentialBackoffFetch('/suppliers', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: SUPPLIER_USER_ID }),
+      });
+
+      if (!response) throw new Error("Supplier lookup failed.");
+
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      // Update state with the fetched company name
+      setSupplierName(data.supplier.company_name || "Unknown Supplier");
+
+    } catch (err) {
+      console.error("Failed to fetch supplier name:", err);
+      setSupplierName("Failed to load name"); // Set a fallback name
+    }
+  };
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      // Use relative path to the provided endpoint
+      const response = await exponentialBackoffFetch('http://localhost:5000/api/products', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: "include"
+
+      });
+
+      // --- ADD THIS GUARD CLAUSE ---
+      // If the fetch failed (and the exponentialBackoffFetch didn't throw properly
+      // or an outside error occurred), we halt execution here and jump to the catch block.
+      if (!response) {
+        throw new Error("Network request failed or returned no response.");
+      }
+      // --- END GUARD CLAUSE ---
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Sanitize and normalize product data types
+      const sanitizedProducts = data.products.map((p: any) => ({
+        ...p,
+        unit_price: parseFloat(p.unit_price) || 0.0,
+        inventory_quantity: parseInt(p.inventory_quantity) || 0,
+        discount: parseFloat(p.discount) || 0.0,
+        // Assume keywords is an array or a comma-separated string
+        keywords: Array.isArray(p.keywords) ? p.keywords : (typeof p.keywords === 'string' ? p.keywords.split(',').map((k: any) => k.trim()) : []),
+        is_available: !!p.is_available
+      }));
+
+      setProducts(sanitizedProducts);
+
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
-    <section className="max-w-2xl mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-2">Menu</h1>
-      <p className="text-sm text-gray-600">View our menu here. (Coming soon)</p>
-    </section>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
+      <section className="max-w-7xl mx-auto">
+        <header className="text-center mb-10 pt-4">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-3 tracking-tight">
+            Our Menu
+          </h1>
+          <p className="text-lg text-gray-600 max-w-xl mx-auto">
+            Explore our curated selection of products. Inventory status is updated in real-time.
+          </p>
+        </header>
+
+        {/* Loading State UI */}
+        {loading && (
+          <div className="flex flex-col justify-center items-center h-64 text-indigo-600">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-500"></div>
+            <p className="mt-4 text-xl font-medium">Fetching the latest menu...</p>
+          </div>
+        )}
+
+        {/* Error State UI */}
+        {error && !loading && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow max-w-lg mx-auto mb-6" role="alert">
+            <strong className="font-bold">Connection Issue:</strong>
+            <span className="block sm:inline ml-2">{error}</span>
+          </div>
+        )}
+
+        {/* Empty Menu State UI */}
+        {!loading && products.length === 0 && !error && (
+          <div className="text-center py-12 bg-white rounded-xl shadow-lg border border-gray-100">
+            <p className="text-xl text-gray-500 font-medium">The menu is currently empty.</p>
+            <p className="text-md text-gray-400 mt-1">Please check back soon for new additions!</p>
+          </div>
+        )}
+
+        {/* Products Grid Display */}
+        {!loading && products.length > 0 && (
+          // CHANGE THE GRID CLASSES HERE
+          <div className="grid grid-cols-1 gap-6">
+            {products.map((product: any) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+
+        <footer className="mt-16 text-center text-sm text-gray-400">
+          Product data is retrieved from the supplier's backend system.
+        </footer>
+      </section>
+    </div>
   );
-}
+};
+
+export default App;
