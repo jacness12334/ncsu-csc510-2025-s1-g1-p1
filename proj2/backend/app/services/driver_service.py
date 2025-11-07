@@ -11,7 +11,7 @@ class DriverService:
     
     # Validate the given user as a driver
     def validate_driver(self, user_id):
-        driver = Drivers.query.get(user_id)
+        driver = Drivers.query.filter_by(user_id=user_id).first()
         if not driver:
             raise ValueError(f"Driver {user_id} not found")
         return driver
@@ -162,7 +162,7 @@ class DriverService:
     
     # Mark the given delivery as completed
     def complete_delivery(self, delivery_id):
-        delivery = Deliveries.query.get(delivery_id)
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
         if not delivery:
             raise ValueError(f"Delivery {delivery_id} not found")
         
@@ -184,11 +184,11 @@ class DriverService:
     
     # Rate the driver of the diven delivery
     def rate_driver(self, delivery_id, new_rating):
-        delivery = Deliveries.query.get(delivery_id)
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
         if not delivery:
             raise ValueError(f"Delivery {delivery_id} not found")
         
-        if delivery.delivery_status is not 'fulfilled':
+        if delivery.delivery_status != 'fulfilled':
             raise ValueError("Can only rate fulfilled deliveries")
         
         if delivery.is_rated:

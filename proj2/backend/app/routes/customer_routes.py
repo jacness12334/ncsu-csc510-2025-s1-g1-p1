@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
 from app.services.customer_service import CustomerService
 
+# Blueprint for customer-related endpoints
 customer_bp = Blueprint('customer', __name__, url_prefix='/api')
 customer_service = CustomerService()
 
+# Create a new customer account
 @customer_bp.route('/customers', methods=['POST'])
 def create_customer():
     try:
@@ -28,7 +30,8 @@ def create_customer():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Fetch a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['GET'])
 def get_customer(user_id):
     try:
@@ -41,7 +44,8 @@ def get_customer(user_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Delete a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['DELETE'])
 def delete_customer(user_id):
     try:
@@ -51,7 +55,8 @@ def delete_customer(user_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Update a customer's default theatre
 @customer_bp.route('/customers/<int:user_id>/theatre', methods=['PUT'])
 def update_default_theatre(user_id):
     try:
@@ -69,7 +74,8 @@ def update_default_theatre(user_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Add a payment method for a customer
 @customer_bp.route('/customers/<int:user_id>/payment-methods', methods=['POST'])
 def add_payment_method(user_id):
     try:
@@ -91,7 +97,8 @@ def add_payment_method(user_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred: ' + str(e)}), 500
-    
+
+# Get all payment methods for a customer
 @customer_bp.route('/customers/<int:customer_id>/payment-methods', methods=['GET'])
 def get_payment_methods(customer_id):
     try:
@@ -111,7 +118,8 @@ def get_payment_methods(customer_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Delete a payment method by id
 @customer_bp.route('/payment-methods/<int:payment_method_id>', methods=['DELETE'])
 def delete_payment_method(payment_method_id):
     try:
@@ -122,6 +130,7 @@ def delete_payment_method(payment_method_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
 
+# Add funds to a payment method
 @customer_bp.route('/payment-methods/<int:payment_method_id>/add-funds', methods=['POST'])
 def add_funds(payment_method_id):
     try:
@@ -138,6 +147,7 @@ def add_funds(payment_method_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
 
+# Add an item to the customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['POST'])
 def add_to_cart(customer_id):
     try:
@@ -155,7 +165,25 @@ def add_to_cart(customer_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Get all items in a customer's cart
+@customer_bp.route('/customers/<int:customer_id>/cart', methods=['GET'])
+def get_cart(customer_id):
+    try:
+        items = customer_service.get_cart_items(customer_id=customer_id) or []
+        return jsonify({
+            'items': [{
+                'id': item.id,
+                'product_id': item.product_id,
+                'quantity': item.quantity
+            } for item in items]
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception:
+        return jsonify({'error': 'An error occurred'}), 500
+
+# Update the quantity of a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
 def update_cart_item(cart_item_id):
     try:
@@ -172,7 +200,8 @@ def update_cart_item(cart_item_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Delete a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['DELETE'])
 def delete_cart_item(cart_item_id):
     try:
@@ -182,7 +211,8 @@ def delete_cart_item(cart_item_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Create a customer showing (book a seat for a movie showing)
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['POST'])
 def create_customer_showing(user_id):
     try:
@@ -200,45 +230,31 @@ def create_customer_showing(user_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
-    
+
+# Create a delivery for a customer showing using a payment method
 @customer_bp.route('/deliveries', methods=['POST'])
 def create_delivery():
     try:
         data = request.get_json()
         delivery = customer_service.create_delivery(
-            driver_id=data.get('driver_id'),
             customer_showing_id=data.get('customer_showing_id'),
-            payment_method_id=data.get('payment_method_id'),
-            staff_id=data.get('staff_id')
+            payment_method_id=data.get('payment_method_id')
         )
-        
-        if not delivery:
-            return jsonify({'error': 'Insufficient funds'}), 402
-        
         return jsonify({
             'message': 'Delivery created successfully',
             'delivery_id': delivery.id,
-            'total_price': float(delivery.total_price)
+            'total_price': float(delivery.total_price),
+            'delivery_status': delivery.delivery_status,
+            'payment_status': delivery.payment_status
         }), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
-    except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
-    
-@customer_bp.route('/deliveries/<int:delivery_id>/complete-payment', methods=['POST'])
-def complete_delivery_payment(delivery_id):
-    try:
-        delivery = customer_service.complete_delivery_payment(delivery_id)
-        return jsonify({
-            'message': 'Payment completed',
-            'delivery_id': delivery.id,
-            'payment_status': delivery.payment_status
-        }), 200
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
+    except Exception:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'An error occurred'}), 500
 
+# Cancel a delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/cancel', methods=['POST'])
 def cancel_delivery(delivery_id):
     try:
@@ -250,5 +266,62 @@ def cancel_delivery(delivery_id):
         }), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': 'An error occurred'}), 500
+
+# Rate a fulfilled delivery by id
+@customer_bp.route('/deliveries/<int:delivery_id>/rate', methods=['POST'])
+def rate_delivery(delivery_id):
+    try:
+        data = request.get_json()
+        rating = data.get('rating')
+        delivery = customer_service.rate_delivery(delivery_id=delivery_id, rating=rating)
+        return jsonify({
+            'message': 'Delivery rated',
+            'delivery_id': delivery.id
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception:
+        return jsonify({'error': 'An error occurred'}), 500
+
+# Get all available products
+@customer_bp.route('/products', methods=['GET'])
+def list_products():
+    try:
+        products = customer_service.show_all_products()
+        return jsonify({
+            'products': [{
+                'id': p.id,
+                'supplier_id': p.supplier_id,
+                'name': p.name,
+                'unit_price': float(p.unit_price),
+                'inventory_quantity': p.inventory_quantity,
+                'category': p.category,
+                'is_available': p.is_available
+            } for p in products]
+        }), 200
+    except Exception as e:
+        return jsonify({'error': 'An error occurred'}), 500
+
+# Get all deliveries for a specific customer by user_id
+@customer_bp.route('/customers/<int:user_id>/deliveries', methods=['GET'])
+def get_deliveries_for_customer(user_id):
+    try:
+        deliveries = customer_service.get_all_deliveries(user_id=user_id)
+        return jsonify({
+            'deliveries': [{
+                'id': d.id,
+                'customer_showing_id': d.customer_showing_id,
+                'payment_method_id': d.payment_method_id,
+                'driver_id': d.driver_id,
+                'staff_id': d.staff_id,
+                'total_price': float(d.total_price) if d.total_price is not None else 0.0,
+                'payment_status': d.payment_status,
+                'delivery_status': d.delivery_status
+            } for d in deliveries]
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500

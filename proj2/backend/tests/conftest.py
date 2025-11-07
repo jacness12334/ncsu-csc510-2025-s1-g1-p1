@@ -216,6 +216,16 @@ def sample_delivery(app, sample_customer_showing, sample_driver, sample_customer
     return delivery_id
 
 @pytest.fixture(scope='function')
+def sample_fulfilled_delivery(app, sample_delivery):
+    from app.models import Deliveries
+    with app.app_context():
+        delivery = Deliveries.query.filter_by(id=sample_delivery).first()
+        delivery.payment_status = 'completed'
+        delivery.delivery_status = 'fulfilled'
+        db.session.commit()
+        return delivery.id
+
+@pytest.fixture(scope='function')
 def sample_theatre(app):
     with app.app_context():
         theatre = Theatres(name="Theatre 1", address="1 Theatre St", phone="9876543211", is_open=True)
@@ -268,6 +278,90 @@ def sample_customer_showing(app, sample_customer, sample_auditorium, sample_show
         )
         customer_showing_id = customer_showing.id
     return customer_showing_id
+
+@pytest.fixture(scope='function')
+def sample_payment_method(app, sample_customer):
+    from app.services.customer_service import CustomerService
+    customer_service = CustomerService()
+    with app.app_context():
+
+        seat = Seats(aisle='A', number=1, auditorium_id=sample_auditorium)
+        db.session.add(seat)
+        db.session.commit()
+
+        customer_showing = customer_service.create_customer_showing(
+            user_id=sample_customer,
+            movie_showing_id=sample_showing,
+            seat_id=seat.id
+        )
+        customer_showing_id = customer_showing.id
+    return customer_showing_id
+
+@pytest.fixture(scope='function')
+def sample_payment_method(app, sample_customer):
+    with app.app_context():
+        pm = PaymentMethods(
+            customer_id=sample_customer,
+            card_number="4111111111111111",
+            expiration_month=12,
+            expiration_year=2027,
+            billing_address="123 Test St",
+            balance=100.00,
+            is_default=True
+        )
+        db.session.add(pm)
+        db.session.commit()
+        return pm.id
+
+@pytest.fixture(scope='function')
+def sample_payment_method_low_balance(app, sample_customer):
+    with app.app_context():
+        pm = PaymentMethods(
+            customer_id=sample_customer,
+            card_number="4111111111111112",
+            expiration_month=11,
+            expiration_year=2027,
+            billing_address="456 Low Funds Ave",
+            balance=5.00,
+            is_default=False
+        )
+        db.session.add(pm)
+        db.session.commit()
+        return pm.id
+
+@pytest.fixture(scope='function')
+def sample_other_customer(app, sample_theatre):
+    from app.services.user_service import UserService
+    user_service = UserService()
+    with app.app_context():
+        user = user_service.create_user(
+            name='Other Customer',
+            email='other_customer@example.com',
+            phone='9998887777',
+            birthday='1991-02-02',
+            password='password123',
+            role='customer'
+        )
+        customer = Customers(user_id=user.id, default_theatre_id=sample_theatre)
+        db.session.add(customer)
+        db.session.commit()
+        return customer.user_id
+
+@pytest.fixture(scope='function')
+def sample_payment_method_other_customer(app, sample_other_customer):
+    with app.app_context():
+        pm = PaymentMethods(
+            customer_id=sample_other_customer,
+            card_number="4111111111111113",
+            expiration_month=10,
+            expiration_year=2028,
+            billing_address="789 Other St",
+            balance=100.00,
+            is_default=False
+        )
+        db.session.add(pm)
+        db.session.commit()
+        return pm.id
     
 @pytest.fixture(scope='function')
 def authenticated_client(client, app, sample_user):

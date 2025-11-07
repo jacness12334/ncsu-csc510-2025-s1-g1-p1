@@ -2,15 +2,20 @@ from app.models import Users
 from app.app import db
 from argon2 import PasswordHasher
 
+
+# Service for managing users: creation, retrieval, authentication, and updates
 class UserService:
 
+    # Initialize password hasher dependency
     def __init__(self):
         self.ph = PasswordHasher()
 
+    # Generate a secure hash for a plaintext password
     def generate_password_hash(self, password):
         password_hash = self.ph.hash(password)
         return password_hash
 
+    # Verify a plaintext password against a stored hash
     def check_password_hash(self, password_hash, password):
         try:
             self.ph.verify(password_hash, password)
@@ -18,6 +23,7 @@ class UserService:
         except:
             return False
         
+    # Validate credentials and return the user if valid; None if invalid
     def validate_credentials(self, email, password):
         if not email or not password:
             raise ValueError("Fields cannot be empty")
@@ -29,6 +35,7 @@ class UserService:
             return None
         return user
 
+    # Create a new user after validating fields, role, and uniqueness
     def create_user(self, name, email, phone, birthday, password, role):
         if not all([name, email, phone, birthday, password, role]):
             raise ValueError("Fields cannot be empty")
@@ -58,6 +65,7 @@ class UserService:
         db.session.commit()
         return user
     
+    # Delete a user by id
     def delete_user(self, user_id):
         user = self.get_user(user_id=user_id)
         if not user:
@@ -67,12 +75,14 @@ class UserService:
         db.session.commit()
         return True
     
+    # Retrieve a user by id or None if missing
     def get_user(self, user_id):
-        user = Users.query.get(user_id)
+        user = Users.query.filter_by(id=user_id).first()
         if not user:
             return None
         return user
         
+    # Update user profile fields with empty/uniqueness checks
     def update_user_profile(self, user_id, name, email, phone, birthday):
         user = self.get_user(user_id=user_id)
         if not user:
@@ -94,6 +104,7 @@ class UserService:
         db.session.commit()
         return user
     
+    # Change password after verifying the current password
     def change_password(self, user_id, current_password, new_password):
         user = self.get_user(user_id=user_id)
         if not user:
@@ -105,7 +116,3 @@ class UserService:
         user.password_hash = self.generate_password_hash(new_password)
         db.session.commit()
         return user
-    
-
-
-    

@@ -137,4 +137,28 @@ def remove_product(product_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500    
+        return jsonify({'error': 'An error occurred'}), 500 
+       
+    
+@supplier_bp.route('/suppliers/all', methods=['GET'])
+def list_open_suppliers():
+    try:
+        service = SupplierService()  
+        suppliers = service.get_all_suppliers()
+
+        return jsonify({
+            "suppliers": [
+                {
+                    "user_id": s.user_id,
+                    "company_name": s.company_name,
+                    "company_address": s.company_address,
+                    "contact_phone": s.contact_phone,
+                    "is_open": s.is_open
+                } for s in suppliers
+            ]
+        }), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": "An error occurred: " + str(e)}), 500

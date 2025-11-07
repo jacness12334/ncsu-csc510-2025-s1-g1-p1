@@ -5,17 +5,18 @@ from app.services.staff_service import StaffService
 from app.services.driver_service import DriverService
 import decimal
 
+# CustomerService class
 class CustomerService:
 
     # Initialize services
     def __init__(self):
         self.user_service = UserService()   
-        self.staff_service = StaffService()
+        self.staff_service = StaffService(0)
         self.driver_service = DriverService()
 
     # Validate given user as customer
     def validate_customer(self, user_id):
-        customer = Customers.query.get(user_id)
+        customer = Customers.query.filter_by(user_id=user_id).first()
         if not customer:
             raise ValueError(f"Customer {user_id} not found")
         return customer
@@ -39,7 +40,7 @@ class CustomerService:
             role=role
         )
         
-        theatre = Theatres.query.get(default_theatre_id)
+        theatre = Theatres.query.filter_by(id=default_theatre_id).first()
         if not theatre:
             raise ValueError(f"Theatre {default_theatre_id} not found")
         
@@ -56,7 +57,7 @@ class CustomerService:
     # Update customer's default theatre
     def update_default_theatre(self, user_id, new_theatre_id):
         customer = self.get_customer(user_id=user_id)
-        theatre = Theatres.query.get(new_theatre_id)
+        theatre = Theatres.query.filter_by(id=new_theatre_id).first()
         if not theatre:
             raise ValueError(f"Theatre {new_theatre_id} not found")
         
@@ -78,7 +79,7 @@ class CustomerService:
     
     # Delete the given payment method
     def delete_payment_method(self, payment_method_id):
-        payment_method = PaymentMethods.query.get(payment_method_id)
+        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
         if not payment_method:
             raise ValueError("Payment method not found")
         
@@ -91,7 +92,7 @@ class CustomerService:
         if amount <= 0.00:
             raise ValueError("Amount to add must be greater than zero")
         
-        payment_method = PaymentMethods.query.get(payment_method_id)
+        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
         if not payment_method:
             raise ValueError("Payment method not found")
         
@@ -107,11 +108,11 @@ class CustomerService:
     # Create movie showing for the given customer
     def create_customer_showing(self, user_id, movie_showing_id, seat_id):
         customer = self.get_customer(user_id=user_id)
-        movie_showing = MovieShowings.query.get(movie_showing_id)
+        movie_showing = MovieShowings.query.filter_by(id=movie_showing_id).first()
         if not movie_showing:
             raise ValueError(f"Movie Showing {movie_showing_id} not found")
         
-        seat = Seats.query.get(seat_id)
+        seat = Seats.query.filter_by(id=seat_id).first()
         if not seat:
             raise ValueError(f"Seat {seat_id} not found")
         
@@ -130,7 +131,7 @@ class CustomerService:
             raise ValueError("Quantity to add must be greater than zero")
         
         customer = self.get_customer(user_id=customer_id)
-        product = Products.query.get(product_id)
+        product = Products.query.filter_by(id=product_id).first()
         if not product:
             raise ValueError(f"Product {product_id} not found")
         
@@ -150,7 +151,7 @@ class CustomerService:
         if quantity <= 0:
             raise ValueError("Quantity to add must be greater than zero")
         
-        cart_item = CartItems.query.get(cart_item_id)
+        cart_item = CartItems.query.filter_by(id=cart_item_id).first()
         if not cart_item:
             raise ValueError(f"Cart item {cart_item_id} not found")
 
@@ -160,7 +161,7 @@ class CustomerService:
 
     # Delete the given cart item
     def delete_cart_item(self, cart_item_id):
-        cart_item = CartItems.query.get(cart_item_id)
+        cart_item = CartItems.query.filter_by(id=cart_item_id).first()
         if not cart_item:
             raise ValueError(f"Cart item {cart_item_id} not found")
 
@@ -176,20 +177,16 @@ class CustomerService:
         return cart_items
 
     # Pay for the given cart items using the given payment method
-    def charge_payment_method(self, payment_method_id, cart_items):
-        payment_method = PaymentMethods.query.get(payment_method_id)
+    def charge_payment_method(self, payment_method_id, total_price):
+        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
         if not payment_method:
             raise ValueError(f"Payment Method {payment_method_id} not found")
         
         self.validate_customer(payment_method.customer_id)
         
-        if len(cart_items) == 0:
-            raise ValueError(f"Cart for customer {payment_method.customer_id} is empty")
-        
-        total_price = self.calculate_total_price(cart_items=cart_items)
         if payment_method.balance < total_price:
             return False
-        
+
         payment_method.balance -= total_price
         db.session.commit()
         return True
@@ -204,22 +201,22 @@ class CustomerService:
         if existing_delivery:
             raise ValueError(f"Delivery already exists for customer showing {customer_showing_id} and payment method {payment_method_id}")
         
-        customer_showing = CustomerShowings.query.get(customer_showing_id)
+        customer_showing = CustomerShowings.query.filter_by(id=customer_showing_id).first()
         if not customer_showing:
             raise ValueError(f"Customer showing {customer_showing_id} not found")
         self.validate_customer(customer_showing.customer_id)
 
-        payment_method = PaymentMethods.query.get(payment_method_id)
+        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
         if not payment_method:
             raise ValueError(f"Payment method {payment_method_id} not found")
         if payment_method.customer_id != customer_showing.customer_id:
             raise ValueError("Payment method does not belong to this customer")
         
-        seat = Seats.query.get(customer_showing.seat_id)
+        seat = Seats.query.filter_by(id=customer_showing.seat_id).first()
         if not seat:
             raise ValueError(f"Seat {customer_showing.seat_id} not found")
         
-        auditorium = Auditoriums.query.get(seat.auditorium_id)
+        auditorium = Auditoriums.query.filter_by(id=seat.auditorium_id).first()
         if not auditorium:
             raise ValueError(f"Auditorium {seat.auditorium_id} not found")
                         
@@ -227,9 +224,7 @@ class CustomerService:
         if not cart_items:
             raise ValueError(f"Cart for {customer_showing.customer_id} is empty")
         
-        for item in cart_items:
-            self.create_delivery_item(item.cart_item_id, delivery.id)
-        total_price = self.charge_payment_method(payment_method_id=payment_method.id, cart_items=cart_items)
+        total_price = self.calculate_total_price(cart_items=cart_items)
         
         delivery = Deliveries(
             driver_id=None, 
@@ -238,12 +233,23 @@ class CustomerService:
             staff_id=None,
             total_price=total_price
         )
+        db.session.add(delivery)
+        db.session.flush()
+
+        for item in cart_items:
+            self.create_delivery_item(cart_item_id=item.id, delivery_id=delivery.id)
+
+        was_charged = self.charge_payment_method(payment_method_id=payment_method.id, total_price=total_price)
+        if not was_charged:
+            db.session.rollback()
+            raise ValueError("Insufficient funds")
+
+        delivery.payment_status = 'completed'
 
         # Attempt to assign driver and staff member for delivery (will remain None if unavailable)
         self.driver_service.try_assign_driver(delivery=delivery)
         self.staff_service.try_assign_staff(theatre_id=auditorium.theatre_id, delivery=delivery)
-
-        db.session.add(delivery)
+        
         db.session.commit()
         return delivery
         
@@ -252,7 +258,7 @@ class CustomerService:
         total_price = decimal.Decimal(0.00)
         for item in cart_items:
             if item:
-                product = Products.query.get(item.product_id)
+                product = Products.query.filter_by(id=item.product_id).first()
                 if not product:
                     raise ValueError(f"Product {item.product_id} not found")
                 total_price += (product.unit_price - product.discount) * item.quantity
@@ -262,11 +268,11 @@ class CustomerService:
     
     # Create delivery item from given cart item and delivery
     def create_delivery_item(self, cart_item_id, delivery_id):
-        cart_item = CartItems.query.get(cart_item_id)
+        cart_item = CartItems.query.filter_by(id=cart_item_id).first()
         if not cart_item:
             raise ValueError(f"Cart item {cart_item_id} not found")
         
-        delivery = Deliveries.query.get(delivery_id)
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
         if not delivery:
             raise ValueError(f"Delivery {delivery_id} not found")
         
@@ -277,42 +283,21 @@ class CustomerService:
         if existing_delivery_item:
             raise ValueError(f"Delivery item {existing_delivery_item.id} already exists for cart item {cart_item.id}")
         
-        delivery_item = DeliveryItems(cart_item.id, delivery.id)
+        delivery_item = DeliveryItems(cart_item_id=cart_item.id, delivery_id=delivery.id)
         db.session.add(delivery_item)
         db.session.commit()
         return delivery_item
     
-    # Complete payment for the given delivery
-    def complete_delivery_payment(self, delivery_id):
-        delivery = Deliveries.query.get(delivery_id)
-        if not delivery:
-            raise ValueError(f"Delivery {delivery_id} not found")
-        
-        if delivery.delivery_status == 'cancelled':
-            raise ValueError(f"Delivery {delivery_id} is cancelled")
-        
-        payment_method = PaymentMethods.query.get(delivery.payment_method_id)
-        if not payment_method:
-            raise ValueError(f"Payment method not found for {delivery.id}")
-        
-        was_charged = self.charge_payment_method(payment_method_id=payment_method.id)
-        if not was_charged:
-            raise ValueError(f"Payment method {payment_method.id} has insufficient funds")
-        
-        delivery.payment_status = 'completed'
-        db.session.commit()
-        return delivery
-    
     # Cancel the given delivery
     def cancel_delivery(self, delivery_id):
-        delivery = Deliveries.query.get(delivery_id)
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
         if not delivery:
             raise ValueError(f"Delivery {delivery_id} not found")
         
         if delivery.delivery_status == 'cancelled':
             raise ValueError(f"Delivery {delivery.id} is already cancelled")
 
-        payment_method = PaymentMethods.query.get(delivery.payment_method_id)
+        payment_method = PaymentMethods.query.filter_by(id=delivery.payment_method_id).first()
         if not payment_method:
             raise ValueError(f"Payment method not found for {delivery.id}")
         
@@ -326,3 +311,14 @@ class CustomerService:
     def rate_delivery(self, delivery_id, rating):
         driver, delivery = self.driver_service.rate_driver(delivery_id=delivery_id, new_rating=rating)
         return delivery
+    
+    # Show all active products
+    def show_all_products(self):
+        products = Products.query.join(Suppliers, Products.supplier_id == Suppliers.user_id).filter(Products.is_available.is_(True)).order_by(Suppliers.company_name.asc(), Products.name.asc()).all()
+        return products
+    
+    # Get all deliveries for the given customer
+    def get_all_deliveries(self, user_id):
+        self.validate_customer(user_id=user_id)
+        deliveries = Deliveries.query.join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id).filter(CustomerShowings.customer_id == user_id).order_by(Deliveries.id.desc()).all()
+        return deliveries

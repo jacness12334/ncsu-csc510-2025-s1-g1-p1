@@ -37,7 +37,7 @@ def create_app(config_name):
     @login_manager.user_loader
     def load_user(user_id):
         from app.models import Users
-        return Users.query.get(int(user_id))
+        return Users.query.filter_by(id=int(user_id)).first()
 
     @login_manager.unauthorized_handler
     def unauthorized():

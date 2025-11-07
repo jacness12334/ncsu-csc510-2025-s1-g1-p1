@@ -77,3 +77,7 @@ class SupplierService:
 
         db.session.delete(product)
         db.session.commit()
+
+    def get_all_suppliers(self):
+        suppliers = Suppliers.query.filter(Suppliers.is_open.is_(True)).order_by(Suppliers.company_name.asc()).all()
+        return suppliers
