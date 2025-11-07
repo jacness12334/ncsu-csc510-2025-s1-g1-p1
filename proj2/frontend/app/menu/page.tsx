@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
  * ProductCard component to display individual product information.
  * Uses robust Tailwind styling for a clean, responsive card layout.
  */
-const ProductCard = ({ product, supplierName }: any) => (
+const ProductCard = ({ product, supplierName, onAddToCart }: any) => (
   <div className="p-4 bg-white shadow-xl rounded-xl transition hover:shadow-2xl hover:scale-[1.02] duration-300 transform border border-gray-100">
     <div className="flex justify-between items-start mb-2">
       <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
@@ -22,6 +22,21 @@ const ProductCard = ({ product, supplierName }: any) => (
 
     {/* Display the price prominently */}
     <p className="text-3xl font-bold text-indigo-600 mb-3">${product.unit_price.toFixed(2)}</p>
+
+    {/* ADD TO CART BUTTON */}
+    <button
+      onClick={() => onAddToCart(product.id)}
+      disabled={!product.is_available || product.inventory_quantity === 0}
+      className={`mt-4 w-full py-2 px-4 rounded-lg font-bold transition duration-200 shadow-md ${product.is_available && product.inventory_quantity > 0
+        ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+        }`}
+      title={product.is_available && product.inventory_quantity > 0 ? "Add to Cart" : "Currently unavailable"}
+    >
+      {/* Icon: Shopping Cart */}
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline mr-2 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+      {product.inventory_quantity === 0 ? 'Sold Out' : 'Add to Cart'}
+    </button>
 
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-600">
       {/* Category */}
@@ -76,6 +91,37 @@ const App = () => {
       }
     }
   };
+
+  // Function to handle adding a product to the cart
+  const addToCart = async (productId: any) => {
+    try {
+      const response = await exponentialBackoffFetch(`http://localhost:5000/api/customers/${Cookies.get('user_id')}/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: 1 // Always adding 1 unit for simplicity
+        }),
+      });
+
+      if (!response) throw new Error("Add to cart request failed.");
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Use console.log for success feedback (since alert() is forbidden)
+      console.log(`✅ Success: Product ${productId} added to cart. Cart Item ID: ${data.cart_item_id}`);
+
+    } catch (err: unknown) {
+      console.error("Failed to add item to cart:", err instanceof Error ? err.message : "");
+      // Log an error if the request fails
+      console.error(`❌ Error adding product ${productId}: ${err instanceof Error ? err.message : ""}`);
+    }
+  };
+
   // Function to fetch all supplier names and create a map
   const fetchSuppliers = async () => {
     try {
@@ -125,28 +171,28 @@ const App = () => {
       if (data.error) throw new Error(data.error);
 
       // 3. ENRICH AND SANITIZE PRODUCT DATA
-      const sanitizedProducts = data.products.map((p: any) => {
+      const enrichedProducts = data.products.map((p: any) => {
         // Find the supplier name using the product's supplier_id
         const name = suppliers[String(p.supplier_id)] || "Unknown Supplier";
 
         return {
           ...p,
           supplierName: name, // <-- Attach the fetched name
-          // The new route doesn't return size, keywords, or discount, so we set them to default values or omit them.
-          // Adjusting parsing based on the new route's payload (id, supplier_id, name, unit_price, inventory_quantity, category, is_available)
           unit_price: parseFloat(p.unit_price) || 0.0,
           inventory_quantity: parseInt(p.inventory_quantity) || 0,
-
-          // These fields are missing from the new route's response, setting defaults:
-          size: p.size || "N/A",
-          keywords: p.keywords || [],
-          discount: p.discount || 0.0,
-
+          size: p.size || "Standard",
+          keywords: Array.isArray(p.keywords) ? p.keywords : [],
+          discount: parseFloat(p.discount) || 0.0,
           is_available: !!p.is_available
         };
       });
 
-      setProducts(sanitizedProducts);
+      // NEW FILTER: Only keep products whose supplierName is NOT "Unknown Supplier"
+      const filteredProducts = enrichedProducts.filter(
+        (p: any) => p.supplierName !== "Unknown Supplier"
+      );
+
+      setProducts(filteredProducts); // <-- Use the filtered list
 
     } catch (err) {
       console.error("Failed to fetch products:", err);
@@ -204,6 +250,7 @@ const App = () => {
                 key={product.id}
                 product={product}
                 supplierName={product.supplierName} // <-- USE THE NAME FROM THE PRODUCT OBJECT
+                onAddToCart={addToCart}
               />
             ))}
           </div>
