@@ -13,45 +13,89 @@ cd ncsu-csc510-2025-s1-g1-p1
 ```
 
 ### 2. Backend Setup (Flask)
+
+#### Switch to backend branch and navigate to backend directory:
 ```bash
-cd backend
+git checkout backend
+cd proj2/backend
+```
+
+#### Set up Python environment:
+```bash
 python -m venv venv
-source venv/bin/activate     # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
 ```
 
-Create a `.env` file in `backend/`:
-```
-DATABASE_URL=mysql+pymysql://<user>:<password>@localhost/moviemunchers
-FLASK_ENV=development
-```
-
-Start the backend:
+#### Install Python dependencies:
 ```bash
-flask run
+pip install flask flask-sqlalchemy mysql-connector-python sqlalchemy pymysql
+```
+
+#### Database Setup:
+1. Create MySQL database:
+```sql
+CREATE DATABASE movie_munchers_dev;
+CREATE DATABASE movie_munchers_test;
+CREATE DATABASE movie_munchers_prod;
+```
+
+2. The backend uses MySQL connection with these credentials (update in `app/app.py` if needed):
+   - User: `root`
+   - Password: `` (empty)
+   - Host: `localhost`
+
+#### Start the backend:
+```bash
+python -c "from app.app import get_app; app = get_app('development'); app.run(debug=True)"
 ```
 Backend runs on `http://localhost:5000`
 
 ### 3. Frontend Setup (Next.js)
+
+#### Switch to frontend branch and navigate to frontend directory:
 ```bash
-cd ../frontend
+git checkout frontend_skeleton
+cd proj2/frontend
+```
+
+#### Install dependencies and start:
+```bash
 npm install
 npm run dev
 ```
 Frontend runs on `http://localhost:3000`
 
 ### 4. Run Tests
+**Note**: Test configurations may need verification
 Frontend:
 ```bash
+cd proj2/frontend
 npm test
 ```
 Backend:
 ```bash
+cd proj2/backend
 pytest
 ```
 
-### 5. Build for Production (optional)
+### 5. Build for Production (Frontend only)
 ```bash
+cd proj2/frontend
 npm run build
 npm start
 ```
+
+### 6. Generate Documentation (Frontend)
+```bash
+cd proj2/frontend
+npm run docs:serve
+```
+Documentation available at `http://localhost:3000`
+
+## Notes
+- Backend and frontend are on separate branches (`backend` and `frontend_skeleton`)
+- You may need to create a `requirements.txt` file for easier dependency management
+- Database migrations and initial data setup may require additional steps
