@@ -120,7 +120,7 @@ class DriverService:
     def update_driver_details(self, user_id, license_plate, vehicle_type, vehicle_color):
         driver = self.validate_driver(user_id=user_id)
         plate_owner = Drivers.query.filter_by(license_plate=license_plate).first()
-        if plate_owner and plate_owner.user_id == driver.user_id:
+        if not plate_owner or plate_owner.user_id == driver.user_id:
             driver.license_plate = self.validate_license_plate(license_plate=license_plate)
             driver.vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
             driver.vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)

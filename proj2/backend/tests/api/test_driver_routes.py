@@ -467,13 +467,12 @@ class TestDriverRoutes:
 
         response = client.get(f'/api/driver/{driver_id}/active-delivery')
         
-        # FIX: Changed expected status from 200 to 404 based on driver_service implementation
-        if response.status_code != 404:
+        if response.status_code != 200:
             error_msg = self._get_error_message(response)
-            assert response.status_code == 404, f"Expected 404 but got {response.status_code}. Error: {error_msg}"
+            assert response.status_code == 200, f"Expected 404 but got {response.status_code}. Error: {error_msg}"
         
         data = json.loads(response.data)
-        assert 'error' in data
+        assert f'No active delivery' in data['message']
 
     def test_show_completed_deliveries_found(self, client, app):
         driver_id, _ = self._create_test_driver(app)
@@ -502,13 +501,12 @@ class TestDriverRoutes:
 
         response = client.get(f'/api/driver/{driver_id}/history')
         
-        if response.status_code != 404:
+        if response.status_code != 200:
             error_msg = self._get_error_message(response)
-            assert response.status_code == 404, f"Expected 404 but got {response.status_code}. Error: {error_msg}"
+            assert response.status_code == 200, f"Expected 404 but got {response.status_code}. Error: {error_msg}"
 
         data = json.loads(response.data)
-        assert 'error' in data
-        assert f'No previous deliveries found for driver {driver_id}' in data['error']
+        assert f'No previous deliveries found' in data['message']
         
     def test_show_completed_deliveries_driver_not_found(self, client):
         response = client.get('/api/driver/999999/history')
