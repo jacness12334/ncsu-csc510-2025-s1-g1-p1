@@ -719,7 +719,7 @@ def get_deliveries_for_customer(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-# Get all deliveries for a specific customer by user_id
+# Get all showings for a specific customer by user_id
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['GET'])
 def get_showings_for_customer(user_id):
     try:
