@@ -134,6 +134,9 @@ class CustomerService:
         product = Products.query.filter_by(id=product_id).first()
         if not product:
             raise ValueError(f"Product {product_id} not found")
+
+        if product.inventory_quantity - quantity <= 0:
+            raise ValueError(f"Product inventory is insufficient")
         
         existing_item = CartItems.query.filter_by(customer_id=customer_id, product_id=product_id).first()
         if existing_item:
@@ -245,6 +248,10 @@ class CustomerService:
             raise ValueError("Insufficient funds")
 
         delivery.payment_status = 'completed'
+
+        for item in cart_items:
+            product = Products.query.filter_by(id=item.product_id).first()
+            product.inventory_quantity -= item.quantity
 
         # Attempt to assign driver and staff member for delivery (will remain None if unavailable)
         self.driver_service.try_assign_driver(delivery=delivery)
