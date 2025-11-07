@@ -2,21 +2,15 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const setCookie = (name: string, value: string, days: number) => {
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + days); // Set expiration in days
-    document.cookie = `${name}=${value}; expires=${expirationDate.toUTCString()}; path=/`;
-  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+    const formElements: any = e.target;
 
     try {
       let response = await fetch("http://localhost:5000/api/users/login", {
@@ -25,8 +19,8 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email,
-          password: password
+          email: formElements.login_email.value,
+          password: formElements.login_password.value
         }),
         credentials: "include"
       });
@@ -41,9 +35,12 @@ export default function LoginPage() {
       console.log(rj);
 
       // Success path:
-      setCookie('user_id', rj.user_id, 1);
+      Cookies.set('user_id', rj.user_id, {
+        expires: 1
+      });
+
       router.push("/menu");
-      alert("Login successful!");
+      window.location.reload();
 
     } catch (error: unknown) {
       // This catches network errors AND the error thrown above
@@ -66,9 +63,9 @@ export default function LoginPage() {
           <input
             type="email"
             id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="login_email"
             required
+            autoComplete="email"
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
             placeholder="you@example.com"
           />
@@ -81,8 +78,8 @@ export default function LoginPage() {
           <input
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="login_password"
+            autoComplete="current-password"
             required
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
             placeholder="••••••••"

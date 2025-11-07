@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import Navbar from '../components/Navbar';
 
 /**
  * ProductCard component to display individual product information.

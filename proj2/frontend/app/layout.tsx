@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="h-full">
       <body className="min-h-screen flex flex-col bg-white text-gray-900">
-        <Navbar />
+        <Navbar updateTrigger={1} />
         <main className="flex-grow mx-auto w-full max-w-6xl px-4 py-8">
           {children}
         </main>
