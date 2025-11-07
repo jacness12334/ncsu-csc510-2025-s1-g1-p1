@@ -629,10 +629,14 @@ def list_deliveries_by_theatre(theatre_id):
 @staff_bp.route('/staff/<int:staff_user_id>', methods=['GET'])
 def get_staff(staff_user_id):
     try:
-        user_id = get_user_id() 
-        svc = StaffService(user_id)
-        data = svc.get_staff(staff_user_id)
-        return jsonify(data), 200
+        service = StaffService(staff_user_id)
+        data = service.get_staff(staff_id=staff_user_id)
+        return jsonify({
+            "user_id": data.user_id,
+            "theatre_id": data.theatre_id,
+            "role": data.role,
+            "is_available": data.is_available
+        }), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
