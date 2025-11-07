@@ -1,9 +1,12 @@
 import mysql.connector
 
+# Schema table names
 tables = ['theatres', 'auditoriums', 'seats', 'users', 'staff', 'movies', 'movie_showings',
           'customers', 'customer_showings', 'payment_methods', 'drivers', 'suppliers',
           'products', 'deliveries', 'cart_items', 'delivery_items']
 
+
+# Drop a single table with foreign key checks temporarily disabled 
 def drop_table(database, table):
     cursor = database.cursor()
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
@@ -12,6 +15,8 @@ def drop_table(database, table):
     database.commit()
     cursor.close()
 
+
+# Drop all existing tables in the connected database 
 def drop_all_tables(database):
     cursor = database.cursor()
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
@@ -23,11 +28,14 @@ def drop_all_tables(database):
     database.commit()
     cursor.close()
     
+
+# Ensure database exists and return a connection handle (using root credentials)
 def get_database(db_name):
     my_host = 'localhost'
     my_user = 'root'
     my_password = ''
 
+    # Create the database if it does not exist (admin connection)
     root = mysql.connector.connect(
         host=my_host,
         user=my_user,
@@ -38,6 +46,8 @@ def get_database(db_name):
     root.commit()
     temp_cursor.close()
     root.close()
+
+    # Connect to the requested database
     connection = mysql.connector.connect(
         host=my_host,
         user=my_user,
@@ -46,8 +56,12 @@ def get_database(db_name):
     )
     return connection    
 
+
+# Create all tables in dependency order
 def create_tables(db):
     cursor_object = db.cursor()
+
+    # Theatres: physical locations with unique (name, address)
     theatres = """CREATE TABLE IF NOT EXISTS theatres (
                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(128) NOT NULL,
@@ -57,6 +71,7 @@ def create_tables(db):
                 CONSTRAINT unique_theatre_address UNIQUE(name, address)
                 )"""
 
+    # Auditoriums: rooms in a theatre; positive number/capacity; cascade on theatre delete
     auditoriums = """CREATE TABLE IF NOT EXISTS auditoriums (
                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
                     theatre_id BIGINT NOT NULL,
@@ -68,6 +83,7 @@ def create_tables(db):
                     CONSTRAINT check_auditorium_capacity CHECK (capacity > 0)
                     )"""
 
+    # Seats: unique (auditorium, aisle, number); positive seat number
     seats = """CREATE TABLE IF NOT EXISTS seats (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             aisle CHAR(1) NOT NULL,
@@ -78,6 +94,7 @@ def create_tables(db):
             CONSTRAINT check_seat_number CHECK (number > 0)
             )"""
 
+    # Users: base accounts for all roles with timestamps and status
     users = """CREATE TABLE IF NOT EXISTS users (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(128) NOT NULL,
@@ -91,6 +108,7 @@ def create_tables(db):
             last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )"""
 
+    # Staff: staff profile per user; role enum and availability
     staff = """CREATE TABLE IF NOT EXISTS staff (
             user_id BIGINT PRIMARY KEY,
             theatre_id BIGINT NOT NULL,
@@ -102,6 +120,7 @@ def create_tables(db):
             FOREIGN KEY (theatre_id) REFERENCES theatres(id)
             )"""
 
+    # Movies: catalog with rating constraint 0–5
     movies = """CREATE TABLE IF NOT EXISTS movies (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             title VARCHAR(128) NOT NULL,
@@ -113,6 +132,7 @@ def create_tables(db):
             CONSTRAINT check_movie_rating CHECK(0.00 <= rating AND 5.00 >= rating)
             )"""
 
+    # Movie showings: scheduled screenings; unique per (auditorium, start_time)
     movie_showings = """CREATE TABLE IF NOT EXISTS movie_showings (
                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
                     movie_id BIGINT NOT NULL,
@@ -126,6 +146,7 @@ def create_tables(db):
                     CONSTRAINT unique_auditorium_showing UNIQUE(auditorium_id, start_time)
                     )"""
 
+    # Customers: profile mapping to default theatre
     customers = """CREATE TABLE IF NOT EXISTS customers (
                 user_id BIGINT PRIMARY KEY,
                 default_theatre_id BIGINT NOT NULL,
@@ -135,6 +156,7 @@ def create_tables(db):
                 FOREIGN KEY (default_theatre_id) REFERENCES theatres(id)
                 )"""
 
+    # Customer showings: bookings with unique seat per showing
     customer_showings = """CREATE TABLE IF NOT EXISTS customer_showings (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         customer_id BIGINT NOT NULL,
@@ -148,6 +170,7 @@ def create_tables(db):
                         CONSTRAINT unique_movie_seat UNIQUE(movie_showing_id, seat_id)
                         )"""
 
+    # Payment methods: balances, expiration checks, and default flag
     payment_methods = """CREATE TABLE IF NOT EXISTS payment_methods (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         customer_id BIGINT NOT NULL,
@@ -165,6 +188,7 @@ def create_tables(db):
                         CONSTRAINT check_balance CHECK (balance >= 0)
                         )"""
 
+    # Drivers: delivery drivers with vehicle info and rating bounds
     drivers = """CREATE TABLE IF NOT EXISTS drivers (
                 user_id BIGINT PRIMARY KEY,
                 license_plate VARCHAR(16) NULL,
@@ -179,6 +203,7 @@ def create_tables(db):
                 CONSTRAINT check_driver_rating CHECK (rating >= 0.00 AND rating <= 5.00)
                 )"""
 
+    # Suppliers: concession vendors with open/closed state
     suppliers = """CREATE TABLE IF NOT EXISTS suppliers (
                 user_id BIGINT PRIMARY KEY,
                 company_name VARCHAR(64) NOT NULL,
@@ -190,6 +215,7 @@ def create_tables(db):
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                 )"""
 
+    # Products: menu items with pricing, inventory, category, and availability
     products = """CREATE TABLE IF NOT EXISTS products (
                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                 supplier_id BIGINT NOT NULL,
@@ -210,6 +236,7 @@ def create_tables(db):
                 CONSTRAINT check_discount_value CHECK (discount >= 0.00)
                 )"""
 
+    # Deliveries: orders tying showings, payments, driver/staff, status, and totals
     deliveries = """CREATE TABLE IF NOT EXISTS deliveries (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             driver_id BIGINT,
@@ -231,6 +258,7 @@ def create_tables(db):
             CONSTRAINT check_total_price CHECK (total_price >= 0.00)
             )"""
     
+    # Cart items: unique (customer, product) with positive quantity
     cart_items = """CREATE TABLE IF NOT EXISTS cart_items (
                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
                     customer_id BIGINT NOT NULL,
@@ -242,6 +270,7 @@ def create_tables(db):
                     CONSTRAINT check_cart_quantity CHECK (quantity > 0)
                     )"""
     
+    # Delivery items: link cart items to deliveries; unique pair
     delivery_items = """CREATE TABLE IF NOT EXISTS delivery_items (
                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                 cart_item_id BIGINT NOT NULL,
@@ -252,6 +281,7 @@ def create_tables(db):
                 CONSTRAINT unique_delivery_item UNIQUE (delivery_id, cart_item_id)
                 )"""
 
+    # Execute DDL statements in dependency order
     cursor_object.execute(theatres)
     cursor_object.execute(auditoriums)
     cursor_object.execute(seats)
@@ -269,18 +299,23 @@ def create_tables(db):
     cursor_object.execute(cart_items)
     cursor_object.execute(delivery_items)
 
+    # Persist schema changes and close the connection
     db.commit()
     cursor_object.close()
     db.close()
 
+
+# Recreate schema for production database
 prod_database = get_database("movie_munchers_prod")
 drop_all_tables(prod_database)
 create_tables(prod_database)
 
+# Recreate schema for development database
 dev_database = get_database("movie_munchers_dev")
 drop_all_tables(dev_database)
 create_tables(dev_database)
 
+# Recreate schema for testing database
 test_database = get_database("movie_munchers_test")
 drop_all_tables(test_database)
 create_tables(test_database)

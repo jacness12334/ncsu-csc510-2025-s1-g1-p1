@@ -13,13 +13,17 @@ from app.models import (
     DeliveryItems, CartItems
 )
 
-# Helper functions
+# ----------------
+# Helper functions 
+# ----------------
 
+# Commit, refresh, and return the given object
 def _commit_and_refresh(obj):
     db.session.commit()
     db.session.refresh(obj)
     return obj
 
+# Create a theatre (optionally set is_open)
 def make_theatre(name="Main Theatre", address="123 Street", phone="5551112222", is_open=None):
     t = Theatres(name=name, address=address, phone=phone)
     if is_open is not None:
@@ -27,16 +31,19 @@ def make_theatre(name="Main Theatre", address="123 Street", phone="5551112222", 
     db.session.add(t)
     return _commit_and_refresh(t)
 
+# Create an auditorium for a theatre
 def make_auditorium(theatre, number=1, capacity=100):
     a = Auditoriums(theatre_id=theatre.id, number=number, capacity=capacity)
     db.session.add(a)
     return _commit_and_refresh(a)
 
+# Create a seat in an auditorium
 def make_seat(auditorium, aisle="A", number=1):
     s = Seats(auditorium_id=auditorium.id, aisle=aisle, number=number)
     db.session.add(s)
     return _commit_and_refresh(s)
 
+# Create a user with unique email/phone defaults
 def make_user(
     name="Alice", email=None, phone=None,
     birthday=date(1990,1,1), password_hash="hash",
@@ -53,6 +60,7 @@ def make_user(
     db.session.add(u)
     return _commit_and_refresh(u)
 
+# Create a staff record for a user/theatre
 def make_staff(user, theatre, role="runner", is_available=None):
     s = Staff(user_id=user.id, theatre_id=theatre.id, role=role)
     if is_available is not None:
@@ -60,6 +68,7 @@ def make_staff(user, theatre, role="runner", is_available=None):
     db.session.add(s)
     return _commit_and_refresh(s)
 
+# Create a movie with defaults
 def make_movie(title="Movie X", genre="Action", length_mins=120, release_year=2024, keywords="x", rating=Decimal("4.50")):
     m = Movies(
         title=title, genre=genre, length_mins=length_mins,
@@ -68,6 +77,7 @@ def make_movie(title="Movie X", genre="Action", length_mins=120, release_year=20
     db.session.add(m)
     return _commit_and_refresh(m)
 
+# Create a movie showing (optionally set in_progress)
 def make_showing(movie, auditorium, start_time=None, in_progress=None):
     start_time = start_time or datetime(2025, 1, 1, 12, 0, 0)
     sh = MovieShowings(movie_id=movie.id, auditorium_id=auditorium.id, start_time=start_time)
@@ -76,11 +86,13 @@ def make_showing(movie, auditorium, start_time=None, in_progress=None):
     db.session.add(sh)
     return _commit_and_refresh(sh)
 
+# Create a customer profile for a user
 def make_customer(user, theatre):
     c = Customers(user_id=user.id, default_theatre_id=theatre.id)
     db.session.add(c)
     return _commit_and_refresh(c)
 
+# Create a payment method (optionally set is_default)
 def make_payment_method(customer, card_number="4111111111111111", month=12, year=2025, billing_address="1 Ave", balance=Decimal("10.00"), is_default=None):
     pm = PaymentMethods(
         customer_id=customer.user_id, card_number=card_number,
@@ -92,6 +104,7 @@ def make_payment_method(customer, card_number="4111111111111111", month=12, year
     db.session.add(pm)
     return _commit_and_refresh(pm)
 
+# Create a driver for a user (optionally set duty_status)
 def make_driver(user, license_plate="ABC123", vehicle_type="car", vehicle_color="red", duty_status=None):
     d = Drivers(
         user_id=user.id, license_plate=license_plate,
@@ -102,6 +115,7 @@ def make_driver(user, license_plate="ABC123", vehicle_type="car", vehicle_color=
     db.session.add(d)
     return _commit_and_refresh(d)
 
+# Create a supplier profile for a user
 def make_supplier(user, company_name="Snacks Co", company_address="500 Snack Rd", contact_phone="5553334444", is_open=None):
     s = Suppliers(
         user_id=user.id, company_name=company_name,
@@ -112,6 +126,7 @@ def make_supplier(user, company_name="Snacks Co", company_address="500 Snack Rd"
     db.session.add(s)
     return _commit_and_refresh(s)
 
+# Create a product (optionally set size/discount/is_available)
 def make_product(supplier, name="Popcorn", unit_price=Decimal("5.00"), inventory_quantity=10, size=None, category="food", discount=None, is_available=None):
     p = Products(
         supplier_id=supplier.user_id, name=name,
@@ -127,11 +142,13 @@ def make_product(supplier, name="Popcorn", unit_price=Decimal("5.00"), inventory
     db.session.add(p)
     return _commit_and_refresh(p)
 
+# Create a cart item for a customer/product
 def make_cart_item(customer, product, quantity=1):
     ci = CartItems(customer_id=customer.user_id, product_id=product.id, quantity=quantity)
     db.session.add(ci)
     return _commit_and_refresh(ci)
 
+# Create a delivery (optionally set driver/staff/status flags)
 def make_delivery(customer_showing, payment_method, total_price=Decimal("12.00"), driver=None, staff=None, payment_status=None, delivery_status=None, is_rated=None):
     d = Deliveries(
         customer_showing_id=customer_showing.id,
@@ -151,16 +168,18 @@ def make_delivery(customer_showing, payment_method, total_price=Decimal("12.00")
     db.session.add(d)
     return _commit_and_refresh(d)
 
+# Create a delivery item linking a delivery to a cart item
 def make_delivery_item(delivery, cart_item):
     di = DeliveryItems(delivery_id=delivery.id, cart_item_id=cart_item.id)
     db.session.add(di)
     return _commit_and_refresh(di)
 
-# Class to test SQLAlchemy models
+# ------------
+# Model tests
+# ------------
 
 class TestModels:
-
-    # Theatres
+    # Theatres: default is_open and unique (name, address)
     def test_theatre_defaults_and_uniqueness(self, app):
         with app.app_context():
             t1 = make_theatre()
@@ -169,6 +188,7 @@ class TestModels:
                 make_theatre(name=t1.name, address=t1.address, phone="5550000000")
             db.session.rollback()
 
+    # Auditoriums: uniqueness (theatre, number), positive checks, and seat cascade on delete
     def test_auditorium_constraints_uniqueness_and_cascade(self, app):
         with app.app_context():
             th = make_theatre()
@@ -192,8 +212,7 @@ class TestModels:
             db.session.commit()
             assert Seats.query.filter_by(id=seat_id).first() is None
 
-
-    # Seats
+    # Seats: uniqueness within auditorium and positive number constraint
     def test_seat_uniqueness_and_invalid_number(self, app):
         with app.app_context():
             th = make_theatre()
@@ -201,13 +220,13 @@ class TestModels:
             s1 = make_seat(aud, aisle="B", number=5)
             assert s1.id is not None
             with pytest.raises(IntegrityError):
-                make_seat(aud, aisle="B", number=5)         
+                make_seat(aud, aisle="B", number=5)
             db.session.rollback()
             with pytest.raises((IntegrityError, OperationalError)):
-                make_seat(aud, aisle="D", number=0)          
+                make_seat(aud, aisle="D", number=0)
             db.session.rollback()
 
-    # Users
+    # Users: defaults (active), unique email/phone, enum role, and last_updated changes on update
     def test_users_defaults_uniques_is_active_and_last_updated(self, app):
         with app.app_context():
             u1 = make_user()
@@ -227,7 +246,7 @@ class TestModels:
             db.session.commit(); db.session.refresh(u1)
             assert u1.last_updated >= before
 
-    # Staff
+    # Staff: default availability, enum role, and user delete cascades
     def test_staff_defaults_enum_and_user_delete_cascade(self, app):
         with app.app_context():
             th = make_theatre()
@@ -241,7 +260,7 @@ class TestModels:
             db.session.delete(u); db.session.commit()
             assert Staff.query.filter_by(user_id=uid).first() is None
 
-    # Movies
+    # Movies: rating check constraint and repr contains "Movie"
     def test_movies_rating_check_and_repr(self, app):
         with app.app_context():
             m = make_movie(rating=Decimal("4.99"))
@@ -253,7 +272,7 @@ class TestModels:
                 make_movie(rating=Decimal("-0.10"))
             db.session.rollback()
 
-    # MovieShowings
+    # MovieShowings: unique per (auditorium, start_time), default flags, and timestamp update
     def test_movie_showings_unique_per_auditorium_and_timestamps(self, app):
         with app.app_context():
             th = make_theatre()
@@ -270,7 +289,7 @@ class TestModels:
             db.session.commit(); db.session.refresh(sh1)
             assert sh1.last_updated >= before
 
-    # Customers
+    # Customers: link to default theatre and cascade on user delete
     def test_customers_create_and_user_delete_cascade(self, app):
         with app.app_context():
             th = make_theatre()
@@ -281,7 +300,7 @@ class TestModels:
             db.session.delete(u); db.session.commit()
             assert Customers.query.filter_by(user_id=uid).first() is None
 
-    # CustomerShowings
+    # CustomerShowings: unique seat per showing and FK integrity
     def test_customer_showings_unique_and_fk_integrity(self, app):
         with app.app_context():
             th = make_theatre()
@@ -305,7 +324,7 @@ class TestModels:
                 db.session.add(bad); db.session.commit()
             db.session.rollback()
 
-    # PaymentMethods
+    # PaymentMethods: defaults, month/year/balance checks
     def test_payment_methods_checks_defaults_and_invalids(self, app):
         with app.app_context():
             u = make_user(role="customer")
@@ -326,7 +345,7 @@ class TestModels:
                 make_payment_method(cust, balance=Decimal("-1.00"))
             db.session.rollback()
 
-    # Drivers
+    # Drivers: defaults for duty_status/rating/stats, enum checks, and last_updated change
     def test_drivers_defaults_enums_and_updates(self, app):
         with app.app_context():
             u = make_user(role="driver")
@@ -343,7 +362,7 @@ class TestModels:
             db.session.commit(); db.session.refresh(d)
             assert d.last_updated >= before
 
-    # Suppliers
+    # Suppliers: default is_open and last_updated change on update
     def test_suppliers_defaults_and_updates(self, app):
         with app.app_context():
             u = make_user(role="supplier")
@@ -354,12 +373,12 @@ class TestModels:
             db.session.commit(); db.session.refresh(s)
             assert s.last_updated >= before
 
-    # Products
+    # Products: defaults, uniqueness per supplier, price/inventory/discount checks, and last_updated change
     def test_products_defaults_constraints_unique_and_updates(self, app):
         with app.app_context():
             su = make_user(role="supplier")
             sup = make_supplier(su)
-            # Set explicitly instead of relying on DB default
+            # Create with explicit values (avoid relying on DB defaults)
             p = make_product(
                 sup,
                 name="Soda",
@@ -391,7 +410,7 @@ class TestModels:
             db.session.commit(); db.session.refresh(p)
             assert p.last_updated >= before
 
-    # CartItems
+    # CartItems: uniqueness (customer, product), positive quantity, and cascade on product delete
     def test_cart_items_unique_check_and_product_delete_cascade(self, app):
         with app.app_context():
             th = make_theatre()
@@ -412,7 +431,7 @@ class TestModels:
             db.session.delete(prod); db.session.commit()
             assert CartItems.query.filter_by(product_id=pid).first() is None
 
-    # Deliveries
+    # Deliveries: default enum flags, total_price check, enum validation, and delivery_time updates on status change
     def test_deliveries_defaults_checks_enums_and_time_onupdate(self, app):
         with app.app_context():
             th = make_theatre()
@@ -441,7 +460,7 @@ class TestModels:
             db.session.commit(); db.session.refresh(d)
             assert d.delivery_time >= before
 
-    # DeliveryItems
+    # DeliveryItems: uniqueness (delivery, cart_item) and cascade on delivery delete
     def test_delivery_items_uniqueness_and_delivery_delete_cascade(self, app):
         with app.app_context():
             th = make_theatre()

@@ -1,8 +1,11 @@
+# Test fixtures and test app setup for API testing
+
 import pytest
 from app.app import create_app, db
 from database import create_tables, drop_all_tables, get_database
 from app.models import *
 
+# Create a fresh Flask app per test function and reset the MySQL test database
 @pytest.fixture(scope='function')
 def app():
     app = create_app('testing')
@@ -14,10 +17,12 @@ def app():
         yield app
         db.session.remove()
 
+# Provide a Flask test client bound to the app fixture
 @pytest.fixture
 def client(app):
     return app.test_client()
 
+# Create a sample user and return its user_id
 @pytest.fixture(scope='function')
 def sample_user(app):
     from app.services.user_service import UserService
@@ -35,6 +40,7 @@ def sample_user(app):
         user_id = user.id
     return user_id
 
+# Create a sample customer (user + customer profile) and return customer user_id
 @pytest.fixture(scope='function')
 def sample_customer(app, sample_theatre):
     from app.services.customer_service import CustomerService
@@ -53,6 +59,7 @@ def sample_customer(app, sample_theatre):
         customer_id = customer.user_id
     return customer_id
 
+# Create a supplier user and Suppliers row; return supplier user_id
 @pytest.fixture(scope='function')
 def sample_supplier(app):
     from app.services.user_service import UserService
@@ -78,7 +85,7 @@ def sample_supplier(app):
         supplier_id = supplier.user_id
     return supplier_id
 
-
+# Create a snack product for the sample supplier; return product id
 @pytest.fixture(scope='function')
 def sample_product(app, sample_supplier):
     with app.app_context():
@@ -95,6 +102,7 @@ def sample_product(app, sample_supplier):
         product_id = product.id
     return product_id
 
+# Create an extra product (beverage) for the sample supplier; return product id
 @pytest.fixture(scope='function')
 def sample_product_extra(app, sample_supplier):
     with app.app_context():
@@ -111,6 +119,7 @@ def sample_product_extra(app, sample_supplier):
         product_id = product.id
     return product_id
 
+# Create a driver user and Drivers row; return driver user_id
 @pytest.fixture(scope='function')
 def sample_driver(app):
     from app.services.user_service import UserService
@@ -138,13 +147,13 @@ def sample_driver(app):
         driver_id = driver.user_id
     return driver_id
 
+# Create a staff user and Staff row (runner) at a theatre; return staff user_id
 @pytest.fixture(scope='function')
 def sample_staff(app, sample_theatre):
     from app.services.user_service import UserService
     user_service = UserService()
 
     with app.app_context():
-        
         staff_user = user_service.create_user(
             name='Test Staff',
             email='staff@example.com',
@@ -164,13 +173,13 @@ def sample_staff(app, sample_theatre):
         staff_id = staff_user.id 
     return staff_id
 
+# Create an admin user and Staff row (admin) at a theatre; return admin user_id
 @pytest.fixture(scope='function')
 def sample_admin(app, sample_theatre):
     from app.services.user_service import UserService
     user_service = UserService()
 
     with app.app_context():
-        
         admin_user = user_service.create_user(
             name="Admin",
             email="admin@example.com",
@@ -185,10 +194,10 @@ def sample_admin(app, sample_theatre):
         admin_id = admin_user.id 
     return admin_id
 
+# Create a pending delivery (with a new PaymentMethods row); return delivery id
 @pytest.fixture(scope='function')
 def sample_delivery(app, sample_customer_showing, sample_driver, sample_customer):
     with app.app_context():
-        
         payment_method = PaymentMethods(
             customer_id=sample_customer,
             card_number="4111111111111111",
@@ -215,6 +224,7 @@ def sample_delivery(app, sample_customer_showing, sample_driver, sample_customer
         delivery_id = delivery.id
     return delivery_id
 
+# Mark an existing delivery as completed/fulfilled; return delivery id
 @pytest.fixture(scope='function')
 def sample_fulfilled_delivery(app, sample_delivery):
     from app.models import Deliveries
@@ -225,6 +235,7 @@ def sample_fulfilled_delivery(app, sample_delivery):
         db.session.commit()
         return delivery.id
 
+# Create a theatre and return its id
 @pytest.fixture(scope='function')
 def sample_theatre(app):
     with app.app_context():
@@ -234,6 +245,7 @@ def sample_theatre(app):
         theatre_id = theatre.id
     return theatre_id
 
+# Create a movie and return its id
 @pytest.fixture(scope='function')
 def sample_movie(app):
     with app.app_context():
@@ -243,16 +255,17 @@ def sample_movie(app):
         movie_id = movie.id
     return movie_id
 
+# Create an auditorium for a theatre and return its id
 @pytest.fixture(scope='function')
 def sample_auditorium(app, sample_theatre):
     with app.app_context():
         auditorium = Auditoriums(theatre_id=sample_theatre, number=1, capacity=100)
         db.session.add(auditorium)
         db.session.commit()
-        
         auditorium_id = auditorium.id
     return auditorium_id
 
+# Create a movie showing and return its id
 @pytest.fixture(scope='function')
 def sample_showing(app, sample_auditorium, sample_movie):
     with app.app_context():
@@ -262,6 +275,7 @@ def sample_showing(app, sample_auditorium, sample_movie):
         showing_id = showing.id
     return showing_id
 
+# Create a customer showing with a saved seat; return customer_showing id
 @pytest.fixture(scope='function')
 def sample_customer_showing(app, sample_customer, sample_auditorium, sample_showing):
     from app.services.customer_service import CustomerService
@@ -279,12 +293,13 @@ def sample_customer_showing(app, sample_customer, sample_auditorium, sample_show
         customer_showing_id = customer_showing.id
     return customer_showing_id
 
+# NOTE: This fixture references sample_auditorium/sample_showing; ensure they are requested when using it
+# Also note a duplicate fixture name 'sample_payment_method' is defined later which will override this one in pytest collection
 @pytest.fixture(scope='function')
 def sample_payment_method(app, sample_customer):
     from app.services.customer_service import CustomerService
     customer_service = CustomerService()
     with app.app_context():
-
         seat = Seats(aisle='A', number=1, auditorium_id=sample_auditorium)
         db.session.add(seat)
         db.session.commit()
@@ -297,6 +312,7 @@ def sample_payment_method(app, sample_customer):
         customer_showing_id = customer_showing.id
     return customer_showing_id
 
+# Create a PaymentMethods row for the sample customer; return payment method id
 @pytest.fixture(scope='function')
 def sample_payment_method(app, sample_customer):
     with app.app_context():
@@ -313,6 +329,7 @@ def sample_payment_method(app, sample_customer):
         db.session.commit()
         return pm.id
 
+# Create a low-balance PaymentMethods row; return payment method id
 @pytest.fixture(scope='function')
 def sample_payment_method_low_balance(app, sample_customer):
     with app.app_context():
@@ -329,6 +346,7 @@ def sample_payment_method_low_balance(app, sample_customer):
         db.session.commit()
         return pm.id
 
+# Create another customer and return the customer user_id
 @pytest.fixture(scope='function')
 def sample_other_customer(app, sample_theatre):
     from app.services.user_service import UserService
@@ -347,6 +365,7 @@ def sample_other_customer(app, sample_theatre):
         db.session.commit()
         return customer.user_id
 
+# Create a PaymentMethods row for the other customer; return payment method id
 @pytest.fixture(scope='function')
 def sample_payment_method_other_customer(app, sample_other_customer):
     with app.app_context():
@@ -362,7 +381,8 @@ def sample_payment_method_other_customer(app, sample_other_customer):
         db.session.add(pm)
         db.session.commit()
         return pm.id
-    
+
+# Log in the sample_user and return an authenticated client
 @pytest.fixture(scope='function')
 def authenticated_client(client, app, sample_user):
     with app.app_context():

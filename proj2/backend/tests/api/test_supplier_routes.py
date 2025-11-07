@@ -3,9 +3,9 @@ from app.app import db
 from app.models import *
 from decimal import Decimal
 
-
+# Test functions in supplier_routes.py
 class TestSupplierRoutes:
-
+    # Get a supplier and verify key fields
     def test_get_supplier_success(self, client, sample_supplier):
         response = client.get(f'/api/suppliers/{sample_supplier}')
         assert response.status_code == 200
@@ -13,15 +13,17 @@ class TestSupplierRoutes:
         assert data['supplier']['company_name'] == "Snacks Inc"
         assert data['supplier']['is_open'] is True
 
+    # Get a missing supplier should return 404 with an error message
     def test_get_supplier_not_found(self, client):
         response = client.get(f'/api/suppliers/{9999}')
         assert response.status_code == 404
         data = json.loads(response.data)
         assert data['error'] == "Supplier 9999 not found"
 
+    # Edit supplier details and confirm they persist in the database
     def test_edit_supplier_success(self, client, sample_supplier):
         response = client.put('/api/suppliers', json={
-            'user_id': sample_supplier, 
+            'user_id': sample_supplier,
             'company_name': 'Updated Supplier',
             'company_address': '456 Updated St.',
             'contact_phone': '555-1234',
@@ -36,6 +38,7 @@ class TestSupplierRoutes:
         assert updated_supplier.company_name == 'Updated Supplier'
         assert updated_supplier.is_open is False
 
+    # Editing without required fields should return 400 with an error
     def test_edit_supplier_missing_fields(self, client, sample_supplier):
         response = client.put('/api/suppliers', json={
             'user_id': sample_supplier,
@@ -47,6 +50,7 @@ class TestSupplierRoutes:
         data = json.loads(response.data)
         assert data['error'] == "Missing required fields"
 
+    # Set supplier availability and verify the change
     def test_set_availability_success(self, client, sample_supplier):
         response = client.put('/api/suppliers/status', json={'user_id': sample_supplier, 'is_open': False})
         assert response.status_code == 200
@@ -56,12 +60,14 @@ class TestSupplierRoutes:
         updated_supplier = Suppliers.query.filter_by(user_id=sample_supplier).first()
         assert updated_supplier.is_open is False
 
+    # Missing is_open flag should return 400
     def test_set_availability_missing_is_open(self, client, sample_supplier):
         response = client.put('/api/suppliers/status', json={'user_id': sample_supplier})
         assert response.status_code == 400
         data = json.loads(response.data)
         assert data['error'] == "Missing is_open field"
 
+    # Get supplier products and verify the list and values
     def test_get_products_success(self, client, sample_supplier, sample_product):
         response = client.get(f'/api/products/{sample_supplier}')
         assert response.status_code == 200
@@ -70,12 +76,14 @@ class TestSupplierRoutes:
         assert data['products'][0]['name'] == "Popcorn"
         assert data['products'][0]['unit_price'] == 5.99
 
+    # Get products when none exist should return an empty list
     def test_get_products_no_products(self, client, sample_supplier):
         response = client.get(f'/api/products/{sample_supplier}')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert len(data['products']) == 0
 
+    # Add a product and verify the response and database row
     def test_add_product_success(self, client, sample_supplier):
         response = client.post('/api/products', json={
             'user_id': sample_supplier,
@@ -97,6 +105,7 @@ class TestSupplierRoutes:
         assert product.name == "New Product"
         assert product.unit_price == 15.0
 
+    # Adding a product without required fields should return 400
     def test_add_product_missing_fields(self, client, sample_supplier):
         response = client.post('/api/products', json={
             'user_id': sample_supplier,
@@ -111,9 +120,10 @@ class TestSupplierRoutes:
         data = json.loads(response.data)
         assert data['error'] == "Missing required fields"
 
+    # Edit a product and verify updates persisted
     def test_edit_product_success(self, client, sample_product):
         response = client.put(f'/api/products/{sample_product}', json={
-            'user_id': sample_product,
+            'user_id': sample_product,  # assuming route handles ownership check
             'name': 'Updated Product',
             'unit_price': 20.0,
             'inventory_quantity': 150,
@@ -132,6 +142,7 @@ class TestSupplierRoutes:
         assert updated_product.name == 'Updated Product'
         assert updated_product.unit_price == 20.0
 
+    # Editing a non-existent product should return 404
     def test_edit_product_not_found(self, client, sample_supplier):
         response = client.put('/api/products/9999', json={
             'user_id': sample_supplier,
@@ -148,6 +159,7 @@ class TestSupplierRoutes:
         data = json.loads(response.data)
         assert data['error'] == "Product 9999 not found"
 
+    # Remove a product and confirm it no longer exists
     def test_remove_product_success(self, client, sample_product):
         response = client.delete(f'/api/products/{sample_product}', json={'user_id': sample_product})
         assert response.status_code == 200
@@ -157,12 +169,14 @@ class TestSupplierRoutes:
         removed_product = Products.query.filter_by(id=sample_product).first()
         assert removed_product is None
 
+    # Removing a non-existent product should return 404
     def test_remove_product_not_found(self, client, sample_supplier):
         response = client.delete('/api/products/9999', json={'user_id': sample_supplier})
         assert response.status_code == 404
         data = json.loads(response.data)
         assert data['error'] == "Product 9999 not found"
-    
+
+    # Get all open suppliers and verify result shape and sample values
     def test_get_all_suppliers_success(self, client, sample_supplier, sample_product):
         response = client.get('/api/suppliers/all')
         assert response.status_code == 200
@@ -176,6 +190,5 @@ class TestSupplierRoutes:
             assert 'company_address' in supplier
             assert 'contact_phone' in supplier
             assert 'is_open' in supplier
-            
             assert supplier['company_name'] == "Snacks Inc"
             assert supplier['is_open'] is True

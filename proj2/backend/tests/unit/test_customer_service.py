@@ -4,12 +4,12 @@ from app.models import Theatres, PaymentMethods, CartItems, Seats
 from app.app import db
 from decimal import Decimal
 
-
+# Tests for customer_service.py
 class TestCustomerService:
-        
+    # Create a customer and verify user_id and default theatre
     def test_create_customer_success(self, app, sample_theatre):
         with app.app_context():
-            customer_service = CustomerService()            
+            customer_service = CustomerService()
             customer = customer_service.create_customer(
                 name='Customer',
                 email='customer@example.com',
@@ -19,11 +19,11 @@ class TestCustomerService:
                 role='customer',
                 default_theatre_id=sample_theatre
             )
-            
             assert customer is not None
             assert customer.user_id is not None
             assert customer.default_theatre_id == sample_theatre
-    
+
+    # Reject if role is not 'customer'
     def test_create_customer_wrong_role(self, app, sample_theatre):
         with app.app_context():
             svc = CustomerService()
@@ -37,7 +37,8 @@ class TestCustomerService:
                     role='driver',
                     default_theatre_id=sample_theatre
                 )
-    
+
+    # Reject duplicate email
     def test_create_customer_duplicate_email(self, app, sample_customer, sample_theatre):
         with app.app_context():
             svc = CustomerService()
@@ -52,6 +53,7 @@ class TestCustomerService:
                     default_theatre_id=sample_theatre
                 )
 
+    # Reject duplicate phone
     def test_create_customer_duplicate_phone(self, app, sample_customer, sample_theatre):
         with app.app_context():
             svc = CustomerService()
@@ -66,19 +68,22 @@ class TestCustomerService:
                     default_theatre_id=sample_theatre
                 )
 
+    # Fetch an existing customer by id
     def test_get_customer_success(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
             customer = svc.get_customer(sample_customer)
             assert customer is not None
             assert customer.user_id == sample_customer
-    
+
+    # get_customer should raise when not found
     def test_get_customer_not_found(self, app):
         with app.app_context():
             svc = CustomerService()
             with pytest.raises(ValueError, match="Customer .* not found"):
                 svc.get_customer(99999)
-    
+
+    # Delete a customer, then verify subsequent lookup fails
     def test_delete_customer_success(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -86,7 +91,8 @@ class TestCustomerService:
             svc.delete_customer(user_id)
             with pytest.raises(ValueError, match="Customer .* not found"):
                 svc.get_customer(user_id)
-    
+
+    # Update default theatre id and confirm new value
     def test_update_default_theatre_success(self, app, sample_customer, sample_theatre):
         with app.app_context():
             svc = CustomerService()
@@ -98,7 +104,8 @@ class TestCustomerService:
                 new_theatre_id=new_theatre.id
             )
             assert updated.default_theatre_id == new_theatre.id
-    
+
+    # Update default theatre should fail if theatre doesn’t exist
     def test_update_default_theatre_not_found(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -107,7 +114,8 @@ class TestCustomerService:
                     user_id=sample_customer,
                     new_theatre_id=99999
                 )
-        
+
+    # Add a payment method and check stored values
     def test_add_payment_method_success(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -124,7 +132,8 @@ class TestCustomerService:
             assert pm.customer_id == sample_customer
             assert pm.card_number == '1234567812345678'
             assert float(pm.balance) == 100.00
-    
+
+    # Adding an identical payment method should raise
     def test_add_payment_method_duplicate(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -147,7 +156,8 @@ class TestCustomerService:
                     balance=50.00,
                     is_default=False
                 )
-    
+
+    # Retrieve multiple payment methods and check list length
     def test_get_customer_payment_methods_success(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -172,14 +182,16 @@ class TestCustomerService:
             methods = svc.get_customer_payment_methods(sample_customer)
             assert isinstance(methods, list)
             assert len(methods) == 2
-    
+
+    # When none exist, return an empty list
     def test_get_customer_payment_methods_none_returns_empty(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
             methods = svc.get_customer_payment_methods(sample_customer)
             assert isinstance(methods, list)
             assert len(methods) == 0
-    
+
+    # Delete a payment method and verify list is empty
     def test_delete_payment_method_success(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -196,13 +208,15 @@ class TestCustomerService:
             assert result is True
             remaining = svc.get_customer_payment_methods(sample_customer)
             assert remaining == []
-    
+
+    # Deleting a missing payment method should raise
     def test_delete_payment_method_not_found(self, app):
         with app.app_context():
             svc = CustomerService()
             with pytest.raises(ValueError, match="Payment method not found"):
                 svc.delete_payment_method(99999)
-    
+
+    # Add funds to a payment method and confirm new balance
     def test_add_funds_to_payment_method_success(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -217,7 +231,8 @@ class TestCustomerService:
             )
             updated_pm = svc.add_funds_to_payment_method(pm.id, 50.00)
             assert float(updated_pm.balance) == 150.00
-    
+
+    # Reject non-positive add-fund amounts
     def test_add_funds_invalid_amount(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
@@ -234,7 +249,8 @@ class TestCustomerService:
                 svc.add_funds_to_payment_method(pm.id, 0.00)
             with pytest.raises(ValueError, match="Amount to add must be greater than zero"):
                 svc.add_funds_to_payment_method(pm.id, -10.00)
-        
+
+    # Create a cart item and check stored fields
     def test_create_cart_item_success(self, app, sample_customer, sample_product):
         with app.app_context():
             svc = CustomerService()
@@ -247,7 +263,8 @@ class TestCustomerService:
             assert item.customer_id == sample_customer
             assert item.product_id == sample_product
             assert item.quantity == 2
-    
+
+    # Creating an existing cart item increases its quantity
     def test_create_cart_item_existing_increases_quantity(self, app, sample_customer, sample_product):
         with app.app_context():
             svc = CustomerService()
@@ -263,7 +280,8 @@ class TestCustomerService:
             )
             assert i1.id == i2.id
             assert i2.quantity == 3
-    
+
+    # Reject zero quantity for cart items
     def test_create_cart_item_invalid_quantity(self, app, sample_customer, sample_product):
         with app.app_context():
             svc = CustomerService()
@@ -274,6 +292,7 @@ class TestCustomerService:
                     quantity=0
                 )
 
+    # Update a cart item’s quantity and verify result
     def test_update_cart_item_success(self, app, sample_customer, sample_product):
         with app.app_context():
             svc = CustomerService()
@@ -283,8 +302,9 @@ class TestCustomerService:
                 quantity=1
             )
             updated = svc.update_cart_item(item.id, 3)
-            assert updated.quantity == 4  
+            assert updated.quantity == 4
 
+    # Reject zero quantity on cart item update
     def test_update_cart_item_invalid_quantity(self, app, sample_customer, sample_product):
         with app.app_context():
             svc = CustomerService()
@@ -295,7 +315,8 @@ class TestCustomerService:
             )
             with pytest.raises(ValueError, match="Quantity to add must be greater than zero"):
                 svc.update_cart_item(item.id, 0)
-    
+
+    # Delete a cart item and ensure it’s gone
     def test_delete_cart_item_success(self, app, sample_customer, sample_product):
         with app.app_context():
             svc = CustomerService()
@@ -308,15 +329,17 @@ class TestCustomerService:
             deleted = CartItems.query.filter_by(id=item.id).first()
             assert deleted is None
 
+    # get_cart_items should return None when cart is empty
     def test_get_cart_items_empty_returns_none(self, app, sample_customer):
         with app.app_context():
             svc = CustomerService()
             items = svc.get_cart_items(sample_customer)
             assert items is None
-        
+
+    # Calculate total price across multiple cart items
     def test_calculate_total_price_success(self, app, sample_customer, sample_product, sample_product_extra):
         with app.app_context():
-            svc = CustomerService()    
+            svc = CustomerService()
             svc.create_cart_item(
                 customer_id=sample_customer,
                 product_id=sample_product,
@@ -330,7 +353,8 @@ class TestCustomerService:
             cart_items = svc.get_cart_items(sample_customer)
             total = svc.calculate_total_price(cart_items)
             assert float(total) == 20.95
-        
+
+    # Create a customer showing and verify fields
     def test_create_customer_showing_success(self, app, sample_customer, sample_auditorium, sample_showing):
         with app.app_context():
             svc = CustomerService()
@@ -346,7 +370,8 @@ class TestCustomerService:
             assert cs.customer_id == sample_customer
             assert cs.movie_showing_id == sample_showing
             assert cs.seat_id == seat.id
-    
+
+    # Charge a payment method and confirm the balance decreases
     def test_charge_payment_method_success(self, app, sample_customer, sample_product, sample_payment_method):
         with app.app_context():
             svc = CustomerService()
@@ -358,7 +383,8 @@ class TestCustomerService:
             assert result is True
             pm = PaymentMethods.query.filter_by(id=sample_payment_method).first()
             assert float(pm.balance) == 100.00 - float(total)
-    
+
+    # Charge should return False when balance is insufficient
     def test_charge_payment_method_insufficient_funds(self, app, sample_customer, sample_product, sample_payment_method_low_balance):
         with app.app_context():
             svc = CustomerService()
@@ -369,12 +395,14 @@ class TestCustomerService:
             result = svc.charge_payment_method(sample_payment_method_low_balance, total)
             assert result is False
 
+    # Rate an eligible delivery and return the updated delivery
     def test_rate_delivery_success(self, app, sample_fulfilled_delivery):
         with app.app_context():
             svc = CustomerService()
             delivery = svc.rate_delivery(delivery_id=sample_fulfilled_delivery, rating=5)
             assert delivery.id == sample_fulfilled_delivery
 
+    # Cancel a delivery and verify status and refund
     def test_cancel_delivery_success_refunds_and_cancels(self, app, sample_delivery):
         with app.app_context():
             from app.models import Deliveries
@@ -387,16 +415,15 @@ class TestCustomerService:
             pm_after = PaymentMethods.query.filter_by(id=refunded_delivery.payment_method_id).first()
             assert float(pm_after.balance) == old_balance + float(refunded_delivery.total_price)
 
+    # get_all_showings should return a list with showing details
     def test_get_customer_showings_success(self, app, sample_customer, sample_customer_showing):
         from app.models import CustomerShowings
         with app.app_context():
             svc = CustomerService()
             showings = svc.get_all_showings(sample_customer)
-
             assert isinstance(showings, list)
             assert len(showings) == 1
             showing = showings[0]
-
             assert "movie_title" in showing
             assert "start_time" in showing
             assert "auditorium" in showing
@@ -404,7 +431,8 @@ class TestCustomerService:
             assert 'theatre_name' in showing
             sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
             assert showing["id"] == sample_customer_showing
-    
+
+    # get_delivery_details should return a populated dict for a valid id
     def test_get_delivery_details_valid(self, app, sample_delivery):
         with app.app_context():
             svc = CustomerService()
@@ -422,13 +450,14 @@ class TestCustomerService:
             assert "movie_title" in details
             assert details["id"] == sample_delivery
 
+    # get_delivery_details should raise when the delivery id does not exist
     def test_get_delivery_details_invalid(self, app):
         from app.models import Deliveries
         with app.app_context():
             svc = CustomerService()
             delivery = Deliveries(
-                customer_showing_id=123,   
-                payment_method_id=456,    
+                customer_showing_id=123,
+                payment_method_id=456,
                 driver_id=None,
                 staff_id=None,
                 total_price=Decimal("19.99"),
@@ -436,4 +465,4 @@ class TestCustomerService:
                 delivery_status="pending",
             )
             with pytest.raises(ValueError, match=f"Delivery {delivery.id} not found"):
-                details = svc.get_delivery_details(delivery.id)
+                _ = svc.get_delivery_details(delivery.id)

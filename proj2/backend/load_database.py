@@ -1,11 +1,13 @@
 from database import get_database
 
+# Create development database and define cursor object
 db_name = "movie_munchers_dev"
 database = get_database(db_name)
 cursor_object = database.cursor()
 
 from argon2.low_level import hash_secret, Type
 
+# Helper function for deterministic password hashing 
 def deterministic_hash(password):
     return hash_secret(
         secret=password.encode(),
@@ -24,18 +26,19 @@ def insert(query, values):
     cursor_object.executemany(query, values)
     database.commit()
 
+# Function to populate existing database
 def populate_db():
-   # theatres
+   # Theatres data
    insert("""INSERT INTO theatres (name, address, phone, is_open) VALUES (%s, %s, %s, %s)""",
          [('Theatre A', '123 A St', '555-0001', True),
             ('Theatre B', '123 B St', '555-0002', True)])
 
-   # auditoriums
+   # Auditoriums data
    insert("""INSERT INTO auditoriums (theatre_id, number, capacity) VALUES (%s, %s, %s)""",
          [(1, 1, 4),
             (2, 1, 4)])
 
-   # seats
+   # Seats data
    insert("""INSERT INTO seats (aisle, number, auditorium_id) VALUES (%s, %s, %s)""",
          [('A', 1, 1),
             ('A', 1, 2),
@@ -46,7 +49,7 @@ def populate_db():
             ('D', 1, 1),
             ('D', 1, 2)])
 
-   # users
+   # Users data
    insert("""INSERT INTO users (name, email, phone, birthday, password_hash, role) VALUES (%s, %s, %s, %s, %s, %s)""",
          [('Alice', 'alice@ncsu.edu', '555-1000', '1990-01-01', ADMIN_HASH, 'staff'),
             ('Bob', 'bob@ncsu.edu', '555-2000', '1990-01-02', ADMIN_HASH, 'staff'),
@@ -64,74 +67,75 @@ def populate_db():
             ('Nick', 'nick@ncsu.edu', '555-0500', '1990-01-14', ADMIN_HASH, 'supplier'),
             ('Oscar', 'oscar@ncsu.edu', '555-0600', '1990-01-15', ADMIN_HASH, 'supplier' ),
             ('Patricia', 'patricia@ncsu.edu', '555-0700', '1990-01-16', ADMIN_HASH, 'supplier')])
-   # staff
+   # Staff data
    insert("""INSERT INTO staff (user_id, theatre_id, role, is_available) VALUES (%s, %s, %s, %s)""",
          [(1, 1, 'runner', True),
             (2, 2, 'admin', False),
             (3, 1, 'runner', True),
             (4, 2, 'admin', False)])
-   # movies
+   # Movies data
    insert("""INSERT INTO movies (title, genre, length_mins, release_year, keywords, rating) VALUES (%s, %s, %s, %s, %s, %s)""", 
          [('Interstellar', 'Sci-Fi', 169, 2014, 'space, time, drama, intense, sweet', 4.8),
             ('The Dark Knight', 'Action', 152, 2008, 'action, intense, classic, hero, energy', 4.9)])
 
-   # movie_showings
+   # Movie showings data
    insert("""INSERT INTO movie_showings (movie_id, auditorium_id, start_time, in_progress) VALUES (%s, %s, %s, %s)""",
          [(1, 1, '2025-11-04 19:30:00', False),
             (2, 2, '2025-10-31 20:00:00', False)])
 
-   # customers
+   # Customers data
    insert("""INSERT INTO customers (user_id, default_theatre_id) VALUES (%s, %s)""",
          [(5, 1),
             (6, 2),
             (7, 1),
             (8, 2)])
 
-   # customer_showings
+   # Customer showings data
    insert("""INSERT INTO customer_showings (customer_id, movie_showing_id, seat_id) VALUES (%s, %s, %s)""",
          [(5, 1, 1),
             (6, 2, 2)])
 
-   # payment_methods
+   # Payment methods data
    insert("""INSERT INTO payment_methods (customer_id, card_number, expiration_month, expiration_year, billing_address, balance, is_default) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
          [(5, '1234567812345678', 11, 2028, '123 Suburb Rd', 200, True),
             (6, '1111222233334444', 1, 2026, '456 Suburb Rd', 5, False)])
 
-   # drivers
+   # Drivers data
    insert("""INSERT INTO drivers (user_id, license_plate, vehicle_type, vehicle_color, duty_status, rating, total_deliveries) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
          [(9, 'ABCD123', 'car', 'red', 'available', 5.00, 10),
             (10, None, 'bike', 'blue', 'available', 5.00, 20),
             (11, None, 'scooter', 'green', 'unavailable', 4.25, 30),
             (12, 'WXYZ789', 'car', 'silver', 'on_delivery', 4.95, 15)])
 
-   # suppliers
+   # Suppliers data
    insert("""INSERT INTO suppliers (user_id, company_name, company_address, contact_phone, is_open) VALUES (%s, %s, %s, %s, %s)""",
          [(13, 'Company A', '123 Company Way', '555-0010', True),
             (14, 'Company B', '456 Company Way', '555-0020', False),
             (15, 'Company C', '789 Company Way', '555-0030', True),
             (16, 'Company D', '223 Company Way', '555-0040', False)])
 
-   # products
+   # Products data
    insert("""INSERT INTO products (supplier_id, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
          [(13, 'Pepsi', 3.00, 10, 'medium', 'sweet, refreshing, cold, quick, energy', 'beverages', 0.00, True),
             (14, 'Chips', 4.00, 20, None, 'crispy, salty, bold, quick, shareable', 'snacks', 0.00, True),
             (15, 'Skittles', 5.00, 5, None, 'fun, colorful, tangy, sweet, fruity', 'candy', 0.00, False),
             (16, 'Hot Dog', 7.00, 8, None, 'savory, filling, classic, flavorful', 'food', 0.00, True)])
 
-   # deliveries 
+   # Deliveries data 
    insert("""INSERT INTO deliveries (driver_id, customer_showing_id, payment_method_id, staff_id, payment_status, total_price, is_rated) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
          [(9, 1, 1, 1, 'completed', 3.00, False),
             (10, 2, 2, 1, 'completed', 8.00, False)])
    
      
-   # cart_items
+   # Cart items data
    insert("""INSERT INTO cart_items (customer_id, product_id, quantity) VALUES (%s, %s, %s)""",
           [(5, 1, 1),
             (6, 2, 2)])
 
-   # delivery_items
+   # Delivery items data
    insert("""INSERT INTO delivery_items (cart_item_id, delivery_id) VALUES (%s, %s)""",
          [(1, 1),
             (2, 2)])
 
+# Call function to populate database
 populate_db()

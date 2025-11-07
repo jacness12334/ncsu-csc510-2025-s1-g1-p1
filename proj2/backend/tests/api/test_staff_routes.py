@@ -22,8 +22,8 @@ class TestStaffRoutes:
         assert data['user_id'] is not None
         assert data['staff_role'] == "runner"
 
+    # Test missing required fields for staff creation   
     def test_add_staff_missing_fields(self, client, sample_admin):
-        # Test missing required fields for staff creation
         response = client.post('/api/staff', json={
             'user_id': sample_admin,
             'name': 'Incomplete Staff'
