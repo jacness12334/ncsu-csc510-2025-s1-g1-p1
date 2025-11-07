@@ -3,27 +3,63 @@ import { create } from "zustand";
 import type { CartItem, Purchasable } from "./types";
 import { CartApiService } from "./cartApi";
 
+/**
+ * Cart state interface defining the structure of the shopping cart store
+ * @interface CartState
+ */
 type CartState = {
+  /** Array of items currently in the cart */
   items: CartItem[];
+  /** Loading state for async operations */
   isLoading: boolean;
+  /** Current error message, null if no error */
   error: string | null;
-  cartItemMap: Map<string, string>; // Maps product_id to cart_item_id for backend operations
+  /** Maps product IDs to backend cart item IDs */
+  cartItemMap: Map<string, string>;
   
   // Actions
+  /** Loads cart items from the backend API */
   loadCart(): Promise<void>;
+  /** Adds an item to the cart with specified quantity */
   add(item: Purchasable, qty?: number): Promise<void>;
+  /** Increases quantity of an existing cart item */
   increment(id: string, qty?: number): Promise<void>;
+  /** Decreases quantity of an existing cart item */
   decrement(id: string, qty?: number): Promise<void>;
+  /** Removes an item completely from the cart */
   remove(id: string): Promise<void>;
+  /** Removes all items from the cart */
   clear(): Promise<void>;
+  /** Gets the current quantity of a specific item */
   getQty(id: string): number;
   
   // Internal state management
+  /** Updates the loading state */
   setLoading(loading: boolean): void;
+  /** Updates the error state */
   setError(error: string | null): void;
+  /** Updates the cart items array */
   setItems(items: CartItem[]): void;
 };
 
+/**
+ * Zustand store for managing shopping cart state and operations
+ * Provides reactive state management for cart items with backend synchronization
+ * 
+ * @example
+ * ```typescript
+ * const { items, add, remove, getQty } = useCartStore();
+ * 
+ * // Add item to cart
+ * await add({ id: "popcorn", name: "Popcorn", price: 6.99 }, 2);
+ * 
+ * // Get quantity of specific item
+ * const quantity = getQty("popcorn");
+ * 
+ * // Remove item from cart
+ * await remove("popcorn");
+ * ```
+ */
 export const useCartStore = create<CartState>((set, get) => ({
   items: [], // Empty cart initially - will be loaded from backend
   isLoading: false,

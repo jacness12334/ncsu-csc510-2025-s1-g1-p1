@@ -1,6 +1,21 @@
 // lib/sampleData.ts
 import type { MenuItem, PaymentMethod } from "./types";
 
+/**
+ * Sample menu data for development and testing purposes
+ * Provides a representative set of movie theater concession items
+ * 
+ * @example
+ * ```typescript
+ * import { MENU } from "@/lib/sampleData";
+ * 
+ * // Filter by category
+ * const snacks = MENU.filter(item => item.category === "Snacks");
+ * 
+ * // Find specific item
+ * const popcorn = MENU.find(item => item.id === "popcorn-sm");
+ * ```
+ */
 export const MENU: MenuItem[] = [
   {
     id: "popcorn-sm",

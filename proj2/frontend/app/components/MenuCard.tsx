@@ -3,6 +3,27 @@
 import type { MenuItem } from "@/lib/types";
 import { useCartStore } from "@/lib/cartStore";
 
+/**
+ * React component for displaying a single menu item with add-to-cart functionality
+ * Integrates with the cart store for quantity management and provides interactive controls
+ * 
+ * @param props - Component props
+ * @param props.item - Menu item data to display
+ * @returns Rendered menu card component
+ * 
+ * @example
+ * ```tsx
+ * const menuItem = {
+ *   id: "popcorn-lg",
+ *   name: "Large Popcorn",
+ *   description: "Buttery and delicious",
+ *   price: 8.99,
+ *   category: "Snacks"
+ * };
+ * 
+ * <MenuCard item={menuItem} />
+ * ```
+ */
 export default function MenuCard({ item }: { item: MenuItem }) {
   const add = useCartStore((s) => s.add);
   const dec = useCartStore((s) => s.decrement);

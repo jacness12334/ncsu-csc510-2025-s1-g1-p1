@@ -6,22 +6,57 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 // Default customer ID (in production, this should come from authentication)
 const DEFAULT_CUSTOMER_ID = "1";
 
+/**
+ * Interface representing cart item data structure from the backend API
+ * @interface BackendCartItem
+ */
 export interface BackendCartItem {
+  /** Unique cart item identifier */
   id: string;
+  /** ID of the customer who owns this cart item */
   customer_id: string;
+  /** ID of the product in the cart */
   product_id: string;
+  /** Quantity of the product in the cart */
   quantity: number;
+  /** Optional populated product information */
   product?: {
+    /** Product unique identifier */
     id: string;
+    /** Product display name */
     name: string;
+    /** Product unit price */
     unit_price: number;
+    /** Product category */
     category: string;
+    /** Product availability status */
     is_available: boolean;
   };
 }
 
+/**
+ * Service class for handling cart-related API operations
+ * Provides methods to interact with the backend cart management system
+ */
 export class CartApiService {
-  // Get all cart items for a customer
+  /**
+   * Retrieves all cart items for a specific customer from the backend
+   * Transforms backend cart item format to frontend CartItem format
+   * 
+   * @param customerId - Customer ID to fetch cart for (defaults to "1")
+   * @returns Promise resolving to array of cart items
+   * @throws Error when API request fails or returns invalid data
+   * 
+   * @example
+   * ```typescript
+   * try {
+   *   const cartItems = await CartApiService.getCartItems("customer123");
+   *   console.log(`Cart has ${cartItems.length} items`);
+   * } catch (error) {
+   *   console.error("Failed to load cart:", error);
+   * }
+   * ```
+   */
   static async getCartItems(customerId: string = DEFAULT_CUSTOMER_ID): Promise<CartItem[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/customers/${customerId}/cart`);
@@ -44,7 +79,25 @@ export class CartApiService {
     }
   }
 
-  // Add item to cart
+  /**
+   * Adds a product to the customer's cart with specified quantity
+   * 
+   * @param customerId - Customer ID to add item for
+   * @param productId - ID of the product to add to cart
+   * @param quantity - Quantity of the product to add
+   * @returns Promise resolving to the created cart item
+   * @throws Error when API request fails or product is unavailable
+   * 
+   * @example
+   * ```typescript
+   * try {
+   *   const cartItem = await CartApiService.addToCart("customer123", "popcorn-lg", 2);
+   *   console.log("Added item to cart:", cartItem);
+   * } catch (error) {
+   *   console.error("Failed to add item:", error);
+   * }
+   * ```
+   */
   static async addToCart(
     customerId: string = DEFAULT_CUSTOMER_ID,
     productId: string,

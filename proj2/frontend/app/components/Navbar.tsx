@@ -2,6 +2,18 @@
 "use client";
 import Link from "next/link";
 
+/**
+ * Main navigation component for the Movie Munchers application
+ * Provides consistent navigation links across all pages with responsive design
+ * 
+ * @returns Rendered navigation header component
+ * 
+ * @example
+ * ```tsx
+ * // Used in layout.tsx
+ * <Navbar />
+ * ```
+ */
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b bg-white/70 backdrop-blur">
