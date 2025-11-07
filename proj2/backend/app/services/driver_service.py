@@ -3,6 +3,7 @@ from app.app import db
 from app.services.user_service import UserService
 import decimal
 
+# Business logic for driver profiles and delivery information.
 class DriverService:
 
     # Initialize services

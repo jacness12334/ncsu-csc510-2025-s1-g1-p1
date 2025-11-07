@@ -5,7 +5,7 @@ from app.services.staff_service import StaffService
 from app.services.driver_service import DriverService
 import decimal
 
-# CustomerService class
+# Business logic for customer profiles, payment methods, carts, showings, products, and deliveries.
 class CustomerService:
 
     # Initialize services

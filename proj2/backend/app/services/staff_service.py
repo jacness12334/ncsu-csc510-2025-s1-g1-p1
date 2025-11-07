@@ -3,6 +3,7 @@ from app.app import db
 from app.services.user_service import UserService
 from datetime import datetime
 
+# Business logic for staff profiles, authorization, and delivery maintenance.
 class StaffService:
 
     # Initialize services
