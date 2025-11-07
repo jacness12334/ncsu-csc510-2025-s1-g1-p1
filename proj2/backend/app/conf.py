@@ -60,4 +60,5 @@ import glob
 print(f"--- DEBUG: Files in the insert path: {glob.glob(str(project_root) + '/*')} ---")
 
 # Insert the project root path
-sys.path.insert(0, str(project_root))
+sys.path.insert(0, os.path.abspath('../')) 
+print(f"DEBUG: sys.path insert path is: {os.path.abspath('../')}")
