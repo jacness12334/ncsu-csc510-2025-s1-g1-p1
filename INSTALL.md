@@ -16,7 +16,6 @@ cd ncsu-csc510-2025-s1-g1-p1
 
 #### Switch to backend branch and navigate to backend directory:
 ```bash
-git checkout backend
 cd proj2/backend
 ```
 
@@ -31,25 +30,28 @@ source venv/bin/activate
 
 #### Install Python dependencies:
 ```bash
-pip install flask flask-sqlalchemy mysql-connector-python sqlalchemy pymysql
+pip install -r requirements.txt
 ```
 
 #### Database Setup:
 1. Create MySQL database:
-```sql
-CREATE DATABASE movie_munchers_dev;
-CREATE DATABASE movie_munchers_test;
-CREATE DATABASE movie_munchers_prod;
+```bash
+python database.py
 ```
 
-2. The backend uses MySQL connection with these credentials (update in `app/app.py` if needed):
+2. Import Dummy data for usage:
+```bash
+python load_database.pu
+``` 
+
+3. The backend uses MySQL connection with these credentials (update in `app/app.py` if needed):
    - User: `root`
    - Password: `` (empty)
    - Host: `localhost`
 
 #### Start the backend:
 ```bash
-python -c "from app.app import get_app; app = get_app('development'); app.run(debug=True)"
+python run.py
 ```
 Backend runs on `http://localhost:5000`
 
@@ -57,7 +59,6 @@ Backend runs on `http://localhost:5000`
 
 #### Switch to frontend branch and navigate to frontend directory:
 ```bash
-git checkout frontend_skeleton
 cd proj2/frontend
 ```
 
@@ -78,7 +79,7 @@ npm test
 Backend:
 ```bash
 cd proj2/backend
-pytest
+python -m pytest
 ```
 
 ### 5. Build for Production (Frontend only)
@@ -94,8 +95,3 @@ cd proj2/frontend
 npm run docs:serve
 ```
 Documentation available at `http://localhost:3000`
-
-## Notes
-- Backend and frontend are on separate branches (`backend` and `frontend_skeleton`)
-- You may need to create a `requirements.txt` file for easier dependency management
-- Database migrations and initial data setup may require additional steps
