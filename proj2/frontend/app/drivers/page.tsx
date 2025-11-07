@@ -84,9 +84,9 @@ export default function DriverDashboardPage() {
 
             setDriver(driverData.driver);
             setVehicleForm({
-                license_plate: driverData.driver.license_plate,
-                vehicle_type: driverData.driver.vehicle_type,
-                vehicle_color: driverData.driver.vehicle_color,
+                license_plate: driverData.driver.license_plate || "",
+                vehicle_type: driverData.driver.vehicle_type || "",
+                vehicle_color: driverData.driver.vehicle_color || "",
             });
 
             setActiveDelivery(activeData.active_delivery || null);
@@ -171,8 +171,8 @@ export default function DriverDashboardPage() {
     return (
         <section className="mx-auto max-w-6xl px-4 py-8 space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Driver Dashboard</h1>
-                <p className="text-gray-600">
+                <h1 className="text-3xl font-bold mb-4">Driver Dashboard</h1>
+                <p className="text-xl font-semibold mb-2">
                     Welcome, {driver.name} {dutyBadge}
                     <button
                         onClick={toggleDutyStatus}

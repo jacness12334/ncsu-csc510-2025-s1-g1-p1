@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
  */
 export default function Navbar({ updateTrigger }: any) {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState(null);
 
   const determine_if_logged_in = async () => {
     const response = await fetch("http://localhost:5000/api/users/me", {
@@ -33,6 +34,7 @@ export default function Navbar({ updateTrigger }: any) {
 
     if (response.status == 200 && responseData.user_id) {
       setLoggedIn(true);
+      setRole(responseData.role)
     } else if (response.status == 401) {
       setLoggedIn(false);
     }
@@ -64,12 +66,21 @@ export default function Navbar({ updateTrigger }: any) {
 
         <div className="flex items-center gap-5 text-sm">
           <Link href="/">Home</Link>
-          <Link href="/editdetails">My Profile</Link>
           <Link href="/menu">Menu</Link>
           <Link href="/checkout">Checkout</Link>
-          <Link href="/track/12345">Track Order</Link>
-          <Link href="/suppliers">Suppliers</Link>
-          <Link href="/staff">Staff</Link>
+          {role === "customer" && (
+            <Link href="/customers">Dashboard</Link>
+          )}
+          {role === "staff" && (
+            <Link href="/staff">Dashboard</Link>
+          )}
+          {role === "driver" && (
+            <Link href="/drivers">Dashboard</Link>
+          )}
+          {role === "supplier" && (
+            <Link href="/suppliers">Dashboard</Link>
+          )}
+          <Link href="/editdetails">My Profile</Link>
 
           {!loggedIn && (<Link
             href="/login"
