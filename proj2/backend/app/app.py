@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS
 from datetime import timedelta
-from app.routes.staff_routes import staff_bp
-from app.routes.supplier_routes import supplier_bp
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -16,8 +14,6 @@ def create_app(config_name):
     app.config['SECRET_KEY'] = 'faedda1dcedc8a54042c86aaa6caf6b8'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=1)
-    app.register_blueprint(staff_bp)
-    app.register_blueprint(supplier_bp)
 
     user = 'root'
     password = ''
@@ -49,8 +45,12 @@ def create_app(config_name):
     
     from app.routes.customer_routes import customer_bp
     from app.routes.user_routes import user_bp
+    from app.routes.staff_routes import staff_bp
+    from app.routes.supplier_routes import supplier_bp
 
     app.register_blueprint(customer_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(staff_bp)
+    app.register_blueprint(supplier_bp)
 
     return app
