@@ -355,3 +355,15 @@ class TestUserRoutes:
             'password': 'newpass123'
         })
         assert response.status_code == 401
+
+        response = client.post('/api/users/login', json={
+            'email': 'flowupdated@example.com',
+            'password': 'newpass123'
+        })
+        assert response.status_code == 401
+
+    def get_user_from_id(self, client, user_id):
+        response = client.get(f'/api/users/{user_id}')
+        assert response.status_code == 200
+        user_data = json.loads(response.data)
+        user_id = user_data['user_id']
