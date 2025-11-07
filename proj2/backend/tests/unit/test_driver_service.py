@@ -71,7 +71,8 @@ def _create_delivery(app, driver_id, showing_id, payment_id, status, is_rated=Fa
 
 @pytest.fixture
 def setup_prerequisites(app):
-    """Helper fixture to create all dependencies required for DriverService logic."""
+    """Helper fixture to create all dependencies required for DriverService
+    logic."""
     unique_id = uuid.uuid4().hex[:6]
     with app.app_context():
         # 1. Theatre Setup

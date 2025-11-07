@@ -221,7 +221,6 @@ swagger_template = {
             }
         },
         # --- ADD THESE TO THE 'definitions' BLOCK IN swagger_config.py ---
-
         'DriverRegistration': {
             'type': 'object',
             'required': ['name', 'email', 'phone', 'birthday', 'password', 'license_plate', 'vehicle_type', 'vehicle_color', 'duty_status'],
