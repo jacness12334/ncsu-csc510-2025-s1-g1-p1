@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 // Product interface matching backend API response
 interface Product {
@@ -16,115 +17,96 @@ interface Product {
 }
 
 export default function SuppliersPage() {
-  // State for store status and UI
   const [isOpen, setIsOpen] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Dashboard metrics calculated from products
+
   const [metrics, setMetrics] = useState({
     totalProducts: 0,
     availableProducts: 0,
     outOfStock: 0,
     lowStock: 0
   });
-  
-  // Recent products for dashboard table
+
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
 
   /**
-   * Retrieves user ID from sessionToken cookie set during login
-   * @returns user ID as number or null if not found
+   * Get user ID from cookie using js-cookie
    */
   const getUserIdFromCookie = () => {
-    const cookies = document.cookie.split(';');
-    const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('sessionToken='));
-    if (sessionCookie) {
-      const tokenValue = sessionCookie.split('=')[1];
-      return parseInt(tokenValue) || null;
-    }
-    return null;
+    const id = Cookies.get("user_id");
+    return id ? parseInt(id) : null;
   };
 
   /**
-   * Initialize user authentication and load dashboard data on component mount
+   * Load dashboard data on mount
    */
   useEffect(() => {
     const id = getUserIdFromCookie();
     if (id) {
       setUserId(id);
       loadDashboardData(id);
+      loadStoreStatus(id);
     } else {
       alert("Please log in to access supplier features");
     }
   }, []);
 
   /**
-   * Loads dashboard data including products and calculates metrics
-   * Calls GET /api/products endpoint from backend
-   * @param userIdParam - The authenticated user's ID
+   * Fetch products and calculate metrics
    */
   const loadDashboardData = async (userIdParam: number) => {
     setIsLoading(true);
     try {
-      // Call backend GET /api/products endpoint (available in backend branch)
-      const response = await fetch(`http://localhost:5000/api/products?user_id=${userIdParam}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      });
-
+      const response = await fetch(`http://localhost:5000/api/products/${userIdParam}`);
       if (response.ok) {
-        const responseData = await response.json();
-        // Backend returns {products: [...]} format
-        const products = responseData.products || [];
-        setRecentProducts(products.slice(0, 5)); // Show first 5 as recent products
-        
-        // Calculate dashboard metrics from products array
+        const data = await response.json();
+        const products = data.products || [];
+        setRecentProducts(products.slice(0, 5));
+
         const totalProducts = products.length;
         const availableProducts = products.filter((p: Product) => p.is_available).length;
         const outOfStock = products.filter((p: Product) => p.inventory_quantity === 0).length;
         const lowStock = products.filter((p: Product) => p.inventory_quantity > 0 && p.inventory_quantity <= 5).length;
-        
-        setMetrics({
-          totalProducts,
-          availableProducts,
-          outOfStock,
-          lowStock
-        });
+
+        setMetrics({ totalProducts, availableProducts, outOfStock, lowStock });
       } else {
-        console.error("Failed to load dashboard data");
+        console.error("Failed to load products");
       }
     } catch (error) {
-      console.error("Error loading dashboard data:", error);
+      console.error("Error loading products:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   /**
-   * Handles store open/closed status toggle
-   * Calls PUT /api/suppliers/status endpoint
+   * Load supplier's store open/closed status
+   */
+  const loadStoreStatus = async (userIdParam: number) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/suppliers/${userIdParam}`);
+      if (response.ok) {
+        const data = await response.json();
+        setIsOpen(data.supplier.is_open);
+      }
+    } catch (error) {
+      console.error("Error fetching store status:", error);
+    }
+  };
+
+  /**
+   * Toggle store open/closed
    */
   const handleToggleStore = async () => {
-    if (!userId) {
-      alert("User not authenticated");
-      return;
-    }
+    if (!userId) return alert("User not authenticated");
 
     setIsLoading(true);
     try {
-      // Call backend PUT /api/suppliers/status endpoint
       const response = await fetch("http://localhost:5000/api/suppliers/status", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          is_open: !isOpen
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, is_open: !isOpen })
       });
 
       if (response.ok) {
@@ -149,7 +131,7 @@ export default function SuppliersPage() {
         <p className="text-gray-600">Manage your store and products</p>
       </div>
 
-      {/* Store Status Section */}
+      {/* Store Status */}
       <div className="mb-8 rounded-lg border p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -195,23 +177,17 @@ export default function SuppliersPage() {
 
       {/* Quick Actions */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
-        <Link
-          href="/suppliers/products"
-          className="rounded-lg border p-6 text-center transition hover:bg-gray-50"
-        >
+        <Link href="/suppliers/products" className="rounded-lg border p-6 text-center transition hover:bg-gray-50">
           <h3 className="mb-2 font-semibold">Manage Products</h3>
           <p className="text-sm text-gray-600">View, add, edit, and delete products</p>
         </Link>
-        <Link
-          href="/suppliers/profile"
-          className="rounded-lg border p-6 text-center transition hover:bg-gray-50"
-        >
+        <Link href="/suppliers/profile" className="rounded-lg border p-6 text-center transition hover:bg-gray-50">
           <h3 className="mb-2 font-semibold">Edit Profile</h3>
           <p className="text-sm text-gray-600">Update company and personal information</p>
         </Link>
       </div>
 
-      {/* Products */}
+      {/* Products Table */}
       <div className="rounded-lg border">
         <div className="border-b p-6">
           <h2 className="text-xl font-semibold">Products</h2>
@@ -269,10 +245,7 @@ export default function SuppliersPage() {
           </table>
         </div>
         <div className="border-t p-4">
-          <Link
-            href="/suppliers/products"
-            className="text-sm text-blue-600 hover:text-blue-500"
-          >
+          <Link href="/suppliers/products" className="text-sm text-blue-600 hover:text-blue-500">
             View all products →
           </Link>
         </div>

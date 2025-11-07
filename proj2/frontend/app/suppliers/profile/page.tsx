@@ -1,6 +1,7 @@
 "use client";
 import { useState, FormEvent, useEffect } from "react";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 export default function SupplierProfilePage() {
   // Company Information (matches backend Suppliers model)
@@ -9,68 +10,63 @@ export default function SupplierProfilePage() {
   const [contactPhone, setContactPhone] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // Personal Information (matches backend Users model)
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [birthday, setBirthday] = useState("");
-
-  // Password change form fields
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-
   // Application state management
   const [userId, setUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  /**
-   * Retrieves user ID from sessionToken cookie set during login
-   * @returns user ID as number or null if not found
-   */
   const getUserIdFromCookie = () => {
-    const cookies = document.cookie.split(';');
-    const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('sessionToken='));
-    if (sessionCookie) {
-      const tokenValue = sessionCookie.split('=')[1];
-      return parseInt(tokenValue) || null;
-    }
-    return null;
+    const id = Cookies.get("user_id");
+    return id ? parseInt(id) || null : null;
   };
 
-  /**
-   * Initialize user authentication on component mount
-   * Note: Would also load existing profile data when GET endpoints are available
-   */
+  // Load profile data from backend
+  const loadProfileData = async (id: number) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/suppliers/${id}`);
+      if (!res.ok) throw new Error("Failed to fetch supplier data");
+      const data = await res.json();
+      const supplier = data.supplier;
+
+      setCompanyName(supplier.company_name);
+      setCompanyAddress(supplier.company_address);
+      setContactPhone(supplier.contact_phone);
+      setIsOpen(supplier.is_open);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     const id = getUserIdFromCookie();
     if (id) {
       setUserId(id);
-      // TODO: Load existing supplier and user data when GET /api/suppliers endpoint is enabled
-      // loadProfileData(id);
+      loadProfileData(id);
     } else {
-      alert("Please log in to access supplier features");
     }
   }, []);
 
-  /**
-   * Handles profile form submission
-   * Note: PUT /api/suppliers endpoint excluded as requested
-   * Form structure ready for future backend integration
-   */
+  // Toggle supplier availability immediately on checkbox change
+  const handleAvailabilityChange = async (checked: boolean) => {
+    setIsOpen(checked);
+    if (!userId) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/suppliers/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, is_open: checked }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to update availability");
+      }
+    } catch (error) {
+      console.error(error);
+      setIsOpen(!checked); // revert on failure
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
-    // Validate password fields if attempting to change password
-    if (newPassword && newPassword !== confirmNewPassword) {
-      alert("New passwords do not match.");
-      return;
-    }
-
-    if (newPassword && newPassword.length < 8) {
-      alert("New password must be at least 8 characters.");
-      return;
-    }
 
     if (!userId) {
       alert("User not authenticated");
@@ -79,35 +75,37 @@ export default function SupplierProfilePage() {
 
     setIsLoading(true);
     try {
-      // Profile form data is structured and ready for backend integration
-      // PUT /api/suppliers endpoint available but excluded per request
-      // Personal info updates would require user routes integration
-      
-      console.log("Profile data structured for backend:", {
-        supplier: { 
+      // Update supplier company info
+      const supplierRes = await fetch(`http://localhost:5000/api/suppliers`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           user_id: userId,
-          company_name: companyName, 
-          company_address: companyAddress, 
-          contact_phone: contactPhone, 
-          is_open: isOpen 
-        },
-        user: { name, email, phone, birthday },
-        password_change: newPassword ? { current_password: currentPassword, new_password: newPassword } : null
+          company_name: companyName,
+          company_address: companyAddress,
+          contact_phone: contactPhone,
+          is_open: isOpen,
+        }),
       });
-      
-      alert("Profile form ready for backend integration! (PUT /api/suppliers excluded as requested)");
+
+      if (!supplierRes.ok) {
+        const err = await supplierRes.json();
+        throw new Error(err.error || "Failed to update supplier profile");
+      }
+
+      // TODO: Integrate user personal info and password update when routes available
+
+      alert("Profile updated successfully!");
     } catch (error) {
-      console.error("Error preparing profile data:", error);
-      alert("Error processing profile form. Please try again.");
+      console.error(error);
+      alert("Error updating profile. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  /* Profile Page Layout */
   return (
     <section className="mx-auto mt-10 max-w-2xl">
-      {/* Header Section with Navigation */}
       <div className="mb-6">
         <div className="mb-4">
           <Link
@@ -121,13 +119,9 @@ export default function SupplierProfilePage() {
         <p className="text-sm text-gray-600">Update your company and personal information.</p>
       </div>
 
-      {/* Profile Update Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        
-        {/* Company Information Section */}
         <fieldset className="rounded-lg border p-6">
           <legend className="px-2 text-lg font-semibold">Company Information</legend>
-          
           <div className="mt-4 space-y-4">
             <div>
               <label htmlFor="companyName" className="mb-1 block text-sm font-medium">
@@ -179,7 +173,7 @@ export default function SupplierProfilePage() {
                 id="isOpen"
                 type="checkbox"
                 checked={isOpen}
-                onChange={(e) => setIsOpen(e.target.checked)}
+                onChange={(e) => handleAvailabilityChange(e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
               />
               <label htmlFor="isOpen" className="text-sm font-medium">
@@ -189,126 +183,6 @@ export default function SupplierProfilePage() {
           </div>
         </fieldset>
 
-        {/* Personal Information Section */}
-        <fieldset className="rounded-lg border p-6">
-          <legend className="px-2 text-lg font-semibold">Personal Information</legend>
-          
-          {/* Personal details grid layout */}
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="name" className="mb-1 block text-sm font-medium">
-                Full Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="John Supplier"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="mb-1 block text-sm font-medium">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="john@companya.com"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="mb-1 block text-sm font-medium">
-                Personal Phone
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                placeholder="555-0011"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="birthday" className="mb-1 block text-sm font-medium">
-                Birthday
-              </label>
-              <input
-                id="birthday"
-                type="date"
-                value={birthday}
-                onChange={(e) => setBirthday(e.target.value)}
-                required
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-          </div>
-        </fieldset>
-
-        {/* Password Change Section */}
-        <fieldset className="rounded-lg border p-6">
-          <legend className="px-2 text-lg font-semibold">Change Password (Optional)</legend>
-          
-          {/* Password fields grid layout */}
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            <div>
-              <label htmlFor="currentPassword" className="mb-1 block text-sm font-medium">
-                Current Password
-              </label>
-              <input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="newPassword" className="mb-1 block text-sm font-medium">
-                New Password
-              </label>
-              <input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="••••••••"
-                minLength={8}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmNewPassword" className="mb-1 block text-sm font-medium">
-                Confirm New Password
-              </label>
-              <input
-                id="confirmNewPassword"
-                type="password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                placeholder="••••••••"
-                minLength={8}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-          </div>
-        </fieldset>
-
-        {/* Form Submit Button */}
         <div className="flex items-center justify-end">
           <button
             type="submit"
