@@ -19,8 +19,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Run tests and generate coverage report
-        # Replace this with your actual test/coverage command
-        run: pytest --cov=./ --cov-report=xml
+        run: pytest --cov --cov-branch --cov-report=xml
+
+
         
       # 3. Upload coverage to Codecov
       - name: Upload coverage to Codecov
