@@ -1,0 +1,35 @@
+name: CI and Coverage
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 1. Setup your environment (example for Python)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          
+      # 2. Install dependencies and run tests to create a coverage report
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run tests and generate coverage report
+        # Replace this with your actual test/coverage command
+        run: pytest --cov=./ --cov-report=xml
+        
+      # 3. Upload coverage to Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          # Use the secret created in Step 1
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # Specify the path to your coverage report file
+          files: ./coverage.xml
+          # Optional: Make the CI fail if Codecov encounters an error
+          fail_ci_if_error: true
+  
