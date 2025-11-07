@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify
 from app.models import *
-from app.app import db
 from app.services.staff_service import StaffService
 from datetime import datetime
 
+# Blueprint for staff-related endpoints
 staff_bp = Blueprint("staff", __name__, url_prefix="/api")
 
+# Helper function to retrieve the current user's id
 def get_user_id():
     data = request.json
     return data.get('user_id')
@@ -641,6 +642,31 @@ def list_deliveries_by_theatre(theatre_id):
 
 @staff_bp.route('/staff/<int:staff_user_id>', methods=['GET'])
 def get_staff(staff_user_id):
+    """
+    Get Staff Profile
+    ---
+    summary: Get Staff Profile
+    tags: [Staff Management]
+    description: Retrieves staff profile details by staff user ID.
+    parameters:
+      - in: path
+        name: staff_user_id
+        type: integer
+        required: true
+        description: The ID of the staff user.
+    responses:
+      200:
+        description: Staff profile retrieved
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer}
+            theatre_id: {type: integer}
+            role: {type: string}
+            is_available: {type: boolean}
+      404:
+        description: Staff member not found
+    """
     try:
         service = StaffService(staff_user_id)
         data = service.get_staff(staff_id=staff_user_id)

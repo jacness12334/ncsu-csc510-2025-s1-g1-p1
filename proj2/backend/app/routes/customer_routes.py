@@ -3,9 +3,10 @@ from app.services.customer_service import CustomerService
 
 # Blueprint for customer-related endpoints
 customer_bp = Blueprint('customer', __name__, url_prefix='/api')
+
+# CustomerService instance
 customer_service = CustomerService()
 
-# Create a new customer account
 @customer_bp.route('/customers', methods=['POST'])
 def create_customer():
     """
@@ -50,7 +51,6 @@ def create_customer():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Fetch a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['GET'])
 def get_customer(user_id):
     """
@@ -81,7 +81,6 @@ def get_customer(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Delete a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['DELETE'])
 def delete_customer(user_id):
     """
@@ -112,7 +111,6 @@ def delete_customer(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Update a customer's default theatre
 @customer_bp.route('/customers/<int:user_id>/theatre', methods=['PUT'])
 def update_default_theatre(user_id):
     """
@@ -155,7 +153,6 @@ def update_default_theatre(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Add a payment method for a customer
 @customer_bp.route('/customers/<int:user_id>/payment-methods', methods=['POST'])
 def add_payment_method(user_id):
     """
@@ -202,7 +199,6 @@ def add_payment_method(user_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred: ' + str(e)}), 500
 
-# Get all payment methods for a customer
 @customer_bp.route('/customers/<int:customer_id>/payment-methods', methods=['GET'])
 def get_payment_methods(customer_id):
     """
@@ -245,7 +241,6 @@ def get_payment_methods(customer_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Delete a payment method by id
 @customer_bp.route('/payment-methods/<int:payment_method_id>', methods=['DELETE'])
 def delete_payment_method(payment_method_id):
     """
@@ -276,7 +271,6 @@ def delete_payment_method(payment_method_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Add funds to a payment method
 @customer_bp.route('/payment-methods/<int:payment_method_id>/add-funds', methods=['POST'])
 def add_funds(payment_method_id):
     """
@@ -317,7 +311,6 @@ def add_funds(payment_method_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Add an item to the customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['POST'])
 def add_to_cart(customer_id):
     """
@@ -360,7 +353,6 @@ def add_to_cart(customer_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Get all items in a customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['GET'])
 def get_cart(customer_id):
     """
@@ -399,7 +391,6 @@ def get_cart(customer_id):
     except Exception:
         return jsonify({'error': str(e)}), 500
 
-# Update the quantity of a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
 def update_cart_item(cart_item_id):
     """
@@ -443,7 +434,6 @@ def update_cart_item(cart_item_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Delete a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['DELETE'])
 def delete_cart_item(cart_item_id):
     """
@@ -474,7 +464,6 @@ def delete_cart_item(cart_item_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Create a customer showing (book a seat for a movie showing)
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['POST'])
 def create_customer_showing(user_id):
     """
@@ -517,7 +506,6 @@ def create_customer_showing(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Create a delivery for a customer showing using a payment method
 @customer_bp.route('/deliveries', methods=['POST'])
 def create_delivery():
     """
@@ -562,7 +550,6 @@ def create_delivery():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-# Cancel a delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/cancel', methods=['POST'])
 def cancel_delivery(delivery_id):
     """
@@ -600,7 +587,6 @@ def cancel_delivery(delivery_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Rate a fulfilled delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/rate', methods=['POST'])
 def rate_delivery(delivery_id):
     """
@@ -641,7 +627,6 @@ def rate_delivery(delivery_id):
     except Exception:
         return jsonify({'error': str(e)}), 500
 
-# Get all available products
 @customer_bp.route('/products/menu', methods=['GET'])
 def list_products():
     """
@@ -675,7 +660,6 @@ def list_products():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Get all deliveries for a specific customer by user_id
 @customer_bp.route('/customers/<int:user_id>/deliveries', methods=['GET'])
 def get_deliveries_for_customer(user_id):
     """
@@ -719,9 +703,52 @@ def get_deliveries_for_customer(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-# Get all showings for a specific customer by user_id
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['GET'])
 def get_showings_for_customer(user_id):
+    """
+    List Customer Showings
+    ---
+    summary: List Customer Showings
+    tags: [Movie Booking]
+    description: Retrieves all showings for a customer, including movie title, seat, start time, auditorium, and theatre name.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+    responses:
+      200:
+        description: Showings retrieved
+        schema:
+          type: object
+          properties:
+            showings:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: {type: integer}
+                  movie_title: {type: string}
+                  seat:
+                    type: object
+                    nullable: true
+                    properties:
+                      id: {type: integer}
+                      aisle: {type: string}
+                      number: {type: integer}
+                  start_time: {type: string, description: ISO 8601 datetime}
+                  auditorium:
+                    type: object
+                    nullable: true
+                    properties:
+                      id: {type: integer}
+                      number: {type: integer}
+                      theatre_id: {type: integer}
+                  theatre_name: {type: string}
+      404:
+        description: Customer not found
+    """
     try:
       showings = customer_service.get_all_showings(user_id=user_id)
       return jsonify({
@@ -739,9 +766,44 @@ def get_showings_for_customer(user_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Get delivery details by delivery id
 @customer_bp.route('/deliveries/<int:delivery_id>/details', methods=['GET'])
 def get_delivery_details(delivery_id):
+    """
+    Get Delivery Details
+    ---
+    summary: Get Delivery Details
+    tags: [Delivery Operations (Customer)]
+    description: Retrieves delivery details including items, theatre information, and movie title for the given delivery.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery to fetch.
+    responses:
+      200:
+        description: Delivery details retrieved
+        schema:
+          type: object
+          properties:
+            id: {type: integer}
+            driver_id: {type: integer, nullable: true}
+            total_price: {type: number, format: float}
+            delivery_time: {type: string, nullable: true, description: ISO 8601 datetime}
+            delivery_status: {type: string}
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  name: {type: string, nullable: true}
+                  quantity: {type: integer}
+            theatre_name: {type: string, nullable: true}
+            theatre_address: {type: string, nullable: true}
+            movie_title: {type: string, nullable: true}
+      404:
+        description: Delivery not found
+    """
     try:
         details = customer_service.get_delivery_details(delivery_id=delivery_id)
         return jsonify(details), 200

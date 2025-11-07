@@ -3,8 +3,10 @@ from app.models import *
 from app.app import db
 from app.services.supplier_service import SupplierService
 
+# Blueprint for supplier-related endpoints
 supplier_bp = Blueprint("suppliers", __name__, url_prefix="/api")
 
+# Helper function to get the current user's id
 def get_user_id():
     data = request.json
     return data.get('user_id')

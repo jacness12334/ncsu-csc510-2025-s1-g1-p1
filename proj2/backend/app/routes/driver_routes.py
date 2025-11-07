@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
 from app.models import *
-from app.app import db
 from app.services.driver_service import DriverService
-from datetime import datetime
 
+# Blueprint for driver-related endpoints
 driver_bp = Blueprint("driver", __name__, url_prefix="/api")
 
+# Helper function to retrieve the current user
 def get_user_id():
     data = request.json
     return data.get('user_id')

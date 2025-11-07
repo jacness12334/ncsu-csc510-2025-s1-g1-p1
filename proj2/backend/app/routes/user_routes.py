@@ -6,8 +6,9 @@ from datetime import timedelta
 
 # Blueprint for user-related API routes 
 user_bp = Blueprint('user', __name__, url_prefix='/api/users')
-user_service = UserService()
 
+#UserService instance
+user_service = UserService()
 
 # Register a new user account
 @user_bp.route('/register', methods=['POST'])
