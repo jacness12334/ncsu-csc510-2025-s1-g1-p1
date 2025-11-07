@@ -27,11 +27,21 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 
+# In conf.py
+# Add external libraries that may fail to import during doc generation
 autodoc_mock_imports = [
     "flask",
     "flask_sqlalchemy",
-    "flasgger"
+    "flasgger",
+    # **CRITICAL FIX:** Mocking the base library
+    "sqlalchemy",
+    "sqlalchemy.orm", 
+    # Add 'app' as it's an internal package dependency 
+    # which you don't need to actually run during doc generation
+    "app"
+    # Add any other third-party libraries your services rely on
 ]
+
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -59,6 +69,13 @@ print(f"\n--- DEBUG: sys.path insert path is: {project_root} ---")
 import glob
 print(f"--- DEBUG: Files in the insert path: {glob.glob(str(project_root) + '/*')} ---")
 
-# Insert the project root path
-sys.path.insert(0, os.path.abspath('../')) 
-print(f"DEBUG: sys.path insert path is: {os.path.abspath('../')}")
+# The path to the 'source' directory:
+source_dir = pathlib.Path(__file__).parent.resolve() 
+# The path to the directory two levels up (the project root, containing 'backend'):
+project_root = source_dir.parent.parent.resolve() 
+
+# Correct path insertion (remove the os.path.abspath('../') line)
+sys.path.insert(0, str(project_root)) 
+
+# You may also need to insert the backend directory for internal imports
+sys.path.insert(0, str(project_root / 'backend'))
