@@ -240,7 +240,7 @@ class StaffService:
     
     # Show all deliveries for the given theatre
     def show_all_deliveries(self, theatre_id):
-        self.validate_admin()
+        self.validate_staff()
         deliveries = (
             Deliveries.query
             .join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id)
@@ -263,11 +263,12 @@ class StaffService:
 
     # Get staff member
     def get_staff(self, staff_id):
-        st = self.validate_staff(staff_id)
+        self.validate_admin()
+        staff = Staff.query.filter_by(user_id=staff_id).first()
         return {
-            "user_id": st.user_id,
-            "theatre_id": st.theatre_id,
-            "role": st.role,
-            "is_available": st.is_available,
+            "user_id": staff.user_id,
+            "theatre_id": staff.theatre_id,
+            "role": staff.role,
+            "is_available": staff.is_available,
         }
 

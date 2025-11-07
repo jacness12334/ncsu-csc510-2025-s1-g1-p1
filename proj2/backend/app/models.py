@@ -204,7 +204,7 @@ class Deliveries(db.Model):
     __table_args__ = (db.CheckConstraint('total_price >= 0.00', name = 'check_total_price'),)
 
     def __repr__(self):
-        return f'<Deliveries id = {self.i} driver_id = {self.driver_id} customer_showing_id = {self.customer_showing_id} payment_method_id = {self.payment_method_id} staff_id = {self.staff_id} payment_status = {self.payment_status} total_price = {self.total_price} delivery_time = {self.delivery_time} delivery_status = {self.delivery_status}>'
+        return f'<Deliveries id = {self.id} driver_id = {self.driver_id} customer_showing_id = {self.customer_showing_id} payment_method_id = {self.payment_method_id} staff_id = {self.staff_id} payment_status = {self.payment_status} total_price = {self.total_price} delivery_time = {self.delivery_time} delivery_status = {self.delivery_status}>'
     
 class DeliveryItems(db.Model):
     __tablename__ = 'delivery_items'

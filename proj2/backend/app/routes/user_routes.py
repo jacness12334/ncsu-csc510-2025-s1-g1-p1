@@ -142,6 +142,18 @@ def get_current_user():
         'role': current_user.role
     }), 200
 
+@user_bp.route('/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = user_service.get_user(user_id)
+    return jsonify({
+        'user_id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'phone': user.phone,
+        'birthday': str(user.birthday),
+        'role': user.role
+    }), 200
+
 
 # Update the current authenticated user's profile
 @user_bp.route('/me', methods=['PUT'])
@@ -280,3 +292,4 @@ def change_password():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'Password change failed'}), 500
+  

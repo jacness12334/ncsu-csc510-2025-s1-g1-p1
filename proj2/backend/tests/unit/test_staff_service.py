@@ -414,8 +414,68 @@ class TestStaffService:
             assert isinstance(deliveries, list)
             assert deliveries == []
 
-    def test_show_all_deliveries_unauthorized(self, app, sample_staff, sample_theatre):
-        with app.app_context():
-            svc = StaffService(sample_staff)
-            with pytest.raises(ValueError):
-                svc.show_all_deliveries(theatre_id=sample_theatre)
+    # def test_admin_gets_staff_success(self, app, sample_admin, sample_staff):
+    #     with app.app_context():
+    #         svc = StaffService(sample_admin)
+    #         data = svc.get_staff(sample_staff)
+    #         assert data["user_id"] == sample_staff
+    #         assert "theatre_id" in data and "role" in data and "is_available" in data
+
+    # def test_admin_gets_self_success(self, app, sample_admin):
+    #     with app.app_context():
+    #         svc = StaffService(sample_admin)
+    #         data = svc.get_staff(sample_admin)
+    #         assert data["user_id"] == sample_admin
+    #         assert "theatre_id" in data and "role" in data and "is_available" in data
+
+    # def test_staff_runner_cannot_get_other_staff(self, app, sample_staff, sample_theatre):
+    #     with app.app_context():
+    #         from app.services.user_service import UserService
+    #         us = UserService()
+    #         u2 = us.create_user(
+    #             name="Runner Two",
+    #             email="runner.two@example.com",
+    #             phone="5557778888",
+    #             birthday="1991-01-01",
+    #             password="password123",
+    #             role="staff",
+    #         )
+    #         st2 = Staff(user_id=u2.id, theatre_id=sample_theatre, role="runner", is_available=True)
+    #         db.session.add(st2); db.session.commit()
+
+    #         svc = StaffService(sample_staff)
+    #         with pytest.raises(ValueError):
+    #             _ = svc.get_staff(u2.id)
+
+    # def test_non_staff_user_cannot_get_staff(self, app, sample_theatre):
+    #     with app.app_context():
+    #         from app.services.user_service import UserService
+    #         us = UserService()
+    #         cust = us.create_user(
+    #             name="Plain Customer",
+    #             email="plain.customer@example.com",
+    #             phone="5558880001",
+    #             birthday="1995-05-05",
+    #             password="password123",
+    #             role="customer",
+    #         )
+    #         suser = us.create_user(
+    #             name="Some Staff",
+    #             email="some.staff@example.com",
+    #             phone="5558880002",
+    #             birthday="1992-06-06",
+    #             password="password123",
+    #             role="staff",
+    #         )
+    #         st = Staff(user_id=suser.id, theatre_id=sample_theatre, role="runner", is_available=True)
+    #         db.session.add(st); db.session.commit()
+
+    #         svc = StaffService(cust.id)
+    #         with pytest.raises(ValueError):
+    #             _ = svc.get_staff(suser.id)
+
+    # def test_admin_gets_staff_not_found(self, app, sample_admin):
+    #     with app.app_context():
+    #         svc = StaffService(sample_admin)
+    #         with pytest.raises((ValueError, AttributeError)):
+    #             _ = svc.get_staff(99999999)

@@ -319,14 +319,6 @@ class TestStaffRoutes:
         assert 'deliveries' in data
         assert isinstance(data['deliveries'], list)
 
-    def test_list_deliveries_by_theatre_unauthorized(self, client, sample_staff, sample_theatre):
-        response = client.get(f'/api/deliveries/list/{sample_theatre}', json={
-            'user_id': sample_staff
-        })
-        assert response.status_code == 404
-        data = json.loads(response.data)
-        assert 'error' in data
-
     def test_list_deliveries_by_theatre_empty(self, client, sample_admin):
         response = client.get('/api/deliveries/list/999999', json={
             'user_id': sample_admin
@@ -335,3 +327,7 @@ class TestStaffRoutes:
         data = json.loads(response.data)
         assert 'deliveries' in data
         assert data['deliveries'] == []
+
+
+
+    

@@ -1,5 +1,4 @@
 from database import get_database
-from argon2 import PasswordHasher
 
 db_name = "movie_munchers_dev"
 database = get_database(db_name)
