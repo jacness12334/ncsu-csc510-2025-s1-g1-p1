@@ -237,3 +237,22 @@ def fulfill_delivery(delivery_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
+
+@staff_bp.route('/staff/list', methods=['PUT'])
+def list_staff_by_theatre(theatre_id):
+    try:
+        user_id = get_user_id()  
+        service = StaffService(user_id)
+        staff = service.show_all_staff(theatre_id)
+        return jsonify({
+            "staff": [{
+                "user_id": s.user_id,
+                "theatre_id": s.theatre_id,
+                "role": s.role,
+                "is_available": s.is_available
+            } for s in staff]
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': 'An error occurred'}), 500

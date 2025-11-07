@@ -233,12 +233,19 @@ class StaffService:
         db.session.commit()
         return True
     
-    # Show all admin 
-    def show_all_admin(self):
-        staff = self.validate_admin()
+    # Show all staff members 
+    def show_all_staff(self, theatre_id):
+        self.validate_admin()
+        return Staff.query.filter(Staff.theatre_id == theatre_id).order_by(Staff.user_id.asc()).all()
 
-    # Show all showings
+    # # Show all showings
+    # def show_all_showings(self, theatre_id):
+    #     self.validate_admin()
+    #     MovieShowings.query.join(Auditoriums, MovieShowings.auditorium_id == Auditoriums.id).filter(Auditoriums.theatre_id == theatre_id).all()
 
-    # Show all movies
+    # # Show all movies
+    # def show_all_movies(self):
+    #     return Movies.query.order_by(Movies.title.asc()).all()
+
 
     
