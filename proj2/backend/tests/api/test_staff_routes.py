@@ -284,3 +284,30 @@ class TestStaffRoutes:
         assert data['message'] == 'Delivery fulfilled'
         assert Staff.query.filter_by(user_id=sample_staff).first().is_available is True
         assert Deliveries.query.filter_by(id=sample_delivery).first().delivery_status == 'fulfilled'
+
+    def test_list_staff_by_theatre_success(self, client, sample_admin, sample_theatre, sample_staff):
+        response = client.put(f'/api/staff/list/{sample_theatre}', json={
+            'user_id': sample_admin,
+        })
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'staff' in data
+        assert all(s['theatre_id'] == sample_theatre for s in data['staff'])
+        assert any(s['user_id'] == sample_staff for s in data['staff'])
+
+    def test_list_staff_by_theatre_unauthorized(self, client, sample_staff, sample_theatre):
+        response = client.put(f'/api/staff/list/{sample_theatre}', json={
+            'user_id': sample_staff,
+        })
+        assert response.status_code == 404
+        data = json.loads(response.data)
+        assert 'error' in data
+
+    def test_list_staff_by_theatre_empty(self, client, sample_admin):
+        response = client.put(f'/api/staff/list/{9999}', json={
+            'user_id': sample_admin,
+        })
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'staff' in data
+        assert data['staff'] == []

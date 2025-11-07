@@ -183,7 +183,7 @@ class StaffService:
     def accept_delivery(self, delivery_id):
         staff = self.validate_staff()
 
-        delivery = Deliveries.query.get(delivery_id)
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
 
         if not staff.is_available:
             raise ValueError("Staff not available")

@@ -238,7 +238,7 @@ def fulfill_delivery(delivery_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
 
-@staff_bp.route('/staff/list', methods=['PUT'])
+@staff_bp.route('/staff/list/<int:theatre_id>', methods=['PUT'])
 def list_staff_by_theatre(theatre_id):
     try:
         user_id = get_user_id()  

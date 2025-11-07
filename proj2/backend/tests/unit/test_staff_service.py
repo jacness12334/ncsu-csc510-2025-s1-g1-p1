@@ -1,5 +1,6 @@
 import pytest
 from app.services.staff_service import StaffService
+from app.services.user_service import UserService
 from app.models import *
 from datetime import datetime
 
@@ -339,3 +340,62 @@ class TestStaffService:
             staff_service = StaffService(sample_staff)
             with pytest.raises(ValueError, match="Delivery status must be 'delivered' to be fulfilled"):
                 staff_service.fulfill_delivery(sample_delivery)
+
+    def test_show_all_staff_success(self, app, sample_admin, sample_theatre):
+        with app.app_context():
+            # Arrange: create an extra staff user in the target theatre
+            u = UserService().create_user(
+                name='Runner One',
+                email='runner1@example.com',
+                phone='5551237001',
+                birthday='1995-01-01',
+                password='password123',
+                role='staff'
+            )
+            s = Staff(user_id=u.id, theatre_id=sample_theatre, role='runner', is_available=True)
+            db.session.add(s)
+            db.session.commit()
+
+            svc = StaffService(user_id=sample_admin)
+
+            # Act
+            staff_list = svc.show_all_staff(theatre_id=sample_theatre)
+
+            # Assert
+            assert len(staff_list) >= 1
+            assert all(st.theatre_id == sample_theatre for st in staff_list)
+            assert any(st.user_id == u.id for st in staff_list)
+
+    def test_show_all_staff_filters_other_theatre(self, app, sample_admin, sample_theatre):
+        with app.app_context():
+            # Arrange: create a different theatre and staff there
+            other = Theatres(name='Other', address='999 Elsewhere', phone='5550000000', is_open=True)
+            db.session.add(other)
+            db.session.commit()
+
+            u2 = UserService().create_user(
+                name='Runner Two',
+                email='runner2@example.com',
+                phone='5551237002',
+                birthday='1996-02-02',
+                password='password123',
+                role='staff'
+            )
+            s2 = Staff(user_id=u2.id, theatre_id=other.id, role='runner', is_available=True)
+            db.session.add(s2)
+            db.session.commit()
+
+            svc = StaffService(user_id=sample_admin)
+
+            # Act
+            staff_list = svc.show_all_staff(theatre_id=sample_theatre)
+
+            # Assert: staff from other theatre not included
+            assert all(st.theatre_id == sample_theatre for st in staff_list)
+            assert all(st.user_id != u2.id for st in staff_list)
+
+    def test_show_all_staff_unauthorized(self, app, sample_staff, sample_theatre):
+        with app.app_context():
+            svc = StaffService(user_id=sample_staff)
+            with pytest.raises(ValueError):
+                svc.show_all_staff(theatre_id=sample_theatre)
