@@ -64,7 +64,7 @@ def set_availability():
 @supplier_bp.route('/products', methods=['GET'])
 def get_products():
     try:
-        user_id = get_user_id()
+        user_id = Suppliers.query.first().user_id
         service = SupplierService(user_id)
         products = service.get_products()
         return jsonify({"products": [{"id": p.id, "supplier_id": p.supplier_id, "name": p.name, "unit_price": float(p.unit_price), "inventory_quantity": p.inventory_quantity, "size": p.size, "keywords": p.keywords, "category": p.category, "discount": p.discount, "is_available": p.is_available} for p in products]}), 200
@@ -143,7 +143,7 @@ def remove_product(product_id):
 @supplier_bp.route('/suppliers/all', methods=['GET'])
 def list_open_suppliers():
     try:
-        service = SupplierService()  
+        service = SupplierService(user_id)  
         suppliers = service.get_all_suppliers()
 
         return jsonify({
