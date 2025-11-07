@@ -158,7 +158,7 @@ class CustomerService:
         if not cart_item:
             raise ValueError(f"Cart item {cart_item_id} not found")
 
-        cart_item.quantity += quantity
+        cart_item.quantity = quantity
         db.session.commit()
         return cart_item
 
