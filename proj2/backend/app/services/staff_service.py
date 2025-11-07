@@ -237,6 +237,20 @@ class StaffService:
     def show_all_staff(self, theatre_id):
         self.validate_admin()
         return Staff.query.filter(Staff.theatre_id == theatre_id).order_by(Staff.user_id.asc()).all()
+    
+    # Show all deliveries for the given theatre
+    def show_all_deliveries(self, theatre_id):
+        self.validate_admin()
+        deliveries = (
+            Deliveries.query
+            .join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id)
+            .join(Seats, CustomerShowings.seat_id == Seats.id)
+            .join(Auditoriums, Seats.auditorium_id == Auditoriums.id)
+            .filter(Auditoriums.theatre_id == theatre_id)
+            .order_by(Deliveries.delivery_status.asc(), Deliveries.id.desc())
+            .all()
+        )
+        return deliveries
 
     # # Show all showings
     # def show_all_showings(self, theatre_id):

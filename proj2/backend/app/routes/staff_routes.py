@@ -256,3 +256,26 @@ def list_staff_by_theatre(theatre_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@staff_bp.route('/deliveries/list/<int:theatre_id>', methods=['GET'])
+def list_deliveries_by_theatre(theatre_id):
+    try:
+        user_id = get_user_id()
+        service = StaffService(user_id)
+        deliveries = service.show_all_deliveries(theatre_id)
+        return jsonify({
+            "deliveries": [{
+                "id": d.id,
+                "customer_showing_id": d.customer_showing_id,
+                "payment_method_id": d.payment_method_id,
+                "driver_id": d.driver_id,
+                "staff_id": d.staff_id,
+                "total_price": float(d.total_price),
+                "payment_status": d.payment_status,
+                "delivery_status": d.delivery_status
+            } for d in deliveries]
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
