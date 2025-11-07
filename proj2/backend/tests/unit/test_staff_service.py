@@ -420,9 +420,9 @@ class TestStaffService:
             staff = svc.get_staff(sample_staff)
             assert staff.user_id == sample_staff
     
-    def test_get_staff_unauthorized(self, app, sample_staff):
+    def test_get_staff_unauthorized(self, app, sample_customer):
         with app.app_context():
-            svc = StaffService(sample_staff)
+            svc = StaffService(sample_customer)
             with pytest.raises(ValueError, match="Unauthorized User - Not an admin"):
-                staff = svc.get_staff(sample_staff)
+                staff = svc.get_staff(sample_customer)
                 assert staff is None
