@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
  * ProductCard component to display individual product information.
  * Uses robust Tailwind styling for a clean, responsive card layout.
  */
-const ProductCard = ({ product }: any) => (
+const ProductCard = ({ product, supplierName }: any) => (
   <div className="p-4 bg-white shadow-xl rounded-xl transition hover:shadow-2xl hover:scale-[1.02] duration-300 transform border border-gray-100">
     <div className="flex justify-between items-start mb-2">
       <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
@@ -55,7 +55,7 @@ const App = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [supplierName, setSupplierName] = useState("Loading Supplier..."); // <-- ADD THIS LINE
+  const [supplierMap, setSupplierMap] = useState({}); // <-- ADD THIS LINE
 
   // Helper function for fetching with exponential backoff
   const exponentialBackoffFetch = async (url: any, options: any, retries = 3) => {
@@ -76,70 +76,75 @@ const App = () => {
       }
     }
   };
-  // Function to fetch the supplier's name
-  const fetchSupplierName = async () => {
+  // Function to fetch all supplier names and create a map
+  const fetchSuppliers = async () => {
     try {
-      // NOTE: Assuming your backend's /api/suppliers endpoint expects user_id in the body for GET
-      const response = await exponentialBackoffFetch('/suppliers', {
+      // Endpoint is now relative: /api/suppliers/all becomes just '/suppliers/all'
+      const response = await exponentialBackoffFetch('http://localhost:5000/api/suppliers/all', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: SUPPLIER_USER_ID }),
+        // No headers/body needed for this standard GET route
       });
 
-      if (!response) throw new Error("Supplier lookup failed.");
+      if (!response) throw new Error("Supplier list failed.");
 
       const data = await response.json();
-
       if (data.error) throw new Error(data.error);
 
-      // Update state with the fetched company name
-      setSupplierName(data.supplier.company_name || "Unknown Supplier");
+      // Create a map: { 'supplierId1': 'CompanyName A', ...}
+      const map = data.suppliers.reduce((acc: any, s: any) => {
+        // Ensure user_id is a string for mapping consistency
+        acc[String(s.user_id)] = s.company_name;
+        return acc;
+      }, {});
+
+      setSupplierMap(map);
+      return map;
 
     } catch (err) {
-      console.error("Failed to fetch supplier name:", err);
-      setSupplierName("Failed to load name"); // Set a fallback name
+      console.error("Failed to fetch suppliers:", err);
+      return {};
     }
   };
 
   const fetchProducts = async () => {
     setLoading(true);
     setError("");
-
     try {
-      // Use relative path to the provided endpoint
-      const response = await exponentialBackoffFetch('http://localhost:5000/api/products', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: "include"
+      // 1. FETCH SUPPLIERS FIRST
+      const suppliers = await fetchSuppliers(); // Gets the ID -> Name Map
 
+      // 2. FETCH PRODUCTS using the new /products/menu route
+      const response = await exponentialBackoffFetch('http://localhost:5000/api/products/menu', {
+        method: 'GET',
+        // NOTE: No headers or body are needed for this standard GET route!
       });
 
-      // --- ADD THIS GUARD CLAUSE ---
-      // If the fetch failed (and the exponentialBackoffFetch didn't throw properly
-      // or an outside error occurred), we halt execution here and jump to the catch block.
-      if (!response) {
-        throw new Error("Network request failed or returned no response.");
-      }
-      // --- END GUARD CLAUSE ---
+      if (!response) throw new Error("Network request failed or returned no response.");
 
       const data = await response.json();
+      if (data.error) throw new Error(data.error);
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      // 3. ENRICH AND SANITIZE PRODUCT DATA
+      const sanitizedProducts = data.products.map((p: any) => {
+        // Find the supplier name using the product's supplier_id
+        const name = suppliers[String(p.supplier_id)] || "Unknown Supplier";
 
-      // Sanitize and normalize product data types
-      const sanitizedProducts = data.products.map((p: any) => ({
-        ...p,
-        unit_price: parseFloat(p.unit_price) || 0.0,
-        inventory_quantity: parseInt(p.inventory_quantity) || 0,
-        discount: parseFloat(p.discount) || 0.0,
-        // Assume keywords is an array or a comma-separated string
-        keywords: Array.isArray(p.keywords) ? p.keywords : (typeof p.keywords === 'string' ? p.keywords.split(',').map((k: any) => k.trim()) : []),
-        is_available: !!p.is_available
-      }));
+        return {
+          ...p,
+          supplierName: name, // <-- Attach the fetched name
+          // The new route doesn't return size, keywords, or discount, so we set them to default values or omit them.
+          // Adjusting parsing based on the new route's payload (id, supplier_id, name, unit_price, inventory_quantity, category, is_available)
+          unit_price: parseFloat(p.unit_price) || 0.0,
+          inventory_quantity: parseInt(p.inventory_quantity) || 0,
+
+          // These fields are missing from the new route's response, setting defaults:
+          size: p.size || "N/A",
+          keywords: p.keywords || [],
+          discount: p.discount || 0.0,
+
+          is_available: !!p.is_available
+        };
+      });
 
       setProducts(sanitizedProducts);
 
@@ -193,10 +198,13 @@ const App = () => {
 
         {/* Products Grid Display */}
         {!loading && products.length > 0 && (
-          // CHANGE THE GRID CLASSES HERE
           <div className="grid grid-cols-1 gap-6">
             {products.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                supplierName={product.supplierName} // <-- USE THE NAME FROM THE PRODUCT OBJECT
+              />
             ))}
           </div>
         )}
