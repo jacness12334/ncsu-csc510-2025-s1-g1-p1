@@ -1,7 +1,6 @@
 // app/components/Navbar.tsx
 "use client";
 import Link from "next/link";
-import CartButton from "./CartButton";
 
 export default function Navbar() {
   return (
@@ -11,12 +10,12 @@ export default function Navbar() {
 
         <div className="flex items-center gap-5 text-sm">
           <Link href="/">Home</Link>
-          <Link href="/editdetails">Edit Details</Link>
+          <Link href="/editdetails">My Profile</Link>
           <Link href="/menu">Menu</Link>
-          <Link href="/staff">Staff</Link>
+          <Link href="/checkout">Checkout</Link>
           <Link href="/track/12345">Track Order</Link>
           <Link href="/suppliers">Suppliers</Link>
-          <CartButton />
+          <Link href="/staff">Staff</Link>
 
           <Link
             href="/login"

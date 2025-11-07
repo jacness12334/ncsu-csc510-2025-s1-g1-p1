@@ -22,12 +22,7 @@ type jsonPaymentMethodRecieveType = {
 
 export default function EditDetailsPage() {
   const router = useRouter();
-  // Original values (simulate fetched from backend)
-  const [originalName, setOriginalName] = useState("");
-  const [originalEmail, setOriginalEmail] = useState("");
-  const [originalPhone, setOriginalPhone] = useState("");
-  const [originalBirthday, setOriginalBirthday] = useState("");
-  const [originalTheatreId, setOriginalTheatreId] = useState("");
+  // User state
   const [userId, setUserId] = useState("");
   const [userType, setUserType] = useState("");
 
@@ -123,7 +118,7 @@ export default function EditDetailsPage() {
       expirationMonth: newExpMonth,
       expirationYear: newExpYear,
       billingAddress: newBillingAddress,
-      isDefault: paymentMethods.length === 0,
+      isDefault: false,
     };
     setPaymentMethods([...paymentMethods, newPaymentMethod]);
     setNewCardNumber("");
@@ -196,7 +191,7 @@ export default function EditDetailsPage() {
       expirationMonth: newExpMonth,
       expirationYear: newExpYear,
       billingAddress: newBillingAddress,
-      isDefault: paymentMethods.length === 0,
+      isDefault: false,
     };
     setPaymentMethods([...paymentMethods, newPaymentMethod]);
     setNewCardNumber("");
@@ -237,11 +232,7 @@ export default function EditDetailsPage() {
     setPaymentMethods(paymentMethods.filter((m) => m.id !== id));
   };
 
-  const handleSetDefault = (id: string) => {
-    setPaymentMethods(
-      paymentMethods.map((m) => ({ ...m, isDefault: m.id === id }))
-    );
-  };
+
 
   useEffect(() => {
     const f = async () => {
@@ -264,10 +255,6 @@ export default function EditDetailsPage() {
         console.log(rt);
 
         // Success path:
-        setOriginalBirthday(rt.birthday);
-        setOriginalEmail(rt.email);
-        setOriginalName(rt.name);
-        setOriginalPhone(rt.phone);
         setUserId(rt.user_id);
         setBirthday(rt.birthday);
         setEmail(rt.email);
@@ -294,7 +281,6 @@ export default function EditDetailsPage() {
         rt = await response.json();
         console.log(rt);
         setTheatreId(rt.default_theatre_id);
-        setOriginalTheatreId(rt.default_theatre_id);
 
         response = await fetch("http://localhost:5000/api/customers/" + rt.user_id + "/payment-methods", {
           method: "GET",
@@ -312,7 +298,7 @@ export default function EditDetailsPage() {
 
         rt = await response.json();
         console.log(rt.payment_methods);
-        setPaymentMethods(rt.payment_methods.map((item: jsonPaymentMethodRecieveType, index: number) => {
+        setPaymentMethods(rt.payment_methods.map((item: jsonPaymentMethodRecieveType) => {
           return {
             id: item.id,
             cardNumber: item.card_number,
@@ -326,24 +312,18 @@ export default function EditDetailsPage() {
 
       } catch (error: unknown) {
         // This catches network errors AND the error thrown above
-        console.error(error);
-        alert("Error: " + (error instanceof Error ? error.message : String(error)));
+        console.error("Failed to load user data:", error);
+        alert("Error loading user data: " + (error instanceof Error ? error.message : String(error)));
+        
+        // Set empty state - user needs to be logged in and have valid session
+        setPaymentMethods([]);
       }
     }
     f();
 
   }, []);
 
-  // Check if any form fields have changed
-  const hasChanges =
-    name !== originalName ||
-    email !== originalEmail ||
-    phone !== originalPhone ||
-    birthday !== originalBirthday ||
-    TheatreId !== originalTheatreId ||
-    currentPassword !== "" ||
-    newPassword !== "" ||
-    confirmNewPassword !== "";
+
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -485,9 +465,6 @@ export default function EditDetailsPage() {
                 <div>
                   <p className="text-sm font-medium">
                     •••• •••• •••• {method.cardNumber.slice(-4)}
-                    {method.isDefault && (
-                      <span className="ml-2 text-xs text-green-600">(Default)</span>
-                    )}
                   </p>
                   <p className="text-xs text-gray-600">
                     Exp: {method.expirationMonth}/{method.expirationYear}
@@ -495,15 +472,6 @@ export default function EditDetailsPage() {
                   <p className="text-xs text-gray-600">{method.billingAddress}</p>
                 </div>
                 <div className="flex gap-2">
-                  {!method.isDefault && (
-                    <button
-                      type="button"
-                      onClick={() => handleSetDefault(method.id)}
-                      className="text-xs text-blue-600 hover:underline"
-                    >
-                      Set Default
-                    </button>
-                  )}
                   <button
                     type="button"
                     onClick={() => handleEditPayment(method.id)}
@@ -611,7 +579,11 @@ export default function EditDetailsPage() {
         <div className="flex items-center justify-end">
           <button
             className="rounded-xl bg-white px-5 py-2 text-sm text-black hover:bg-gray-700 transition border-2 border-black border-solid mr-[5%]"
-            onClick={() => { confirm("Really delete user?") ? deleteUser : undefined }}
+            onClick={() => { 
+              if (confirm("Really delete user?")) {
+                deleteUser();
+              }
+            }}
           >
             Delete User
           </button>
