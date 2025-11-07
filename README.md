@@ -47,7 +47,7 @@ Movie Munchers brings the joy of dining and entertainment together by letting yo
 ## Team
 Group 1 — Janelle Correia, Aadya Maurya, Jacob Philips, Aarya Rajoju, Galav Sharma  
 
-## Teck Stack
+## Tech Stack
 Frontend: Next.js, React, TypeScript, Tailwind CSS, PostCSS
 
 Backend: Flask, SQLAlchemy
@@ -55,20 +55,16 @@ Backend: Flask, SQLAlchemy
 Database: MySQL
 
 ## Demo
-
+https://drive.google.com/drive/folders/1tsO8Q6qzF6KXDPT4G35aEQn0aarRmzRl?usp=sharing 
 
 ## Implemented Milestones
 - Browse menu: Customers can view suppliers and their products 
 - Suppliers: Supplies can manage products.
 - Ordering: Customers can order their meals. 
 - Payments: Customers can add payment methods and checkout.
-- Drivers: Drivers can view and select deliveries
 - Tracking:  Customers can track their delivery.
 - Staff: Staff can manage orders.
 - Profiles: Users can view and edit their profiles.
-
-## Testing
-
 
 ## Future Milestones
 - Snack Bundles: Create an interface for custom snack bundles.
@@ -77,6 +73,7 @@ Database: MySQL
 - Restaurant Partners: Allow local restaurants to join via secure endpoints.
 - Donations: Each purchase adds 1% of earnings to our donation program. 
 - Nutritional Info: Meals have Nutritional Info. 
+- Drivers: Drivers can view and select deliveries
 
 ## Software use cases
 1. Moviegoer – Order Food During a Movie
@@ -99,6 +96,7 @@ An admin reviews analytics, manages user roles, updates content, and ensures sys
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [License](LICENSE.md)
 - [Code of Conduct](CODE-OF-CONDUCT.md)
+- [DEPENDENCIES](DEPENDENCIES.md)
 
 ## Discussion 
 Discord Link: https://discord.gg/7X5gABgbGA
