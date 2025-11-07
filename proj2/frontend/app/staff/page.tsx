@@ -339,51 +339,53 @@ export default function StaffPage() {
             </div>
 
             {/* Theatres */}
-            <div className="border rounded shadow-sm p-4 bg-white">
-                <button
-                    onClick={() => toggle("theatres")}
-                    className="w-full text-left font-semibold text-lg mb-3 hover:text-blue-600 transition"
-                >
-                    Theatres {expanded.theatres ? "▲" : "▼"}
-                </button>
-                {expanded.theatres && (
-                    <ul className="space-y-2">
-                        {theatres.map((t) => (
-                            <li
-                                key={t.id}
-                                className="flex justify-between items-center border-b py-2"
-                            >
-                                <span>
-                                    {t.name}{" "}
-                                    <span className="text-sm text-gray-500">
-                                        {t.address}
+            { role === "admin" && (
+                <div className="border rounded shadow-sm p-4 bg-white">
+                    <button
+                        onClick={() => toggle("theatres")}
+                        className="w-full text-left font-semibold text-lg mb-3 hover:text-blue-600 transition"
+                    >
+                        Theatres {expanded.theatres ? "▲" : "▼"}
+                    </button>
+                    {expanded.theatres && (
+                        <ul className="space-y-2">
+                            {theatres.map((t) => (
+                                <li
+                                    key={t.id}
+                                    className="flex justify-between items-center border-b py-2"
+                                >
+                                    <span>
+                                        {t.name}{" "}
+                                        <span className="text-sm text-gray-500">
+                                            {t.address}
+                                        </span>
                                     </span>
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    {statusBadge(
-                                        t.is_open ? "Open" : "Closed",
-                                        t.is_open ? "green" : "red"
-                                    )}
-                                    {role === "admin" && (
-                                        <button
-                                            onClick={() =>
-                                                toggleTheatreStatus(t.id)
-                                            }
-                                            className={`px-3 py-1 rounded font-medium transition ${
-                                                t.is_open
-                                                    ? "bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300"
-                                                    : "bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300"
-                                            }`}
-                                        >
-                                            {t.is_open ? "Close" : "Open"}
-                                        </button>
-                                    )}
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+                                    <div className="flex items-center gap-2">
+                                        {statusBadge(
+                                            t.is_open ? "Open" : "Closed",
+                                            t.is_open ? "green" : "red"
+                                        )}
+                                        {role === "admin" && (
+                                            <button
+                                                onClick={() =>
+                                                    toggleTheatreStatus(t.id)
+                                                }
+                                                className={`px-3 py-1 rounded font-medium transition ${
+                                                    t.is_open
+                                                        ? "bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300"
+                                                        : "bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300"
+                                                }`}
+                                            >
+                                                {t.is_open ? "Close" : "Open"}
+                                            </button>
+                                        )}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            )}
 
             {/* Staff (admin only) */}
             {role === "admin" && (
