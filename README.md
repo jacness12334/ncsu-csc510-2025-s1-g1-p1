@@ -50,7 +50,20 @@ Database: MySQL
 - Nutritional Info: Meals have Nutritional Info. 
 
 ## Software use cases
+1. Moviegoer – Order Food During a Movie
+A user opens the Movie Munchers app, selects their theater and seat, browses the menu, and places an order. They pay in-app and track delivery status in real time.
 
+2. Supplier – Manage Menu and Orders
+A restaurant or vendor logs in to update menu items, mark ingredients out of stock, and view incoming orders from nearby theaters.
+
+3. Delivery Driver – Pick Up and Deliver Orders
+A driver checks the app for available deliveries, accepts one, and uses route info to deliver the food to the customer’s seat.
+
+4. Theater Staff – Coordinate Deliveries
+Staff monitor incoming orders, verify seat numbers, and ensure deliveries are routed efficiently inside the theater.
+
+5. Admin / Developer – Maintain System
+An admin reviews analytics, manages user roles, updates content, and ensures system uptime and data accuracy.
 
 ## Documentation
 - [Installation Guide](INSTALL.md)
@@ -78,10 +91,27 @@ https://github.com/txt/se25fall/issues
 
 ---
 
-© 2025 Movie Munchers Team (Group 1), North Carolina State University.  
-All rights reserved.  
-We retain the copyright for all original code, documentation, and media in this repository,  
-except where otherwise noted for third-party or outside contributions.
+MIT License
+
+Copyright (c) 2025 Jacob Phillips, Aadya Maurya, Janelle Correia, Galav Sharma, Aarya Rajoju
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 
 
