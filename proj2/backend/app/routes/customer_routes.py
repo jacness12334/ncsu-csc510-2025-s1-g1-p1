@@ -737,3 +737,14 @@ def get_showings_for_customer(user_id):
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Get delivery details by delivery id
+@customer_bp.route('/deliveries/<int:delivery_id>/details', methods=['GET'])
+def get_delivery_details(delivery_id):
+    try:
+        details = customer_service.get_delivery_details(delivery_id=delivery_id)
+        return jsonify(details), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
