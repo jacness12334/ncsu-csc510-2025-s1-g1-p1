@@ -462,7 +462,7 @@ class TestCustomerRoutes:
         response = client.delete(f'/api/customers/{user_id}')
         assert response.status_code == 200
 
-   # Test getting showings for given customer
+   # Test getting showings for valid customer
     def test_get_showings_for_customer_success(self, client, app, sample_customer, sample_customer_showing):
         with app.app_context():
             response = client.get(f"/api/customers/{sample_customer}/showings")
@@ -477,3 +477,21 @@ class TestCustomerRoutes:
             sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
             assert showing["id"] == sample_customer_showing 
             assert showing["seat"]["id"] == sample_showing.seat_id  
+
+    # Test getting delivery details for valid delivery
+    def test_get_delivery_details_success(self, client, app, sample_delivery):
+        with app.app_context():
+            response = client.get(f"/api/deliveries/{sample_delivery}/details")
+            assert response.status_code == 200
+            data = response.get_json()
+            for key in ("id", "driver_id", "total_price", "delivery_time", "delivery_status", "items", "theatre_name", "theatre_address", "movie_title"):
+                assert key in data
+            assert isinstance(data["items"], list)
+
+    # Test getting delivery details for invalid delivery
+    def test_get_delivery_details_not_found(self, client, app):
+        with app.app_context():
+            response = client.get("/api/deliveries/999999/details")
+            assert response.status_code == 404
+            body = response.get_json()
+            assert "error" in body
