@@ -175,7 +175,7 @@ class Products(db.Model):
     name = db.Column(db.String(128), nullable = False)
     unit_price = db.Column(DECIMAL(10,2), nullable = False)
     inventory_quantity = db.Column(INTEGER(unsigned = True), server_default = '0', nullable = False)
-    size = db.Column(db.Enum('small', 'medium', 'large'), server_default = 'small')
+    size = db.Column(db.Enum('small', 'medium', 'large'), nullable = True)
     keywords = db.Column(db.String(256))
     category = db.Column(db.Enum('beverages', 'snacks', 'candy', 'food'), nullable = False)
     discount = db.Column(DECIMAL(10,2), server_default = u'0.00', nullable = False)

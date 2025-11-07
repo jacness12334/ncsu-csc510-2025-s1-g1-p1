@@ -2,7 +2,6 @@ from app.models import Users
 from app.app import db
 from argon2 import PasswordHasher
 
-
 # Service for managing users: creation, retrieval, authentication, and updates
 class UserService:
 

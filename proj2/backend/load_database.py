@@ -1,4 +1,5 @@
 from database import get_database
+from argon2 import PasswordHasher
 
 db_name = "movie_munchers_dev"
 database = get_database(db_name)
@@ -10,6 +11,9 @@ def insert(query, values):
     database.commit()
 
 def populate_db():
+   ph = PasswordHasher()
+   ADMIN_PLAIN = "StaffTest"
+   ADMIN_HASH = ph.hash(ADMIN_PLAIN)
    # theatres
    insert("""INSERT INTO theatres (name, address, phone, is_open) VALUES (%s, %s, %s, %s)""",
          [('Theatre A', '123 A St', '555-0001', True),
@@ -34,7 +38,7 @@ def populate_db():
    # users
    insert("""INSERT INTO users (name, email, phone, birthday, password_hash, role) VALUES (%s, %s, %s, %s, %s, %s)""",
          [('Alice', 'alice@ncsu.edu', '555-1000', '1990-01-01', 'hash1', 'staff'),
-            ('Bob', 'bob@ncsu.edu', '555-2000', '1990-01-02', 'hash2', 'staff'),
+            ('Bob', 'bob@ncsu.edu', '555-2000', '1990-01-02', ADMIN_HASH, 'staff'),
             ('Charles', 'charles@ncsu.edu', '555-3000', '1990-01-03', 'hash3', 'staff'),
             ('Daisy', 'daisy@ncsu.edu', '555-4000', '1990-01-04', 'hash4', 'staff'),
             ('Evelyn', 'evelyn@ncsu.edu', '555-5000', '1990-01-04', 'hash5', 'customer'),

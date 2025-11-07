@@ -200,7 +200,7 @@ def create_tables(db):
                 keywords VARCHAR(256),
                 category ENUM('beverages', 'snacks', 'candy', 'food') NOT NULL,
                 discount DECIMAL(10,2) UNSIGNED DEFAULT 0.00 NOT NULL,
-                is_available BOOLEAN NOT NULL DEFAULT FALSE,
+                is_available BOOLEAN NOT NULL DEFAULT TRUE,
                 date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (supplier_id) REFERENCES suppliers(user_id) ON DELETE CASCADE,
