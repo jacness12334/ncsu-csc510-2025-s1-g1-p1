@@ -130,6 +130,19 @@ def get_theatres(staff_user_id):
         return jsonify({'error': str(e)}), 500
 
 
+@staff_bp.route('/theatres', methods=['GET'])
+def get_all_theatres():
+    """
+    TODO: doc this method pls mr. gemini
+    """
+    try:
+        return jsonify({'theatres': [{"id": t.id, "name": t.name, "address": t.address, "phone": t.phone, "is_open": t.is_open} for t in Theatres.query.all()]}), 200
+
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @staff_bp.route('/theatres', methods=['PUT'])
 def set_theatre_status():
     """
