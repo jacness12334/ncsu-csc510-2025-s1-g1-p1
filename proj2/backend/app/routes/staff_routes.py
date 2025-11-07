@@ -225,9 +225,6 @@ def accept_delivery(delivery_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred'}), 500
 
-
-
-
 @staff_bp.route('/deliveries/<int:delivery_id>/fulfill', methods=['PUT'])
 def fulfill_delivery(delivery_id):
     try:

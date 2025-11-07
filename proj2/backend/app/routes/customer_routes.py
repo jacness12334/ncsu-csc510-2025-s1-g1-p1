@@ -286,7 +286,7 @@ def rate_delivery(delivery_id):
         return jsonify({'error': 'An error occurred'}), 500
 
 # Get all available products
-@customer_bp.route('/products', methods=['GET'])
+@customer_bp.route('/products/menu', methods=['GET'])
 def list_products():
     try:
         products = customer_service.show_all_products()
