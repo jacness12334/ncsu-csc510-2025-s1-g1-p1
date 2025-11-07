@@ -57,6 +57,7 @@ export default function StaffPage() {
         role: "runner" as "runner" | "admin",
         theatre_id: theatres[0]?.id || 0,
     });
+    const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
 
     const userId = Number(Cookies.get("user_id") || 0);
 
@@ -78,6 +79,19 @@ export default function StaffPage() {
                 const staffInfo = await staffRes.json();
                 if (!staffInfo || !staffInfo.role) return;
                 setRole(staffInfo.role);
+
+                const userRes = await fetch(
+                    `http://localhost:5000/api/users/${userId}`
+                );
+                const userData = await userRes.json();
+
+                setCurrentStaff({
+                    user_id: staffInfo.user_id,
+                    name: userData.name || "User",
+                    role: staffInfo.role,
+                    theatre_id: staffInfo.theatre_id,
+                    is_available: staffInfo.is_available,
+                });
 
                 const theatreRes = await fetch(
                     `http://localhost:5000/api/theatres/${userId}`
@@ -170,39 +184,28 @@ export default function StaffPage() {
         }
     };
 
-    /** Staff actions */
-    const addStaff = async () => {
+    const toggleMyAvailability = async () => {
+        if (!currentStaff) return;
         try {
-            if (!theatres.length) return;
             const res = await fetch(`http://localhost:5000/api/staff`, {
-                method: "POST",
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     user_id: userId,
-                    name: "New Staff",
-                    email: "newstaff@example.com",
-                    phone: "1234567890",
-                    birthday: "2000-01-01",
-                    password: "password123",
-                    theatre_id: theatres[0].id,
-                    role: "runner",
+                    is_available: !currentStaff.is_available,
                 }),
             });
             const data = await res.json();
-            if (data.user_id) {
-                setStaff((prev) => [
-                    ...prev,
-                    {
-                        user_id: data.user_id,
-                        name: "New Staff",
-                        role: "runner",
-                        theatre_id: theatres[0].id,
-                        is_available: true,
-                    },
-                ]);
+            if (!res.ok) {
+                console.error(data.error);
+                return;
             }
+
+            setCurrentStaff((prev) =>
+                prev ? { ...prev, is_available: !prev.is_available } : prev
+            );
         } catch (err) {
-            console.error(err);
+            console.error("Failed to toggle availability:", err);
         }
     };
 
@@ -307,7 +310,32 @@ export default function StaffPage() {
         <section className="mx-auto max-w-6xl px-4 py-8 space-y-6">
             <div>
                 <h1 className="text-3xl font-bold mb-2">Staff Dashboard</h1>
-                <p className="text-gray-600">Welcome, {role.toUpperCase()}</p>
+                <div>
+                    <p className="text-gray-600 flex items-center gap-2">
+                        Welcome, {currentStaff?.name || role?.toUpperCase()}
+                        {currentStaff &&
+                            statusBadge(
+                                currentStaff.is_available
+                                    ? "Available"
+                                    : "Unavailable",
+                                currentStaff.is_available ? "green" : "red"
+                            )}
+                        {currentStaff && (
+                            <button
+                                onClick={toggleMyAvailability}
+                                className={`ml-2 px-3 py-1 rounded font-medium transition ${
+                                    currentStaff.is_available
+                                        ? "bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300"
+                                        : "bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300"
+                                }`}
+                            >
+                                {currentStaff.is_available
+                                    ? "Set Unavailable"
+                                    : "Set Available"}
+                            </button>
+                        )}
+                    </p>
+                </div>
             </div>
 
             {/* Theatres */}
