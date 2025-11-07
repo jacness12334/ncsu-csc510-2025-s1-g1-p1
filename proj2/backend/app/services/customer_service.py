@@ -366,3 +366,28 @@ class CustomerService:
                 } if auditorium else None,
             })
         return result
+    
+    # Get delivery details for given delivery
+    def get_delivery_details(self, delivery_id):
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
+        if not delivery:
+            raise ValueError(f"Delivery {delivery_id} not found")
+        delivery_items = DeliveryItems.query.filter_by(delivery_id=delivery.id).all()
+        cart_items = [CartItems.query.filter_by(id=item.cart_item_id).first() for item in delivery_items]
+        items = [{"name": Products.query.filter_by(id=item.product_id).first().name, "quantity": item.quantity} for item in cart_items]
+        customer_showing = CustomerShowings.query.filter_by(id=delivery.customer_showing_id).first()
+        showing = MovieShowings.query.filter_by(id=customer_showing.movie_showing_id).first()
+        movie = Movies.query.filter_by(id=showing.movie_id).first()
+        auditorium = Auditoriums.query.filter_by(id=showing.auditorium_id).first()
+        theatre = Theatres.query.filter_by(id=auditorium.theatre_id).first()
+        return {
+            "id": delivery.id,
+            "driver_id": delivery.driver_id,
+            "total_price": float(delivery.total_price),
+            "delivery_time": delivery.delivery_time.isoformat() if delivery.delivery_time else None,
+            "delivery_status": delivery.delivery_status,
+            "items": items,
+            "theatre_name": theatre.name,
+            "theatre_address": theatre.address,
+            "movie_title": movie.title,
+        }
