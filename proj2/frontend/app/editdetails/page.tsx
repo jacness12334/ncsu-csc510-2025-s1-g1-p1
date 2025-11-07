@@ -264,6 +264,10 @@ export default function EditDetailsPage() {
 
         let user_id = rt.user_id;
 
+        if (rt.role != 'customer') {
+          return;
+        }
+
         response = await fetch("http://localhost:5000/api/customers/" + user_id, {
           method: "GET",
           headers: {
@@ -314,7 +318,7 @@ export default function EditDetailsPage() {
         // This catches network errors AND the error thrown above
         console.error("Failed to load user data:", error);
         alert("Error loading user data: " + (error instanceof Error ? error.message : String(error)));
-        
+
         // Set empty state - user needs to be logged in and have valid session
         setPaymentMethods([]);
       }
@@ -402,7 +406,7 @@ export default function EditDetailsPage() {
           </div>
         </div>
 
-        <div>
+        {userType == 'customer' && (<div>
           <label htmlFor="defaultTheatre" className="mb-1 block text-sm font-medium">Default Theatre</label>
           <input
             id="defaultTheatre"
@@ -411,7 +415,7 @@ export default function EditDetailsPage() {
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
           </input>
-        </div>
+        </div>)}
 
         <fieldset className="rounded-2xl border p-4">
           <legend className="px-2 text-sm font-semibold">Change Password (optional)</legend>
@@ -454,7 +458,7 @@ export default function EditDetailsPage() {
           </div>
         </fieldset>
 
-        <fieldset className="rounded-2xl border p-4">
+        {userType == 'customer' && (<fieldset className="rounded-2xl border p-4">
           <legend className="px-2 text-sm font-semibold">Payment Methods</legend>
           <div className="space-y-3">
             {paymentMethods.map((method) => (
@@ -575,11 +579,12 @@ export default function EditDetailsPage() {
             )}
           </div>
         </fieldset>
+        )}
 
         <div className="flex items-center justify-end">
           <button
             className="rounded-xl bg-white px-5 py-2 text-sm text-black hover:bg-gray-700 transition border-2 border-black border-solid mr-[5%]"
-            onClick={() => { 
+            onClick={() => {
               if (confirm("Really delete user?")) {
                 deleteUser();
               }
