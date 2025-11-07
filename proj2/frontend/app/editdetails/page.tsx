@@ -12,11 +12,11 @@ type PaymentMethod = {
 };
 
 type jsonPaymentMethodRecieveType = {
+  billing_address: string;
   id: string;
   card_number: string;
   expiration_month: string;
   expiration_year: string;
-  billingAddress: string;
   is_default: boolean;
 };
 
@@ -133,7 +133,8 @@ export default function EditDetailsPage() {
     setShowAddPayment(false);
   };
 
-  const handleEditPayment = (id: string) => {
+  const handleEditPayment = async (id: string) => {
+
     const method = paymentMethods.find((m) => m.id === id);
     if (method) {
       setNewCardNumber(method.cardNumber);
@@ -143,6 +144,67 @@ export default function EditDetailsPage() {
       setEditingPaymentId(id);
       setShowAddPayment(true);
     }
+
+    let response = await fetch("http://localhost:5000/api/customers/" + userId + "/payment-methods", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cart_item_id: id
+      }),
+      credentials: "include"
+    });
+
+    if (!response.ok) {
+      // If server responds with 400/500 code, get the specific message
+      const errorData = await response.json();
+      console.log(response);
+      alert(errorData.message || response.statusText);
+      throw new Error(errorData.message || response.statusText);
+
+    }
+
+    let rt = await response.json();
+
+    response = await fetch("http://localhost:5000/api/customers/" + userId + "/payment-methods", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cart_item_id: id
+      }),
+      credentials: "include"
+    });
+
+    if (!response.ok) {
+      // If server responds with 400/500 code, get the specific message
+      const errorData = await response.json();
+      console.log(response);
+      alert(errorData.message || response.statusText);
+      throw new Error(errorData.message || response.statusText);
+
+    }
+
+    rt = await response.json();
+
+    // Success path:
+    const newPaymentMethod: PaymentMethod = {
+      id: rt.id,
+      cardNumber: newCardNumber,
+      expirationMonth: newExpMonth,
+      expirationYear: newExpYear,
+      billingAddress: newBillingAddress,
+      isDefault: paymentMethods.length === 0,
+    };
+    setPaymentMethods([...paymentMethods, newPaymentMethod]);
+    setNewCardNumber("");
+    setNewExpMonth("");
+    setNewExpYear("");
+    setNewBillingAddress("");
+    setShowAddPayment(false);
+
   };
 
   const handleSaveEditPayment = () => {
@@ -250,14 +312,14 @@ export default function EditDetailsPage() {
 
         rt = await response.json();
         console.log(rt.payment_methods);
-        setPaymentMethods(rt.payment_methods.map((item: PaymentMethod, index: number) => {
+        setPaymentMethods(rt.payment_methods.map((item: jsonPaymentMethodRecieveType, index: number) => {
           return {
             id: item.id,
             cardNumber: item.card_number,
-            expirationMonth: newExpMonth,
-            expirationYear: newExpYear,
-            billingAddress: newBillingAddress,
-            isDefault: paymentMethods.length === 0,
+            expirationMonth: item.expiration_month,
+            expirationYear: item.expiration_year,
+            billingAddress: item.billing_address,
+            isDefault: item.is_default
 
           }
         }));
