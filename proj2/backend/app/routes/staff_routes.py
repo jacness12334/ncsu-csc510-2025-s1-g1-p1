@@ -12,6 +12,26 @@ def get_user_id():
 
 @staff_bp.route('/staff', methods=['POST'])
 def add_staff():
+    """
+    Add New Staff Member
+    ---
+    tags: [Staff Management]
+    description: Adds a new staff member to the system. Requires the manager's user_id in the body for authorization.
+    parameters:
+      - in: body
+        name: staff_registration
+        schema: {$ref: '#/definitions/StaffRegistration'}
+    responses:
+      201:
+        description: Staff member created successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            user_id: {type: integer}
+            staff_role: {type: string}
+      400: {description: Missing required fields}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -39,6 +59,32 @@ def add_staff():
 
 @staff_bp.route('/staff/<int:staff_user_id>', methods=['DELETE'])
 def remove_staff(staff_user_id):
+    """
+    Remove Staff Member
+    ---
+    tags: [Staff Management]
+    description: Removes a staff member from the system. Requires the manager's user_id in the body for authorization.
+    parameters:
+      - in: path
+        name: staff_user_id
+        type: integer
+        required: true
+        description: The user ID of the staff member to remove.
+      - in: body
+        name: manager_id
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The staff manager user ID.'}
+    responses:
+      200:
+        description: Staff successfully removed
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Staff member not found or unauthorized}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -52,6 +98,28 @@ def remove_staff(staff_user_id):
 
 @staff_bp.route('/theatres/<int:staff_user_id>', methods=['GET'])
 def get_theatres(staff_user_id):
+    """
+    Get Theatres Managed by Staff
+    ---
+    tags: [Theatre Operations]
+    description: Retrieves a list of theatres associated with a given staff member's ID.
+    parameters:
+      - in: path
+        name: staff_user_id
+        type: integer
+        required: true
+        description: The user ID of the staff member.
+    responses:
+      200:
+        description: Theatres retrieved successfully
+        schema:
+          type: object
+          properties:
+            theatres:
+              type: array
+              items: {$ref: '#/definitions/TheatreDetails'}
+      404: {description: Staff member not found}
+    """
     try:
         service = StaffService(staff_user_id)
         theatres = service.get_theatres()
@@ -64,6 +132,25 @@ def get_theatres(staff_user_id):
 
 @staff_bp.route('/theatres', methods=['PUT'])
 def set_theatre_status():
+    """
+    Set Theatre Open/Close Status
+    ---
+    tags: [Theatre Operations]
+    description: Opens or closes a theatre location. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: body
+        name: theatre_status_update
+        schema: {$ref: '#/definitions/TheatreStatusUpdate'}
+    responses:
+      200:
+        description: Theatre status updated successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      400: {description: Missing required fields}
+      404: {description: Theatre or Staff not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -80,6 +167,25 @@ def set_theatre_status():
 
 @staff_bp.route('/movies', methods=['POST'])
 def add_movie():
+    """
+    Add New Movie
+    ---
+    tags: [Movie Management]
+    description: Adds a new movie to the system. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: body
+        name: new_movie
+        schema: {$ref: '#/definitions/MovieCreateEdit'}
+    responses:
+      201:
+        description: Movie added successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            movie_id: {type: integer}
+      400: {description: Missing required fields}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -104,6 +210,31 @@ def add_movie():
 
 @staff_bp.route('/movies/<int:movie_id>', methods=['PUT'])
 def edit_movie(movie_id):
+    """
+    Edit Existing Movie
+    ---
+    tags: [Movie Management]
+    description: Updates details for an existing movie. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: path
+        name: movie_id
+        type: integer
+        required: true
+        description: The ID of the movie to update.
+      - in: body
+        name: movie_update
+        schema: {$ref: '#/definitions/MovieCreateEdit'}
+    responses:
+      200:
+        description: Movie details changed successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            movie_id: {type: integer}
+      400: {description: Missing required fields}
+      404: {description: Movie not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -129,6 +260,32 @@ def edit_movie(movie_id):
 
 @staff_bp.route('/movies/<int:movie_id>', methods=['DELETE'])
 def remove_movie(movie_id):
+    """
+    Remove Movie
+    ---
+    tags: [Movie Management]
+    description: Removes a movie by its ID. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: path
+        name: movie_id
+        type: integer
+        required: true
+        description: The ID of the movie to remove.
+      - in: body
+        name: staff_id
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The staff manager user ID.'}
+    responses:
+      200:
+        description: Movie successfully removed
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Movie or Staff not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -142,6 +299,25 @@ def remove_movie(movie_id):
 
 @staff_bp.route('/showings', methods=['POST'])
 def add_showing():
+    """
+    Add New Movie Showing
+    ---
+    tags: [Showings Scheduling]
+    description: Schedules a new movie showing. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: body
+        name: new_showing
+        schema: {$ref: '#/definitions/ShowingCreateEdit'}
+    responses:
+      201:
+        description: Movie Showing created successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            showing_id: {type: integer}
+      400: {description: Missing required fields}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -163,6 +339,31 @@ def add_showing():
 
 @staff_bp.route('/showings/<int:showing_id>', methods=['PUT'])
 def edit_showing(showing_id):
+    """
+    Edit Existing Showing
+    ---
+    tags: [Showings Scheduling]
+    description: Updates the details of an existing movie showing. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: path
+        name: showing_id
+        type: integer
+        required: true
+        description: The ID of the showing to update.
+      - in: body
+        name: showing_update
+        schema: {$ref: '#/definitions/ShowingCreateEdit'}
+    responses:
+      200:
+        description: Movie Showing details changed successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            showing_id: {type: integer}
+      400: {description: Missing required fields}
+      404: {description: Showing not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -185,6 +386,32 @@ def edit_showing(showing_id):
 
 @staff_bp.route('/showings/<int:showing_id>', methods=['DELETE'])
 def remove_showing(showing_id):
+    """
+    Remove Movie Showing
+    ---
+    tags: [Showings Scheduling]
+    description: Removes a movie showing by its ID. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: path
+        name: showing_id
+        type: integer
+        required: true
+        description: The ID of the showing to remove.
+      - in: body
+        name: staff_id
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The staff manager user ID.'}
+    responses:
+      200:
+        description: Movie Showing successfully removed
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Showing or Staff not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -198,6 +425,25 @@ def remove_showing(showing_id):
 
 @staff_bp.route('/staff', methods=['PUT'])
 def set_availability():
+    """
+    Set Staff Availability
+    ---
+    tags: [Staff Management]
+    description: Sets the staff member's availability status.
+    parameters:
+      - in: body
+        name: availability_update
+        schema: {$ref: '#/definitions/StaffAvailabilityUpdate'}
+    responses:
+      200:
+        description: Availability set successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      400: {description: Missing required fields}
+      404: {description: Staff member not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -214,6 +460,32 @@ def set_availability():
 
 @staff_bp.route('/deliveries/<int:delivery_id>/accept', methods=['PUT'])
 def accept_delivery(delivery_id):
+    """
+    Accept Delivery Order
+    ---
+    tags: [Delivery Management]
+    description: Staff member accepts a delivery order for fulfillment. Requires staff user_id in the body.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery order to accept.
+      - in: body
+        name: staff_id
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The staff member user ID.'}
+    responses:
+      200:
+        description: Delivery accepted successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Delivery or Staff not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -226,6 +498,32 @@ def accept_delivery(delivery_id):
 
 @staff_bp.route('/deliveries/<int:delivery_id>/fulfill', methods=['PUT'])
 def fulfill_delivery(delivery_id):
+    """
+    Fulfill Delivery Order
+    ---
+    tags: [Delivery Management]
+    description: Staff member marks a delivery order as fulfilled (ready for pickup/delivery). Requires staff user_id in the body.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery order to fulfill.
+      - in: body
+        name: staff_id
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The staff member user ID.'}
+    responses:
+      200:
+        description: Delivery fulfilled successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Delivery or Staff not found}
+    """
     try:
         user_id = get_user_id()
         service = StaffService(user_id)
@@ -239,6 +537,34 @@ def fulfill_delivery(delivery_id):
 
 @staff_bp.route('/staff/list/<int:theatre_id>', methods=['PUT'])
 def list_staff_by_theatre(theatre_id):
+    """
+    List Staff by Theatre
+    ---
+    tags: [Staff Management]
+    description: Retrieves a list of all staff members working at a specific theatre ID. Requires staff user_id in the body for authorization.
+    parameters:
+      - in: path
+        name: theatre_id
+        type: integer
+        required: true
+        description: The ID of the theatre to list staff for.
+      - in: body
+        name: staff_id
+        schema:
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The staff manager user ID.'}
+    responses:
+      200:
+        description: List of staff retrieved successfully
+        schema:
+          type: object
+          properties:
+            staff:
+              type: array
+              items: {$ref: '#/definitions/StaffMemberDetails'}
+      404: {description: Theatre or Staff not found}
+    """
     try:
         user_id = get_user_id()  
         service = StaffService(user_id)
@@ -258,6 +584,28 @@ def list_staff_by_theatre(theatre_id):
     
 @staff_bp.route('/deliveries/list/<int:theatre_id>', methods=['GET'])
 def list_deliveries_by_theatre(theatre_id):
+    """
+    List Deliveries by Theatre
+    ---
+    tags: [Delivery Management]
+    description: Retrieves a list of all current delivery orders associated with a specific theatre ID.
+    parameters:
+      - in: path
+        name: theatre_id
+        type: integer
+        required: true
+        description: The ID of the theatre to list deliveries for.
+    responses:
+      200:
+        description: List of deliveries retrieved successfully
+        schema:
+          type: object
+          properties:
+            deliveries:
+              type: array
+              items: {$ref: '#/definitions/DeliveryDetails'}
+      404: {description: Theatre not found}
+    """
     try:
         service = StaffService(Staff.query.first().user_id)
         deliveries = service.show_all_deliveries(theatre_id)

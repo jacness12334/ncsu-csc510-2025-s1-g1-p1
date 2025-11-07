@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS
 from datetime import timedelta
+from flasgger import Swagger
+
+from .swagger_config import swagger_template
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -43,6 +46,8 @@ def create_app(config_name):
     def unauthorized():
         return jsonify({'error': 'Unauthorized - login required'}), 401
     
+    Swagger(app, template=swagger_template)
+
     from app.routes.customer_routes import customer_bp
     from app.routes.user_routes import user_bp
     from app.routes.staff_routes import staff_bp

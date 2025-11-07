@@ -12,6 +12,21 @@ user_service = UserService()
 # Register a new user account
 @user_bp.route('/register', methods=['POST'])
 def register():
+    """
+    Register User
+    ---
+    tags: [User Management]
+    description: Registers a new user account.
+    parameters:
+      - in: body
+        name: registration_data
+        schema: {$ref: '#/definitions/UserRegistration'}
+    responses:
+      201:
+        description: User registered successfully
+        schema: {$ref: '#/definitions/UserResponse'}
+      400: {description: Invalid input}
+    """
     try:
         data = request.get_json()
         user = user_service.create_user(
@@ -39,6 +54,21 @@ def register():
 # Log in a user and create a session
 @user_bp.route('/login', methods=['POST'])
 def login():
+    """
+    Log In User
+    ---
+    tags: [User Management]
+    description: Authenticates a user and starts a session.
+    parameters:
+      - in: body
+        name: login_credentials
+        schema: {$ref: '#/definitions/UserLogin'}
+    responses:
+      200:
+        description: Logged in successfully
+        schema: {$ref: '#/definitions/UserResponse'}
+      401: {description: Invalid email or password}
+    """
     try:
         data = request.get_json()
         email = data.get('email')
@@ -72,6 +102,18 @@ def login():
 @user_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
+    """
+    Log Out User
+    ---
+    tags: [User Management]
+    description: Logs out the current authenticated user.
+    responses:
+      200:
+        description: Logged out successfully
+        schema:
+          properties:
+            message: {type: string}
+    """
     logout_user()
     return jsonify({'message': 'Logged out successfully'}), 200
 
@@ -80,6 +122,17 @@ def logout():
 @user_bp.route('/me', methods=['GET'])
 @login_required
 def get_current_user():
+    """
+    Get Current User Profile
+    ---
+    tags: [User Management]
+    description: Retrieves the profile details of the current authenticated user.
+    responses:
+      200:
+        description: User profile retrieved successfully
+        schema: {$ref: '#/definitions/UserProfile'}
+      401: {description: Unauthorized - Login required}
+    """
     return jsonify({
         'user_id': current_user.id,
         'name': current_user.name,
@@ -94,6 +147,24 @@ def get_current_user():
 @user_bp.route('/me', methods=['PUT'])
 @login_required
 def update_profile():
+    """
+    Update User Profile
+    ---
+    tags: [User Management]
+    description: Updates the profile information for the current authenticated user.
+    parameters:
+      - in: body
+        name: profile_update
+        schema: {$ref: '#/definitions/UserUpdate'}
+    responses:
+      200:
+        description: Profile updated successfully
+        schema:
+          properties:
+            message: {type: string}
+            user: {$ref: '#/definitions/UserProfile'}
+      400: {description: Invalid input}
+    """
     try:
         data = request.get_json()
         name = data.get('name')
@@ -132,6 +203,26 @@ def update_profile():
 @user_bp.route('/<int:user_id>', methods=['DELETE'])
 @login_required
 def delete_user(user_id):
+    """
+    Delete User Account
+    ---
+    tags: [User Management]
+    description: Deletes the current authenticated user's account (only self-deletion allowed).
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the user account to delete.
+    responses:
+      200:
+        description: User deleted successfully
+        schema:
+          properties:
+            message: {type: string}
+      403: {description: Unauthorized}
+      404: {description: User not found}
+    """
     try:
         if current_user.id != user_id:
             return jsonify({'error': 'Unauthorized'}), 403
@@ -152,6 +243,23 @@ def delete_user(user_id):
 @user_bp.route('/me/password', methods=['PUT'])
 @login_required
 def change_password():
+    """
+    Change User Password
+    ---
+    tags: [User Management]
+    description: Changes the password for the current authenticated user.
+    parameters:
+      - in: body
+        name: password_change
+        schema: {$ref: '#/definitions/PasswordChange'}
+    responses:
+      200:
+        description: Password changed successfully
+        schema:
+          properties:
+            message: {type: string}
+      400: {description: Invalid input or current password incorrect}
+    """
     try:
         data = request.get_json()
         current_password = data.get('current_password')

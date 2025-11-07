@@ -8,6 +8,25 @@ customer_service = CustomerService()
 # Create a new customer account
 @customer_bp.route('/customers', methods=['POST'])
 def create_customer():
+    """
+    Create Customer Account
+    ---
+    tags: [Customer Management]
+    description: Registers a new customer user account.
+    parameters:
+      - in: body
+        name: customer_registration
+        schema: {$ref: '#/definitions/CustomerRegistration'}
+    responses:
+      201:
+        description: Customer created successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            customer: {$ref: '#/definitions/CustomerProfile'}
+      400: {description: Invalid input}
+    """
     try:
         data = request.get_json()
         customer = customer_service.create_customer(
@@ -34,6 +53,23 @@ def create_customer():
 # Fetch a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['GET'])
 def get_customer(user_id):
+    """
+    Get Customer Profile
+    ---
+    tags: [Customer Management]
+    description: Retrieves the basic customer profile details by user ID.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+    responses:
+      200:
+        description: Customer profile retrieved successfully
+        schema: {$ref: '#/definitions/CustomerProfile'}
+      404: {description: Customer not found}
+    """
     try:
         customer = customer_service.get_customer(user_id=user_id)
         return jsonify({
@@ -48,6 +84,26 @@ def get_customer(user_id):
 # Delete a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['DELETE'])
 def delete_customer(user_id):
+    """
+    Delete Customer Account
+    ---
+    tags: [Customer Management]
+    description: Deletes a customer account by user ID.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user to delete.
+    responses:
+      200:
+        description: Customer deleted successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Customer not found}
+    """
     try:
         customer_service.delete_customer(user_id)
         return jsonify({'message': 'Customer deleted successfully'}), 200
@@ -59,6 +115,30 @@ def delete_customer(user_id):
 # Update a customer's default theatre
 @customer_bp.route('/customers/<int:user_id>/theatre', methods=['PUT'])
 def update_default_theatre(user_id):
+    """
+    Update Default Theatre
+    ---
+    tags: [Customer Management]
+    description: Updates the customer's default theatre ID.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+      - in: body
+        name: theatre_update
+        schema: {$ref: '#/definitions/TheatreUpdate'}
+    responses:
+      200:
+        description: Default theatre updated
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            customer: {$ref: '#/definitions/CustomerProfile'}
+      400: {description: Invalid input}
+    """
     try:
         data = request.get_json()
         new_theatre_id = data.get('theatre_id')
@@ -78,6 +158,30 @@ def update_default_theatre(user_id):
 # Add a payment method for a customer
 @customer_bp.route('/customers/<int:user_id>/payment-methods', methods=['POST'])
 def add_payment_method(user_id):
+    """
+    Add Payment Method
+    ---
+    tags: [Payment Methods]
+    description: Adds a new credit/debit or loyalty card payment method for a customer.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+      - in: body
+        name: payment_method_details
+        schema: {$ref: '#/definitions/PaymentMethodCreate'}
+    responses:
+      201:
+        description: Payment method added
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            payment_method_id: {type: integer}
+      400: {description: Invalid input}
+    """
     try:
         data = request.get_json()
         payment_method = customer_service.add_payment_method(
@@ -101,6 +205,28 @@ def add_payment_method(user_id):
 # Get all payment methods for a customer
 @customer_bp.route('/customers/<int:customer_id>/payment-methods', methods=['GET'])
 def get_payment_methods(customer_id):
+    """
+    Get Customer Payment Methods
+    ---
+    tags: [Payment Methods]
+    description: Retrieves all saved payment methods for a customer.
+    parameters:
+      - in: path
+        name: customer_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+    responses:
+      200:
+        description: Payment methods retrieved
+        schema:
+          type: object
+          properties:
+            payment_methods:
+              type: array
+              items: {$ref: '#/definitions/PaymentMethodDetails'}
+      404: {description: Customer not found}
+    """
     try:
         payment_methods = customer_service.get_customer_payment_methods(customer_id=customer_id)
         return jsonify({
@@ -122,6 +248,26 @@ def get_payment_methods(customer_id):
 # Delete a payment method by id
 @customer_bp.route('/payment-methods/<int:payment_method_id>', methods=['DELETE'])
 def delete_payment_method(payment_method_id):
+    """
+    Delete Payment Method
+    ---
+    tags: [Payment Methods]
+    description: Deletes a specific payment method by its ID.
+    parameters:
+      - in: path
+        name: payment_method_id
+        type: integer
+        required: true
+        description: The ID of the payment method to delete.
+    responses:
+      200:
+        description: Payment method deleted
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Payment method not found}
+    """
     try:
         customer_service.delete_payment_method(payment_method_id)
         return jsonify({'message': 'Payment method deleted'}), 200
@@ -133,6 +279,30 @@ def delete_payment_method(payment_method_id):
 # Add funds to a payment method
 @customer_bp.route('/payment-methods/<int:payment_method_id>/add-funds', methods=['POST'])
 def add_funds(payment_method_id):
+    """
+    Add Funds to Payment Method
+    ---
+    tags: [Payment Methods]
+    description: Adds funds to a payment method balance (e.g., loyalty card or store credit).
+    parameters:
+      - in: path
+        name: payment_method_id
+        type: integer
+        required: true
+        description: The ID of the payment method.
+      - in: body
+        name: fund_amount
+        schema: {$ref: '#/definitions/FundAddition'}
+    responses:
+      200:
+        description: Funds added successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            new_balance: {type: number, format: float}
+      400: {description: Invalid amount or payment method}
+    """
     try:
         data = request.get_json()
         amount = data.get('amount')
@@ -150,6 +320,30 @@ def add_funds(payment_method_id):
 # Add an item to the customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['POST'])
 def add_to_cart(customer_id):
+    """
+    Add Item to Cart
+    ---
+    tags: [Shopping Cart]
+    description: Adds a product item to the customer's shopping cart.
+    parameters:
+      - in: path
+        name: customer_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+      - in: body
+        name: cart_item
+        schema: {$ref: '#/definitions/CartItemCreate'}
+    responses:
+      201:
+        description: Item added to cart
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            cart_item_id: {type: integer}
+      400: {description: Invalid product or quantity}
+    """
     try:
         data = request.get_json()
         cart_item = customer_service.create_cart_item(
@@ -169,6 +363,28 @@ def add_to_cart(customer_id):
 # Get all items in a customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['GET'])
 def get_cart(customer_id):
+    """
+    Get Shopping Cart
+    ---
+    tags: [Shopping Cart]
+    description: Retrieves all items currently in the customer's shopping cart.
+    parameters:
+      - in: path
+        name: customer_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+    responses:
+      200:
+        description: Cart items retrieved successfully
+        schema:
+          type: object
+          properties:
+            items:
+              type: array
+              items: {$ref: '#/definitions/CartItemDetails'}
+      404: {description: Customer not found}
+    """
     try:
         items = customer_service.get_cart_items(customer_id=customer_id) or []
         return jsonify({
@@ -186,6 +402,32 @@ def get_cart(customer_id):
 # Update the quantity of a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
 def update_cart_item(cart_item_id):
+    """
+    Update Cart Item Quantity
+    ---
+    tags: [Shopping Cart]
+    description: Updates the quantity of a specific item in the cart.
+    parameters:
+      - in: path
+        name: cart_item_id
+        type: integer
+        required: true
+        description: The ID of the cart item to update.
+      - in: body
+        name: quantity_update
+        schema: {$ref: '#/definitions/CartItemUpdate'}
+    responses:
+      200:
+        description: Cart item updated
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            cart_item_id: {type: integer}
+            new_quantity: {type: integer}
+      400: {description: Invalid quantity}
+      404: {description: Cart item not found}
+    """
     try:
         data = request.get_json()
         quantity = data.get('quantity')
@@ -204,6 +446,26 @@ def update_cart_item(cart_item_id):
 # Delete a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['DELETE'])
 def delete_cart_item(cart_item_id):
+    """
+    Delete Cart Item
+    ---
+    tags: [Shopping Cart]
+    description: Removes a specific item from the cart.
+    parameters:
+      - in: path
+        name: cart_item_id
+        type: integer
+        required: true
+        description: The ID of the cart item to delete.
+    responses:
+      200:
+        description: Cart item deleted
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Cart item not found}
+    """
     try:
         customer_service.delete_cart_item(cart_item_id)
         return jsonify({'message': 'Cart item deleted'}), 200
@@ -215,6 +477,30 @@ def delete_cart_item(cart_item_id):
 # Create a customer showing (book a seat for a movie showing)
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['POST'])
 def create_customer_showing(user_id):
+    """
+    Book Movie Showing
+    ---
+    tags: [Movie Booking]
+    description: Books a seat for a specific movie showing.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+      - in: body
+        name: booking_details
+        schema: {$ref: '#/definitions/CustomerShowingCreate'}
+    responses:
+      201:
+        description: Showing booked successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            customer_showing_id: {type: integer}
+      400: {description: Invalid input or seat already taken}
+    """
     try:
         data = request.get_json()
         customer_showing = customer_service.create_customer_showing(
@@ -234,6 +520,28 @@ def create_customer_showing(user_id):
 # Create a delivery for a customer showing using a payment method
 @customer_bp.route('/deliveries', methods=['POST'])
 def create_delivery():
+    """
+    Create Delivery Order
+    ---
+    tags: [Delivery Operations (Customer)]
+    description: Places a new delivery order based on the current cart items. Cart is cleared upon creation.
+    parameters:
+      - in: body
+        name: delivery_creation
+        schema: {$ref: '#/definitions/DeliveryCreate'}
+    responses:
+      201:
+        description: Delivery created successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            delivery_id: {type: integer}
+            total_price: {type: number, format: float}
+            delivery_status: {type: string}
+            payment_status: {type: string}
+      400: {description: Invalid input, empty cart, or payment failure}
+    """
     try:
         data = request.get_json()
         delivery = customer_service.create_delivery(
@@ -257,6 +565,29 @@ def create_delivery():
 # Cancel a delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/cancel', methods=['POST'])
 def cancel_delivery(delivery_id):
+    """
+    Cancel Delivery
+    ---
+    tags: [Delivery Operations (Customer)]
+    description: Cancels an existing delivery order.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery to cancel.
+    responses:
+      200:
+        description: Delivery cancelled
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            delivery_id: {type: integer}
+            delivery_status: {type: string}
+      400: {description: Cannot cancel delivery in current status}
+      404: {description: Delivery not found}
+    """
     try:
         delivery = customer_service.cancel_delivery(delivery_id)
         return jsonify({
@@ -272,6 +603,31 @@ def cancel_delivery(delivery_id):
 # Rate a fulfilled delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/rate', methods=['POST'])
 def rate_delivery(delivery_id):
+    """
+    Rate Delivery
+    ---
+    tags: [Delivery Operations (Customer)]
+    description: Rates a fulfilled delivery order (rating applies to the service/order).
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery to rate.
+      - in: body
+        name: rating_value
+        schema: {$ref: '#/definitions/DeliveryRateCustomer'}
+    responses:
+      200:
+        description: Delivery rated
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            delivery_id: {type: integer}
+      400: {description: Invalid rating or delivery status is not fulfilled}
+      404: {description: Delivery not found}
+    """
     try:
         data = request.get_json()
         rating = data.get('rating')
@@ -288,6 +644,21 @@ def rate_delivery(delivery_id):
 # Get all available products
 @customer_bp.route('/products/menu', methods=['GET'])
 def list_products():
+    """
+    List Available Menu Products
+    ---
+    tags: [Product Catalog]
+    description: Retrieves a list of all currently available concession products (the menu).
+    responses:
+      200:
+        description: Products retrieved successfully
+        schema:
+          type: object
+          properties:
+            products:
+              type: array
+              items: {$ref: '#/definitions/ProductMenu'}
+    """
     try:
         products = customer_service.show_all_products()
         return jsonify({
@@ -307,6 +678,28 @@ def list_products():
 # Get all deliveries for a specific customer by user_id
 @customer_bp.route('/customers/<int:user_id>/deliveries', methods=['GET'])
 def get_deliveries_for_customer(user_id):
+    """
+    Get Customer Delivery History
+    ---
+    tags: [Delivery Operations (Customer)]
+    description: Retrieves a list of all delivery orders associated with the customer.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+    responses:
+      200:
+        description: Deliveries retrieved successfully
+        schema:
+          type: object
+          properties:
+            deliveries:
+              type: array
+              items: {$ref: '#/definitions/DeliveryDetails'}
+      404: {description: Customer not found}
+    """
     try:
         deliveries = customer_service.get_all_deliveries(user_id=user_id)
         return jsonify({

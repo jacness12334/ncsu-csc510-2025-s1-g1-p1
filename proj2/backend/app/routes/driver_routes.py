@@ -27,6 +27,25 @@ def delivery_to_dict(delivery):
 # --- Admin/Staff Routes for Driver Management ---
 @driver_bp.route('/driver', methods=['POST'])
 def create_driver():
+    """
+    Create New Driver Account
+    ---
+    tags: [Driver Management (Admin)]
+    description: Creates a new driver account with vehicle details.
+    parameters:
+      - in: body
+        name: driver_registration
+        schema: {$ref: '#/definitions/DriverRegistration'}
+    responses:
+      201:
+        description: Driver created successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            user_id: {type: integer}
+      400: {description: Missing required fields}
+    """
     try:
         data = request.json
         service = DriverService()
@@ -57,6 +76,26 @@ def create_driver():
 
 @driver_bp.route('/driver/<int:driver_user_id>', methods=['DELETE'])
 def delete_driver(driver_user_id):
+    """
+    Delete Driver Account
+    ---
+    tags: [Driver Management (Admin)]
+    description: Deletes a driver account by user ID.
+    parameters:
+      - in: path
+        name: driver_user_id
+        type: integer
+        required: true
+        description: The ID of the driver's user account to delete.
+    responses:
+      200:
+        description: Driver deleted successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Driver not found}
+    """
     try:
         service = DriverService()
         service.delete_driver(driver_user_id)
@@ -70,6 +109,26 @@ def delete_driver(driver_user_id):
 # --- Driver Information and Status Update (By Driver or Admin) ---
 @driver_bp.route('/driver/<int:driver_user_id>', methods=['GET'])
 def get_driver_info(driver_user_id):
+    """
+    Get Driver Profile
+    ---
+    tags: [Driver Profile]
+    description: Retrieves detailed profile and vehicle information for a driver.
+    parameters:
+      - in: path
+        name: driver_user_id
+        type: integer
+        required: true
+        description: The ID of the driver's user account.
+    responses:
+      200:
+        description: Driver profile retrieved successfully
+        schema:
+          type: object
+          properties:
+            driver: {$ref: '#/definitions/DriverProfile'}
+      404: {description: Driver not found}
+    """
     try:
         service = DriverService()
         driver = service.validate_driver(driver_user_id)
@@ -96,6 +155,31 @@ def get_driver_info(driver_user_id):
 
 @driver_bp.route('/driver/<int:driver_user_id>', methods=['PUT'])
 def update_driver_details(driver_user_id):
+    """
+    Update Driver Vehicle Details
+    ---
+    tags: [Driver Profile]
+    description: Updates the vehicle-specific details (plate, type, color) for a driver.
+    parameters:
+      - in: path
+        name: driver_user_id
+        type: integer
+        required: true
+        description: The ID of the driver's user account.
+      - in: body
+        name: vehicle_update
+        schema: {$ref: '#/definitions/DriverUpdate'}
+    responses:
+      200:
+        description: Driver details updated successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            user_id: {type: integer}
+      400: {description: Missing required fields or invalid input}
+      404: {description: Driver not found}
+    """
     try:
         data = request.json
         service = DriverService()
@@ -118,6 +202,31 @@ def update_driver_details(driver_user_id):
 
 @driver_bp.route('/driver/<int:driver_user_id>/status', methods=['PUT'])
 def update_driver_status(driver_user_id):
+    """
+    Update Driver Duty Status
+    ---
+    tags: [Driver Profile]
+    description: Updates the driver's duty status (e.g., on_duty, off_duty, delivering).
+    parameters:
+      - in: path
+        name: driver_user_id
+        type: integer
+        required: true
+        description: The ID of the driver's user account.
+      - in: body
+        name: status_update
+        schema: {$ref: '#/definitions/DriverStatusUpdate'}
+    responses:
+      200:
+        description: Duty status updated successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            duty_status: {type: string}
+      400: {description: Missing new_status field}
+      404: {description: Driver not found}
+    """
     try:
         data = request.json
         service = DriverService()
@@ -138,6 +247,30 @@ def update_driver_status(driver_user_id):
 # --- Delivery Assignment and Rating ---
 @driver_bp.route('/deliveries/assign/<int:delivery_id>', methods=['PUT'])
 def assign_driver(delivery_id):
+    """
+    Assign Driver to Delivery
+    ---
+    tags: [Delivery Operations]
+    description: Attempts to find and assign an available driver to a specific delivery order.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery order to assign.
+    responses:
+      200:
+        description: Delivery successfully assigned to a driver
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            delivery_id: {type: integer}
+            assigned_driver_id: {type: integer}
+            driver_duty_status: {type: string}
+            delivery_status: {type: string}
+      404: {description: No available drivers found or Delivery not found}
+    """
     try:
         service = DriverService()
         # Fetch delivery object (assuming it's checked by service for existence)
@@ -164,6 +297,29 @@ def assign_driver(delivery_id):
 
 @driver_bp.route('/deliveries/<int:delivery_id>/complete', methods=['PUT'])
 def complete_delivery(delivery_id):
+    """
+    Complete Delivery Order
+    ---
+    tags: [Delivery Operations]
+    description: Marks the delivery order as completed by the driver.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery order to mark as complete.
+    responses:
+      200:
+        description: Delivery marked as completed
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            delivery_id: {type: integer}
+            new_status: {type: string}
+      400: {description: Invalid delivery status transition}
+      404: {description: Delivery not found}
+    """
     try:
         service = DriverService()
         delivery = service.complete_delivery(delivery_id)
@@ -180,6 +336,32 @@ def complete_delivery(delivery_id):
 
 @driver_bp.route('/deliveries/<int:delivery_id>/rate', methods=['PUT'])
 def rate_driver(delivery_id):
+    """
+    Rate Driver
+    ---
+    tags: [Delivery Operations]
+    description: Allows a customer to rate the driver after the delivery is complete.
+    parameters:
+      - in: path
+        name: delivery_id
+        type: integer
+        required: true
+        description: The ID of the delivery order being rated.
+      - in: body
+        name: rating_value
+        schema: {$ref: '#/definitions/DeliveryRate'}
+    responses:
+      200:
+        description: Driver rated successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            delivery_id: {type: integer}
+            new_rating: {type: number, format: float}
+      400: {description: Missing rating field or invalid value}
+      404: {description: Delivery or Driver not found}
+    """
     try:
         data = request.json
         service = DriverService()
@@ -202,6 +384,26 @@ def rate_driver(delivery_id):
 # --- Driver Delivery Views ---
 @driver_bp.route('/driver/<int:driver_id>/active-delivery', methods=['GET'])
 def get_active_delivery(driver_id):
+    """
+    Get Active Delivery
+    ---
+    tags: [Driver Views]
+    description: Retrieves the single delivery currently assigned to and being worked on by the driver.
+    parameters:
+      - in: path
+        name: driver_id
+        type: integer
+        required: true
+        description: The ID of the driver's user account.
+    responses:
+      200:
+        description: Active delivery retrieved successfully
+        schema:
+          type: object
+          properties:
+            active_delivery: {$ref: '#/definitions/DeliveryHistoryItem'}
+      404: {description: Driver not found or no active delivery}
+    """
     try:
         service = DriverService()
         delivery = service.get_active_delivery(driver_id)
@@ -213,6 +415,28 @@ def get_active_delivery(driver_id):
 
 @driver_bp.route('/driver/<int:driver_id>/history', methods=['GET'])
 def show_completed_deliveries(driver_id):
+    """
+    Get Delivery History
+    ---
+    tags: [Driver Views]
+    description: Retrieves a history of all completed delivery orders for a specific driver.
+    parameters:
+      - in: path
+        name: driver_id
+        type: integer
+        required: true
+        description: The ID of the driver's user account.
+    responses:
+      200:
+        description: Delivery history retrieved successfully
+        schema:
+          type: object
+          properties:
+            history:
+              type: array
+              items: {$ref: '#/definitions/DeliveryHistoryItem'}
+      404: {description: Driver not found}
+    """
     try:
         service = DriverService()
         deliveries = service.show_completed_deliveries(driver_id)
@@ -224,4 +448,3 @@ def show_completed_deliveries(driver_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
-    

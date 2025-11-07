@@ -12,6 +12,26 @@ def get_user_id():
 
 @supplier_bp.route('/suppliers/<int:supplier_id>', methods=['GET'])
 def get_supplier(supplier_id):
+    """
+    Get Supplier Details
+    ---
+    tags: [Supplier Management]
+    description: Retrieves detailed information for a specific supplier by ID.
+    parameters:
+      - in: path
+        name: supplier_id
+        type: integer
+        required: true
+        description: The ID of the supplier (which is their user ID).
+    responses:
+      200:
+        description: Supplier details retrieved successfully
+        schema:
+          type: object
+          properties:
+            supplier: {$ref: '#/definitions/SupplierDetails'}
+      404: {description: Supplier not found}
+    """
     try:
         service = SupplierService(supplier_id)
         supplier = service.get_supplier()
@@ -24,6 +44,26 @@ def get_supplier(supplier_id):
 
 @supplier_bp.route('/suppliers', methods=['PUT'])
 def edit_supplier():
+    """
+    Update Supplier Profile
+    ---
+    tags: [Supplier Management]
+    description: Updates the contact and company details for the authenticated supplier. Requires user_id in body.
+    parameters:
+      - in: body
+        name: supplier_update
+        schema: {$ref: '#/definitions/SupplierEdit'}
+    responses:
+      200:
+        description: Supplier details changed successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            supplier_id: {type: integer}
+      400: {description: Missing required fields}
+      404: {description: Supplier not found}
+    """
     try:
         user_id = get_user_id()
         service = SupplierService(user_id)
@@ -46,6 +86,25 @@ def edit_supplier():
 
 @supplier_bp.route('/suppliers/status', methods=['PUT'])
 def set_availability():
+    """
+    Set Supplier Availability Status
+    ---
+    tags: [Supplier Management]
+    description: Toggles the supplier's open/closed status. Requires user_id in body.
+    parameters:
+      - in: body
+        name: status_update
+        schema: {$ref: '#/definitions/SupplierStatusUpdate'}
+    responses:
+      200:
+        description: Supplier status changed successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      400: {description: Missing is_open field}
+      404: {description: Supplier not found}
+    """
     try:
         user_id = get_user_id()
         service = SupplierService(user_id)
@@ -62,6 +121,22 @@ def set_availability():
 
 @supplier_bp.route('/products/<int:supplier_id>', methods=['GET'])
 def get_products(supplier_id):
+    """
+    List All Products (for a supplier)
+    ---
+    tags: [Product Management]
+    description: Retrieves all products managed by a specific supplier (supplier_id is determined internally).
+    responses:
+      200:
+        description: Products retrieved successfully
+        schema:
+          type: object
+          properties:
+            products:
+              type: array
+              items: {$ref: '#/definitions/Product'}
+      404: {description: Supplier not found}
+    """
     try:
         service = SupplierService(supplier_id)
         products = service.get_products()
@@ -74,6 +149,26 @@ def get_products(supplier_id):
 
 @supplier_bp.route('/products', methods=['POST'])
 def add_product():
+    """
+    Add New Product
+    ---
+    tags: [Product Management]
+    description: Creates a new product entry under the authenticated supplier. Requires user_id in body.
+    parameters:
+      - in: body
+        name: product_details
+        schema: {$ref: '#/definitions/ProductCreateEdit'}
+    responses:
+      201:
+        description: Product added successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            product_id: {type: integer}
+      400: {description: Missing required fields}
+      404: {description: Supplier not found}
+    """
     try:
         user_id = get_user_id()
         service = SupplierService(user_id)
@@ -100,6 +195,31 @@ def add_product():
 
 @supplier_bp.route('/products/<int:product_id>', methods=['PUT'])
 def edit_product(product_id):
+    """
+    Edit Existing Product
+    ---
+    tags: [Product Management]
+    description: Updates the details of an existing product. Requires user_id in body.
+    parameters:
+      - in: path
+        name: product_id
+        type: integer
+        required: true
+        description: The ID of the product to update.
+      - in: body
+        name: product_details
+        schema: {$ref: '#/definitions/ProductCreateEdit'}
+    responses:
+      200:
+        description: Product details changed successfully
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+            product_id: {type: integer}
+      400: {description: Missing required fields}
+      404: {description: Product or Supplier not found}
+    """
     try:
         user_id = get_user_id()
         service = SupplierService(user_id)
@@ -127,6 +247,32 @@ def edit_product(product_id):
 
 @supplier_bp.route('/products/<int:product_id>', methods=['DELETE'])
 def remove_product(product_id):
+    """
+    Remove Product
+    ---
+    tags: [Product Management]
+    description: Deletes a product by its ID. Requires user_id in body.
+    parameters:
+      - in: path
+        name: product_id
+        type: integer
+        required: true
+        description: The ID of the product to remove.
+      - in: body
+        name: user_id
+        schema: 
+          type: object
+          properties:
+            user_id: {type: integer, description: 'The supplier user ID.'}
+    responses:
+      200:
+        description: Product successfully removed
+        schema:
+          type: object
+          properties:
+            message: {type: string}
+      404: {description: Product or Supplier not found}
+    """
     try:
         user_id = get_user_id()
         service = SupplierService(user_id)
@@ -140,6 +286,21 @@ def remove_product(product_id):
     
 @supplier_bp.route('/suppliers/all', methods=['GET'])
 def list_open_suppliers():
+    """
+    List All Suppliers
+    ---
+    tags: [Supplier Management]
+    description: Retrieves a list of all suppliers, regardless of their open status.
+    responses:
+      200:
+        description: List of suppliers retrieved successfully
+        schema:
+          type: object
+          properties:
+            suppliers:
+              type: array
+              items: {$ref: '#/definitions/SupplierDetails'}
+    """
     try:
         service = SupplierService(Suppliers.query.first().user_id)  
         suppliers = service.get_all_suppliers()
