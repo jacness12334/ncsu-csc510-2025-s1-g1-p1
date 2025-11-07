@@ -11,6 +11,15 @@ type PaymentMethod = {
   isDefault: boolean;
 };
 
+type jsonPaymentMethodRecieveType = {
+  id: string;
+  card_number: string;
+  expiration_month: string;
+  expiration_year: string;
+  billingAddress: string;
+  is_default: boolean;
+};
+
 export default function EditDetailsPage() {
   const router = useRouter();
   // Original values (simulate fetched from backend)
@@ -20,6 +29,7 @@ export default function EditDetailsPage() {
   const [originalBirthday, setOriginalBirthday] = useState("");
   const [originalTheatreId, setOriginalTheatreId] = useState("");
   const [userId, setUserId] = useState("");
+  const [userType, setUserType] = useState("");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,23 +54,12 @@ export default function EditDetailsPage() {
   const deleteUser = async () => {
 
     try {
-      let response = await fetch("http://localhost:5000/api/users/" + userId, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include"
-      });
 
-      if (!response.ok) {
-        // If server responds with 400/500 code, get the specific message
-        const errorData = await response.json();
-        throw new Error(errorData.message || response.statusText);
+      if (userType != 'customer') {
+        throw new Error("Not implemented yet");
       }
 
-      console.log(await response.text());
-
-      response = await fetch("http://localhost:5000/api/customers/" + userId, {
+      let response = await fetch("http://localhost:5000/api/customers/" + userId, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -86,13 +85,40 @@ export default function EditDetailsPage() {
     }
   }
 
-  const handleAddPayment = () => {
+  const handleAddPayment = async () => {
     if (!newCardNumber || !newExpMonth || !newExpYear || !newBillingAddress) {
       alert("Please fill in all payment fields.");
       return;
     }
+
+    let response = await fetch("http://localhost:5000/api/customers/" + userId + "/payment-methods", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        card_number: newCardNumber,
+        expiration_month: newExpMonth,
+        expiration_year: newExpYear,
+        billing_address: newBillingAddress
+      }),
+      credentials: "include"
+    });
+
+    if (!response.ok) {
+      // If server responds with 400/500 code, get the specific message
+      const errorData = await response.json();
+      console.log(response);
+      alert(errorData.message || response.statusText);
+      throw new Error(errorData.message || response.statusText);
+
+    }
+
+    let rt = await response.json();
+
+    // Success path:
     const newPaymentMethod: PaymentMethod = {
-      id: Date.now().toString(),
+      id: rt.id,
       cardNumber: newCardNumber,
       expirationMonth: newExpMonth,
       expirationYear: newExpYear,
@@ -105,9 +131,6 @@ export default function EditDetailsPage() {
     setNewExpYear("");
     setNewBillingAddress("");
     setShowAddPayment(false);
-
-
-
   };
 
   const handleEditPayment = (id: string) => {
@@ -188,9 +211,11 @@ export default function EditDetailsPage() {
         setEmail(rt.email);
         setName(rt.name);
         setPhone(rt.phone);
+        setUserType(rt.role);
 
+        let user_id = rt.user_id;
 
-        response = await fetch("http://localhost:5000/api/customers/" + userId, {
+        response = await fetch("http://localhost:5000/api/customers/" + user_id, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -224,7 +249,18 @@ export default function EditDetailsPage() {
         }
 
         rt = await response.json();
-        console.log(rt);
+        console.log(rt.payment_methods);
+        setPaymentMethods(rt.payment_methods.map((item: PaymentMethod, index: number) => {
+          return {
+            id: item.id,
+            cardNumber: item.card_number,
+            expirationMonth: newExpMonth,
+            expirationYear: newExpYear,
+            billingAddress: newBillingAddress,
+            isDefault: paymentMethods.length === 0,
+
+          }
+        }));
 
       } catch (error: unknown) {
         // This catches network errors AND the error thrown above
@@ -326,17 +362,13 @@ export default function EditDetailsPage() {
 
         <div>
           <label htmlFor="defaultTheatre" className="mb-1 block text-sm font-medium">Default Theatre</label>
-          <select
+          <input
             id="defaultTheatre"
             value={TheatreId}
             onChange={(e) => setTheatreId(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
-            <option value="">Select a theatre</option>
-            <option value="1">Downtown Cinema #1</option>
-            <option value="2">Midtown Cinema #2</option>
-            <option value="3">Uptown Cinema #3</option>
-          </select>
+          </input>
         </div>
 
         <fieldset className="rounded-2xl border p-4">
