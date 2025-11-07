@@ -253,7 +253,7 @@ class StaffService:
 
     # Get staff member
     def get_staff(self, staff_id):
-        self.validate_admin()
+        self.validate_staff()
         staff = Staff.query.filter_by(user_id=staff_id).first()
         return staff
   
