@@ -10,6 +10,7 @@ def get_user_id():
     data = request.json
     return data.get('user_id')
 
+# Helper function to convert delivery fields into dictionary
 def delivery_to_dict(delivery):
     return {
         "id": delivery.id,
@@ -22,7 +23,6 @@ def delivery_to_dict(delivery):
         "delivery_time": delivery.delivery_time.isoformat() if delivery.delivery_time else None,
         "delivery_status": delivery.delivery_status,
     }
-
 
 # --- Admin/Staff Routes for Driver Management ---
 @driver_bp.route('/driver', methods=['POST'])
