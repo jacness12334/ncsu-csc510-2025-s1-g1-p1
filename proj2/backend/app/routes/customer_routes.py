@@ -316,7 +316,7 @@ def get_deliveries_for_customer(user_id):
                 'payment_method_id': d.payment_method_id,
                 'driver_id': d.driver_id,
                 'staff_id': d.staff_id,
-                'total_price': float(d.total_price) if d.total_price is not None else 0.0,
+                'total_price': float(d.total_price),
                 'payment_status': d.payment_status,
                 'delivery_status': d.delivery_status
             } for d in deliveries]

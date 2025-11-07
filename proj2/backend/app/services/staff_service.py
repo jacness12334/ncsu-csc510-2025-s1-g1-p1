@@ -237,4 +237,8 @@ class StaffService:
     def show_all_admin(self):
         staff = self.validate_admin()
 
+    # Show all showings
+
+    # Show all movies
+
     
