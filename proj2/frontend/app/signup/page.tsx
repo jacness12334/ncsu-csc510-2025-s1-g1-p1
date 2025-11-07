@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import Select from 'react-select';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -11,8 +12,21 @@ export default function SignupPage() {
   const [birthday, setBirthday] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [userType, setUserType] = useState("customer");
-  const [theatre, setTheatre] = useState("");
+
+  // for customer or staff
+  const [theatre, setTheatre] = useState<any>([]);
+  const [selectedTheatreID, setSelectedTheatreID] = useState<number>(0);
+
+  // for drivers
+  const [licensePlate, setLicensePlate] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [vehicleColor, setVehicleColor] = useState("");
+  const [dutyStatus, setDutyStatus] = useState("");
+  const [rating, setRating] = useState("");
+  const [totalDeliveries, setTotalDeliveries] = useState("");
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -38,7 +52,7 @@ export default function SignupPage() {
               birthday: birthday,
               password: password,
               role: 'customer',
-              default_theatre_id: 1
+              default_theatre_id: selectedTheatreID
             })
           });
 
@@ -68,36 +82,7 @@ export default function SignupPage() {
               birthday: birthday,
               password: password,
               role: userType.split('-')[1],
-              theatre_id: theatre
-            })
-          });
-
-          if (!response.ok) {
-            // If server responds with 400/500 code, get the specific message
-            const errorData = await response.json();
-            throw new Error(errorData.message || response.statusText);
-          }
-
-          // Success path:
-          router.push("/login");
-          alert("Registration successful!");
-          break;
-
-        case 'supplier':
-          response = await fetch("http://localhost:5000/api/suppliers", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: name,
-              email: email,
-              phone: phone,
-              birthday: birthday,
-              password: password,
-              company_name: '',
-              company_address: '',
-              contact_phone: ''
+              theatre_id: selectedTheatreID
             })
           });
 
@@ -113,6 +98,35 @@ export default function SignupPage() {
           break;
 
         case 'driver':
+          response = await fetch("http://localhost:5000/api/drivers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              phone: phone,
+              birthday: birthday,
+              password: password,
+              license_plate: licensePlate,
+              vehicle_type: vehicleType,
+              vehicle_color: vehicleColor,
+              dutyStatus: dutyStatus,
+              rating: rating,
+              total_deliveries: totalDeliveries
+            })
+          });
+
+          if (!response.ok) {
+            // If server responds with 400/500 code, get the specific message
+            const errorData = await response.json();
+            throw new Error(errorData.message || response.statusText);
+          }
+
+          // Success path:
+          router.push("/login");
+          alert("Registration successful!");
           break;
 
         default:
@@ -128,7 +142,30 @@ export default function SignupPage() {
     }
   };
 
+  useEffect(() => {
+    const get_theatre_options = async () => {
+      const response = await fetch("http://localhost:5000/api/theatres", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
 
+      if (!response.ok) {
+        // If server responds with 400/500 code, get the specific message
+        const errorData = await response.json();
+        throw new Error(errorData.message || response.statusText);
+      }
+
+      const rt = await response.json();
+
+      // Success path:
+      setTheatre([...(rt.theatres)]);
+
+    }
+
+    get_theatre_options();
+  }, []);
 
   return (
     <section className="max-w-md mx-auto mt-10">
@@ -149,8 +186,7 @@ export default function SignupPage() {
             <option value='customer'>Customer</option>
             <option value='staff-runner'>Staff - Runner (Must be logged in as admin)</option>
             <option value='staff-admin'>Staff - Admin (Must be logged in as admin)</option>
-            <option value='driver'>Driver (Must be logged in as admin)</option>
-            <option value='supplier'>Supplier (Must be logged in as admin)</option>
+            <option value='driver'>Driver</option>
           </select>
         </div>
         <div>
@@ -212,16 +248,72 @@ export default function SignupPage() {
           />
         </div>
 
-        {userType == 'customer' && (
+        {(userType == 'customer' || userType == 'staff-admin' || userType == 'staff-runner') && (
           <div>
             <label htmlFor="theatre" className="block text-sm font-medium mb-1">
-              Movie Theatre ID
+              Movie Theatre
+            </label>
+            <Select
+              onChange={(e) => { setSelectedTheatreID(e.value); }}
+              options={theatre.map((item: any, index: number) => {
+                return {
+                  value: item.id, label: `<h3>${item.name}</h3>${item.address}<br/><i>${item.phone}</i>`
+                };
+              })}
+              formatOptionLabel={(option: any) => (
+                <span dangerouslySetInnerHTML={{ __html: option.label }} />
+              )}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            />
+
+          </div>
+        )}
+
+        {userType == 'driver' && (
+          <div>
+            <label htmlFor="licensePlateInput" className="block text-sm font-medium mb-1">
+              License Plate
             </label>
             <input
               type="number"
-              id="theatre"
-              value={theatre}
-              onChange={(e) => setTheatre(e.target.value)}
+              id="licensePlateInput"
+              value={licensePlate}
+              onChange={(e) => setLicensePlate(e.target.value)}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="1"
+            />
+
+          </div>
+        )}
+        {userType == 'driver' && (
+          <div>
+            <label htmlFor="vehicleTypeInputLabel" className="block text-sm font-medium mb-1">
+              Vehicle Type
+            </label>
+            <input
+              type="number"
+              id="vehicleTypeInput"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="1"
+            />
+
+          </div>
+        )}
+        {userType == 'driver' && (
+          <div>
+            <label htmlFor="vehicleColorInputLabel" className="block text-sm font-medium mb-1">
+              Vehicle Colour
+            </label>
+            <input
+              type="number"
+              id="vehicleColorInput"
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
               required
               className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
               placeholder="1"
