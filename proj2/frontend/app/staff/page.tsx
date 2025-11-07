@@ -40,8 +40,7 @@ export default function StaffPage() {
     });
     const [loading, setLoading] = useState(true);
 
-    //   const userId = Number(Cookies.get("user_id") || 0);
-    const userId = 2;
+    const userId = Number(Cookies.get("user_id") || 0);
 
     const toggle = (section: "theatres" | "staff" | "deliveries") => {
         setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -51,26 +50,30 @@ export default function StaffPage() {
     useEffect(() => {
         const fetchData = async () => {
             if (!userId) {
-                router.push("/login");
+                // router.push("/login");
                 return;
             }
 
             try {
                 // Fetch current staff info (to get role)
-                const staffRes = await fetch(`/api/staff/${userId}`);
+                const staffRes = await fetch(
+                    `http://localhost:5000/api/staff/${userId}`
+                );
                 if (!staffRes.ok)
                     throw new Error("Failed to get staff details");
                 const staffInfo = await staffRes.json();
 
                 if (!staffInfo || !staffInfo.role) {
-                    router.push("/login");
+                    //   router.push("/login");
                     return;
                 }
 
                 setRole(staffInfo.role);
 
                 // Fetch theatres for this staff
-                const theatreRes = await fetch(`/api/theatres/${userId}`);
+                const theatreRes = await fetch(
+                    `http://localhost:5000/api/theatres/${userId}`
+                );
                 const theatreData = await theatreRes.json();
                 setTheatres(theatreData.theatres || []);
 
@@ -79,7 +82,7 @@ export default function StaffPage() {
                 if (staffInfo.role === "admin") {
                     for (const theatre of theatreData.theatres || []) {
                         const res = await fetch(
-                            `/api/staff/list/${theatre.id}`,
+                            `http://localhost:5000/api/staff/list/${theatre.id}`,
                             {
                                 method: "PUT",
                                 headers: { "Content-Type": "application/json" },
@@ -96,7 +99,7 @@ export default function StaffPage() {
                 const deliveryList: Delivery[] = [];
                 for (const theatre of theatreData.theatres || []) {
                     const res = await fetch(
-                        `/api/deliveries/list/${theatre.id}`
+                        `http://localhost:5000/api/deliveries/list/${theatre.id}`
                     );
                     const data = await res.json();
                     deliveryList.push(
@@ -126,7 +129,7 @@ export default function StaffPage() {
             const theatre = theatres.find((t) => t.id === id);
             if (!theatre) return;
 
-            await fetch(`/api/theatres`, {
+            await fetch(`http://localhost:5000/api/theatres`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -150,7 +153,7 @@ export default function StaffPage() {
     const addStaff = async () => {
         try {
             if (!theatres.length) return;
-            const res = await fetch(`/api/staff`, {
+            const res = await fetch(`http://localhost:5000/api/staff`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -184,7 +187,7 @@ export default function StaffPage() {
 
     const removeStaff = async (staffUserId: number) => {
         try {
-            await fetch(`/api/staff/${staffUserId}`, {
+            await fetch(`http://localhost:5000/api/staff/${staffUserId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: userId }),
@@ -198,7 +201,7 @@ export default function StaffPage() {
     /** Delivery actions */
     const acceptDelivery = async (id: number) => {
         try {
-            await fetch(`/api/deliveries/${id}/accept`, {
+            await fetch(`http://localhost:5000/api/deliveries/${id}/accept`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: userId }),
@@ -215,7 +218,7 @@ export default function StaffPage() {
 
     const fulfillDelivery = async (id: number) => {
         try {
-            await fetch(`/api/deliveries/${id}/fulfill`, {
+            await fetch(`http://localhost:5000/api/deliveries/${id}/fulfill`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: userId }),
