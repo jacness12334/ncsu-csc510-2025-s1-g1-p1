@@ -24,7 +24,15 @@ interface Delivery {
     productName: string;
     theatreName: string;
     quantity: number;
-    delivery_status: "pending" | "accepted" | "delivered" | "fulfilled";
+    delivery_status:
+        | "pending"
+        | "accepted"
+        | "in_progress"
+        | "ready_for_pickup"
+        | "in_transit"
+        | "delivered"
+        | "fulfilled"
+        | "cancelled";
 }
 
 export default function StaffPage() {
@@ -39,6 +47,16 @@ export default function StaffPage() {
         deliveries: true,
     });
     const [loading, setLoading] = useState(true);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newStaff, setNewStaff] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        birthday: "",
+        password: "",
+        role: "runner" as "runner" | "admin",
+        theatre_id: theatres[0]?.id || 0,
+    });
 
     const userId = Number(Cookies.get("user_id") || 0);
 
@@ -49,35 +67,24 @@ export default function StaffPage() {
     /** Authentication check + fetch all data */
     useEffect(() => {
         const fetchData = async () => {
-            if (!userId) {
-                // router.push("/login");
-                return;
-            }
+            if (!userId) return;
 
             try {
-                // Fetch current staff info (to get role)
                 const staffRes = await fetch(
                     `http://localhost:5000/api/staff/${userId}`
                 );
                 if (!staffRes.ok)
                     throw new Error("Failed to get staff details");
                 const staffInfo = await staffRes.json();
-
-                if (!staffInfo || !staffInfo.role) {
-                    //   router.push("/login");
-                    return;
-                }
-
+                if (!staffInfo || !staffInfo.role) return;
                 setRole(staffInfo.role);
 
-                // Fetch theatres for this staff
                 const theatreRes = await fetch(
                     `http://localhost:5000/api/theatres/${userId}`
                 );
                 const theatreData = await theatreRes.json();
                 setTheatres(theatreData.theatres || []);
 
-                // Fetch staff for each theatre (admins only)
                 const staffList: Staff[] = [];
                 if (staffInfo.role === "admin") {
                     for (const theatre of theatreData.theatres || []) {
@@ -90,12 +97,25 @@ export default function StaffPage() {
                             }
                         );
                         const data = await res.json();
-                        staffList.push(...(data.staff || []));
+
+                        for (const s of data.staff || []) {
+                            try {
+                                const userRes = await fetch(
+                                    `http://localhost:5000/api/users/${s.user_id}`
+                                );
+                                const userData = await userRes.json();
+                                staffList.push({
+                                    ...s,
+                                    name: userData.name || "Unnamed",
+                                });
+                            } catch {
+                                staffList.push({ ...s, name: "Unknown" });
+                            }
+                        }
                     }
                 }
                 setStaff(staffList);
 
-                // Fetch deliveries for each theatre
                 const deliveryList: Delivery[] = [];
                 for (const theatre of theatreData.theatres || []) {
                     const res = await fetch(
@@ -112,6 +132,7 @@ export default function StaffPage() {
                         }))
                     );
                 }
+                console.log(deliveryList);
                 setDeliveries(deliveryList);
             } catch (err) {
                 console.error("Error fetching data:", err);
@@ -236,7 +257,15 @@ export default function StaffPage() {
     /** Status badge helper */
     const statusBadge = (
         text: string,
-        type: "green" | "red" | "gray" | "blue" | "yellow"
+        type:
+            | "green"
+            | "red"
+            | "gray"
+            | "blue"
+            | "yellow"
+            | "orange"
+            | "purple"
+            | "pink"
     ) => {
         const colors: Record<string, string> = {
             green: "bg-green-100 text-green-700 border border-green-300",
@@ -244,6 +273,9 @@ export default function StaffPage() {
             gray: "bg-gray-100 text-gray-700 border border-gray-300",
             blue: "bg-blue-100 text-blue-700 border border-blue-300",
             yellow: "bg-yellow-100 text-yellow-700 border border-yellow-300",
+            orange: "bg-orange-100 text-orange-700 border border-orange-300",
+            purple: "bg-purple-100 text-purple-700 border border-purple-300",
+            pink: "bg-pink-100 text-pink-700 border border-pink-300",
         };
         return (
             <span
@@ -336,12 +368,184 @@ export default function StaffPage() {
                     </button>
                     {expanded.staff && (
                         <div className="space-y-2">
-                            <button
-                                onClick={addStaff}
-                                className="mb-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 active:bg-blue-800 transition"
-                            >
-                                Add Staff
-                            </button>
+                            {!showAddForm ? (
+                                <button
+                                    onClick={() => setShowAddForm(true)}
+                                    className="mb-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 active:bg-blue-800 transition"
+                                >
+                                    Add Staff
+                                </button>
+                            ) : (
+                                <form
+                                    onSubmit={async (e) => {
+                                        e.preventDefault();
+                                        try {
+                                            const res = await fetch(
+                                                `http://localhost:5000/api/staff`,
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type":
+                                                            "application/json",
+                                                    },
+                                                    body: JSON.stringify({
+                                                        user_id: userId,
+                                                        ...newStaff,
+                                                    }),
+                                                }
+                                            );
+                                            const data = await res.json();
+                                            if (data.user_id) {
+                                                setStaff((prev) => [
+                                                    ...prev,
+                                                    {
+                                                        user_id: data.user_id,
+                                                        name: newStaff.name,
+                                                        role: newStaff.role,
+                                                        theatre_id:
+                                                            newStaff.theatre_id,
+                                                        is_available: true,
+                                                    },
+                                                ]);
+                                                setShowAddForm(false);
+                                                setNewStaff({
+                                                    name: "",
+                                                    email: "",
+                                                    phone: "",
+                                                    birthday: "",
+                                                    password: "",
+                                                    role: "runner",
+                                                    theatre_id:
+                                                        theatres[0]?.id || 0,
+                                                });
+                                            }
+                                        } catch (err) {
+                                            console.error(err);
+                                        }
+                                    }}
+                                    className="border p-4 rounded bg-gray-50 space-y-3"
+                                >
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <input
+                                            type="text"
+                                            placeholder="Full Name"
+                                            value={newStaff.name}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    name: e.target.value,
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full"
+                                            required
+                                        />
+                                        <input
+                                            type="email"
+                                            placeholder="Email"
+                                            value={newStaff.email}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    email: e.target.value,
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full"
+                                            required
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Phone"
+                                            value={newStaff.phone}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    phone: e.target.value,
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full"
+                                        />
+                                        <input
+                                            type="date"
+                                            value={newStaff.birthday}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    birthday: e.target.value,
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full"
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder="Password"
+                                            value={newStaff.password}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    password: e.target.value,
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full"
+                                            required
+                                        />
+                                        <select
+                                            value={newStaff.role}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    role: e.target.value as
+                                                        | "admin"
+                                                        | "runner",
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full"
+                                        >
+                                            <option value="runner">
+                                                Runner
+                                            </option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                        <select
+                                            value={newStaff.theatre_id}
+                                            onChange={(e) =>
+                                                setNewStaff((p) => ({
+                                                    ...p,
+                                                    theatre_id: Number(
+                                                        e.target.value
+                                                    ),
+                                                }))
+                                            }
+                                            className="border rounded px-3 py-2 w-full col-span-2"
+                                        >
+                                            <option value={0}>
+                                                Select Theatre
+                                            </option>
+                                            {theatres.map((t) => (
+                                                <option key={t.id} value={t.id}>
+                                                    {t.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex justify-end gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setShowAddForm(false)
+                                            }
+                                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                                        >
+                                            Save Staff
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
                             <ul className="space-y-2">
                                 {staff.map((s) => (
                                     <li
@@ -388,51 +592,78 @@ export default function StaffPage() {
                 </button>
                 {expanded.deliveries && (
                     <ul className="space-y-2">
-                        {deliveries.map((d) => (
-                            <li
-                                key={d.id}
-                                className="flex justify-between items-center border-b py-2"
-                            >
-                                <span>
-                                    {d.productName} → {d.theatreName} (Qty:{" "}
-                                    {d.quantity})
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    {statusBadge(
-                                        d.delivery_status,
-                                        d.delivery_status === "pending"
-                                            ? "gray"
-                                            : d.delivery_status === "accepted"
-                                            ? "blue"
-                                            : d.delivery_status === "delivered"
-                                            ? "yellow"
-                                            : "green"
-                                    )}
-                                    {(role === "admin" || role === "runner") &&
-                                        d.delivery_status === "pending" && (
-                                            <button
-                                                onClick={() =>
-                                                    acceptDelivery(d.id)
-                                                }
-                                                className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 active:bg-blue-300 transition"
-                                            >
-                                                Accept
-                                            </button>
+                        {deliveries.map((d) => {
+                            let badgeColor: any = "gray";
+                            switch (d.delivery_status) {
+                                case "pending":
+                                    badgeColor = "gray";
+                                    break;
+                                case "accepted":
+                                    badgeColor = "blue";
+                                    break;
+                                case "in_progress":
+                                    badgeColor = "purple";
+                                    break;
+                                case "ready_for_pickup":
+                                    badgeColor = "orange";
+                                    break;
+                                case "in_transit":
+                                    badgeColor = "pink";
+                                    break;
+                                case "delivered":
+                                    badgeColor = "yellow";
+                                    break;
+                                case "fulfilled":
+                                    badgeColor = "green";
+                                    break;
+                                case "cancelled":
+                                    badgeColor = "red";
+                                    break;
+                            }
+
+                            return (
+                                <li
+                                    key={d.id}
+                                    className="flex justify-between items-center border-b py-2"
+                                >
+                                    <span>
+                                        {d.productName} → {d.theatreName} (Qty:{" "}
+                                        {d.quantity})
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        {statusBadge(
+                                            d.delivery_status,
+                                            badgeColor
                                         )}
-                                    {(role === "admin" || role === "runner") &&
-                                        d.delivery_status === "delivered" && (
-                                            <button
-                                                onClick={() =>
-                                                    fulfillDelivery(d.id)
-                                                }
-                                                className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 active:bg-green-300 transition"
-                                            >
-                                                Fulfill
-                                            </button>
-                                        )}
-                                </div>
-                            </li>
-                        ))}
+                                        {(role === "admin" ||
+                                            role === "runner") &&
+                                            d.delivery_status === "pending" && (
+                                                <button
+                                                    onClick={() =>
+                                                        acceptDelivery(d.id)
+                                                    }
+                                                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 active:bg-blue-300 transition"
+                                                >
+                                                    Accept
+                                                </button>
+                                            )}
+                                        {(role === "admin" ||
+                                            role === "runner") &&
+                                            d.delivery_status ===
+                                                "delivered" && (
+                                                <button
+                                                    onClick={() =>
+                                                        fulfillDelivery(d.id)
+                                                    }
+                                                    className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 active:bg-green-300 transition"
+                                                >
+                                                    Fulfill
+                                                </button>
+                                            )}
+                                    </div>
+                                </li>
+                            );
+                        })}
                     </ul>
                 )}
             </div>
