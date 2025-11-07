@@ -337,9 +337,9 @@ class TestStaffRoutes:
         assert 'theatre_id' in data
         assert data['role'] == 'admin'
 
-    def test_get_staff_by_id_unauthorized(self, client, sample_staff):
-        response = client.get(f'/api/staff/{sample_staff}', json={
-            'user_id': sample_staff
+    def test_get_staff_by_id_unauthorized(self, client, sample_customer):
+        response = client.get(f'/api/staff/{sample_customer}', json={
+            'user_id': sample_customer
         })
         assert response.status_code == 404
         data = json.loads(response.data)
