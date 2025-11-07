@@ -5,15 +5,27 @@ db_name = "movie_munchers_dev"
 database = get_database(db_name)
 cursor_object = database.cursor()
 
+from argon2.low_level import hash_secret, Type
+
+def deterministic_hash(password):
+    return hash_secret(
+        secret=password.encode(),
+        salt=b"FixedSaltForTesting123",
+        time_cost=3,
+        memory_cost=2**16,
+        parallelism=4,
+        hash_len=32,
+        type=Type.ID
+    ).decode()
+
+ADMIN_HASH = deterministic_hash("StaffTest")
+
 # HELPER FUNCTION FOR EXECUTING SQL QUERIES
 def insert(query, values):
     cursor_object.executemany(query, values)
     database.commit()
 
 def populate_db():
-   ph = PasswordHasher()
-   ADMIN_PLAIN = "StaffTest"
-   ADMIN_HASH = ph.hash(ADMIN_PLAIN)
    # theatres
    insert("""INSERT INTO theatres (name, address, phone, is_open) VALUES (%s, %s, %s, %s)""",
          [('Theatre A', '123 A St', '555-0001', True),

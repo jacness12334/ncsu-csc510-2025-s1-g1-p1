@@ -625,3 +625,15 @@ def list_deliveries_by_theatre(theatre_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@staff_bp.route('/staff/<int:staff_user_id>', methods=['GET'])
+def get_staff(staff_user_id):
+    try:
+        user_id = get_user_id() 
+        svc = StaffService(user_id)
+        data = svc.get_staff(staff_user_id)
+        return jsonify(data), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

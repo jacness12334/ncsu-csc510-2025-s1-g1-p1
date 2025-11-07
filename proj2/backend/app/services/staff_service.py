@@ -261,5 +261,13 @@ class StaffService:
     # def show_all_movies(self):
     #     return Movies.query.order_by(Movies.title.asc()).all()
 
+    # Get staff member
+    def get_staff(self, staff_id):
+        st = self.validate_staff(staff_id)
+        return {
+            "user_id": st.user_id,
+            "theatre_id": st.theatre_id,
+            "role": st.role,
+            "is_available": st.is_available,
+        }
 
-    
