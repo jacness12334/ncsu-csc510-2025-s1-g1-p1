@@ -29,7 +29,7 @@ def create_customer():
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Fetch a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['GET'])
@@ -43,7 +43,7 @@ def get_customer(user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Delete a customer by user_id
 @customer_bp.route('/customers/<int:user_id>', methods=['DELETE'])
@@ -54,7 +54,7 @@ def delete_customer(user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Update a customer's default theatre
 @customer_bp.route('/customers/<int:user_id>/theatre', methods=['PUT'])
@@ -73,7 +73,7 @@ def update_default_theatre(user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Add a payment method for a customer
 @customer_bp.route('/customers/<int:user_id>/payment-methods', methods=['POST'])
@@ -117,7 +117,7 @@ def get_payment_methods(customer_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Delete a payment method by id
 @customer_bp.route('/payment-methods/<int:payment_method_id>', methods=['DELETE'])
@@ -128,7 +128,7 @@ def delete_payment_method(payment_method_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Add funds to a payment method
 @customer_bp.route('/payment-methods/<int:payment_method_id>/add-funds', methods=['POST'])
@@ -145,7 +145,7 @@ def add_funds(payment_method_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Add an item to the customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['POST'])
@@ -164,7 +164,7 @@ def add_to_cart(customer_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Get all items in a customer's cart
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['GET'])
@@ -181,7 +181,7 @@ def get_cart(customer_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Update the quantity of a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
@@ -199,7 +199,7 @@ def update_cart_item(cart_item_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Delete a specific cart item
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['DELETE'])
@@ -210,7 +210,7 @@ def delete_cart_item(cart_item_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Create a customer showing (book a seat for a movie showing)
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['POST'])
@@ -229,7 +229,7 @@ def create_customer_showing(user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Create a delivery for a customer showing using a payment method
 @customer_bp.route('/deliveries', methods=['POST'])
@@ -252,7 +252,7 @@ def create_delivery():
     except Exception:
         import traceback
         traceback.print_exc()
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Cancel a delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/cancel', methods=['POST'])
@@ -267,7 +267,7 @@ def cancel_delivery(delivery_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Rate a fulfilled delivery by id
 @customer_bp.route('/deliveries/<int:delivery_id>/rate', methods=['POST'])
@@ -283,7 +283,7 @@ def rate_delivery(delivery_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Get all available products
 @customer_bp.route('/products/menu', methods=['GET'])
@@ -302,7 +302,7 @@ def list_products():
             } for p in products]
         }), 200
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 # Get all deliveries for a specific customer by user_id
 @customer_bp.route('/customers/<int:user_id>/deliveries', methods=['GET'])
@@ -324,4 +324,4 @@ def get_deliveries_for_customer(user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500

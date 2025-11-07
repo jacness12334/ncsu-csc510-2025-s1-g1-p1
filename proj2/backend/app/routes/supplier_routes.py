@@ -20,7 +20,7 @@ def get_supplier():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @supplier_bp.route('/suppliers', methods=['PUT'])
@@ -42,7 +42,7 @@ def edit_supplier():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @supplier_bp.route('/suppliers/status', methods=['PUT'])
@@ -58,7 +58,7 @@ def set_availability():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @supplier_bp.route('/products', methods=['GET'])
@@ -71,7 +71,7 @@ def get_products():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @supplier_bp.route('/products', methods=['POST'])
@@ -97,7 +97,7 @@ def add_product():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @supplier_bp.route('/products/<int:product_id>', methods=['PUT'])
@@ -124,7 +124,7 @@ def edit_product(product_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @supplier_bp.route('/products/<int:product_id>', methods=['DELETE'])
@@ -137,7 +137,7 @@ def remove_product(product_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500 
+        return jsonify({'error': str(e)}), 500 
        
     
 @supplier_bp.route('/suppliers/all', methods=['GET'])

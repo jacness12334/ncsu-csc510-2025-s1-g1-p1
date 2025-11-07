@@ -34,7 +34,7 @@ def add_staff():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/staff/<int:staff_user_id>', methods=['DELETE'])
@@ -47,7 +47,7 @@ def remove_staff(staff_user_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/theatres', methods=['GET'])
@@ -60,7 +60,7 @@ def get_theatres():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/theatres', methods=['PUT'])
@@ -76,7 +76,7 @@ def set_theatre_status():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/movies', methods=['POST'])
@@ -100,7 +100,7 @@ def add_movie():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/movies/<int:movie_id>', methods=['PUT'])
@@ -125,7 +125,7 @@ def edit_movie(movie_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/movies/<int:movie_id>', methods=['DELETE'])
@@ -138,7 +138,7 @@ def remove_movie(movie_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/showings', methods=['POST'])
@@ -159,7 +159,7 @@ def add_showing():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/showings/<int:showing_id>', methods=['PUT'])
@@ -181,7 +181,7 @@ def edit_showing(showing_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/showings/<int:showing_id>', methods=['DELETE'])
@@ -194,7 +194,7 @@ def remove_showing(showing_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/staff', methods=['PUT'])
@@ -210,7 +210,7 @@ def set_availability():
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @staff_bp.route('/deliveries/<int:delivery_id>/accept', methods=['PUT'])
@@ -223,7 +223,7 @@ def accept_delivery(delivery_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 @staff_bp.route('/deliveries/<int:delivery_id>/fulfill', methods=['PUT'])
 def fulfill_delivery(delivery_id):
@@ -236,7 +236,7 @@ def fulfill_delivery(delivery_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
 
 @staff_bp.route('/staff/list/<int:theatre_id>', methods=['PUT'])
 def list_staff_by_theatre(theatre_id):
@@ -255,4 +255,4 @@ def list_staff_by_theatre(theatre_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
-        return jsonify({'error': 'An error occurred'}), 500
+        return jsonify({'error': str(e)}), 500
