@@ -1,5 +1,5 @@
 // lib/sampleData.ts
-import type { MenuItem, BundleItem } from "./types";
+import type { MenuItem } from "./types";
 
 export const MENU: MenuItem[] = [
   {
@@ -7,7 +7,6 @@ export const MENU: MenuItem[] = [
     name: "Classic Butter Popcorn",
     description: "Fresh & buttery",
     price: 6.99,
-    nutrition: { calories: 420, carbs: 45, fat: 22, protein: 6, servingSize: "per tub" },
     category: "Snacks",
   },
   {
@@ -15,7 +14,6 @@ export const MENU: MenuItem[] = [
     name: "Nachos with Cheese",
     description: "Crispy chips + cheddar dip",
     price: 7.49,
-    nutrition: { calories: 480, carbs: 54, fat: 23, protein: 8, servingSize: "per tray" },
     category: "Snacks",
   },
   {
@@ -23,7 +21,6 @@ export const MENU: MenuItem[] = [
     name: "Pretzel Bites",
     description: "Soft baked bites + warm cheese",
     price: 5.99,
-    nutrition: { calories: 390, carbs: 42, fat: 17, protein: 9, servingSize: "per cup" },
     category: "Snacks",
   },
   {
@@ -31,7 +28,6 @@ export const MENU: MenuItem[] = [
     name: "Soda (Medium)",
     description: "Coke, Diet, Sprite, Fanta",
     price: 3.99,
-    nutrition: { calories: 190, carbs: 52, fat: 0, protein: 0, servingSize: "16 oz" },
     category: "Beverages",
   },
   {
@@ -39,7 +35,6 @@ export const MENU: MenuItem[] = [
     name: "Bottled Water",
     description: "16.9 fl oz",
     price: 2.49,
-    nutrition: { calories: 0, carbs: 0, fat: 0, protein: 0, servingSize: "per bottle" },
     category: "Beverages",
   },
   {
@@ -47,79 +42,6 @@ export const MENU: MenuItem[] = [
     name: "Chocolate Chip Cookie",
     description: "Freshly baked",
     price: 3.49,
-    nutrition: { calories: 260, carbs: 34, fat: 12, protein: 3, servingSize: "per cookie" },
     category: "Desserts",
-  },
-];
-
-export const BUNDLES: BundleItem[] = [
-  {
-    id: "bundle-family-classic",
-    name: "Family Movie Night (Classic)",
-    description: "Theater favorites for a cozy family night",
-    price: 24.99,
-    serves: 2,
-    perPersonNutrition: { calories: 550, carbs: 62, fat: 22, protein: 9, servingSize: "per person" },
-    includes: [
-      "1× Classic Butter Popcorn (share)",
-      "2× Medium Sodas",
-      "2× Chocolate Chip Cookies",
-    ],
-  },
-  {
-    id: "bundle-family-healthy",
-    name: "Family Movie Night (Mindful)",
-    description: "Lighter picks with portion awareness",
-    price: 22.99,
-    serves: 2,
-    perPersonNutrition: { calories: 360, carbs: 48, fat: 9, protein: 6, servingSize: "per person" },
-    includes: [
-      "1× Light Popcorn (share)",
-      "2× Bottled Waters",
-      "1× Fruit Cup (share)",
-    ],
-  },
-  {
-    id: "bundle-family-3",
-    name: "Family Movie Night (For 3)",
-    description: "Perfect for small families of three",
-    price: 29.99,
-    serves: 3,
-    perPersonNutrition: { calories: 580, carbs: 65, fat: 24, protein: 10, servingSize: "per person" },
-    includes: [
-      "1× Large Butter Popcorn (share)",
-      "3× Medium Sodas",
-      "3× Chocolate Chip Cookies",
-      "1× Nachos with Cheese (share)",
-    ],
-  },
-  {
-    id: "bundle-family-4",
-    name: "Family Movie Night (For 4)",
-    description: "Snacks and drinks for the whole crew",
-    price: 39.99,
-    serves: 4,
-    perPersonNutrition: { calories: 610, carbs: 70, fat: 25, protein: 11, servingSize: "per person" },
-    includes: [
-      "2× Large Butter Popcorns",
-      "4× Medium Sodas",
-      "4× Chocolate Chip Cookies",
-      "2× Nachos with Cheese",
-    ],
-  },
-  {
-    id: "bundle-family-5",
-    name: "Family Movie Night (For 5)",
-    description: "Big family fun with extra snacks to share",
-    price: 49.99,
-    serves: 5,
-    perPersonNutrition: { calories: 640, carbs: 75, fat: 27, protein: 12, servingSize: "per person" },
-    includes: [
-      "2× Large Butter Popcorns",
-      "5× Medium Sodas",
-      "5× Chocolate Chip Cookies",
-      "2× Nachos with Cheese",
-      "1× Pretzel Bites (share)",
-    ],
   },
 ];

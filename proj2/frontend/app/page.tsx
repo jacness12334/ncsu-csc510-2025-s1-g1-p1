@@ -6,7 +6,7 @@ export default function Home() {
       <div className="w-full max-w-4xl text-center px-4">
         <h1 className="text-4xl font-bold mb-6">Welcome to Movie Munchers</h1>
         <p className="text-lg text-gray-600 mb-8">
-          Snacks, family bundles, and a theater experience anywhere.
+          Snacks and a theater experience anywhere.
         </p>
         
         {/* Mission Statement */}
@@ -14,9 +14,9 @@ export default function Home() {
           <h2 className="text-2xl font-semibold mb-4 text-gray-900">Our Mission</h2>
           <p className="text-gray-700 leading-relaxed max-w-3xl mx-auto">
             Movie Munchers makes movie nights easier and more enjoyable by letting you order food directly to your theater seat. 
-            The app connects local restaurants, theaters, and communities to offer snack bundles, mindful menu options, and 
-            group-booking features. A portion of every order supports non-profits, turning simple snacking into a fun, 
-            healthy, and socially positive experience.
+            The app connects local restaurants, theaters, and communities to offer convenient ordering and 
+            group-booking features. A portion of every order supports non-profits, turning simple snacking into a fun 
+            and socially positive experience.
           </p>
         </div>
       </div>

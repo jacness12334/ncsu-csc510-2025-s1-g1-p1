@@ -1,7 +1,6 @@
 // app/components/MenuCard.tsx
 "use client";
 import type { MenuItem } from "@/lib/types";
-import NutritionBadge from "./NutritionBadge";
 import { useCartStore } from "@/lib/cartStore";
 
 export default function MenuCard({ item }: { item: MenuItem }) {
@@ -13,7 +12,6 @@ export default function MenuCard({ item }: { item: MenuItem }) {
     <div className="rounded-2xl border p-4 shadow-sm">
       <h3 className="text-base font-semibold">{item.name}</h3>
       <p className="mt-1 text-sm text-gray-600">{item.description ?? "Tasty snack"}</p>
-      <NutritionBadge n={item.nutrition} />
 
       <div className="mt-3 flex items-center justify-between">
         <span className="text-sm font-medium">${item.price.toFixed(2)}</span>
