@@ -9,7 +9,7 @@ from argon2.low_level import hash_secret, Type
 def deterministic_hash(password):
     return hash_secret(
         secret=password.encode(),
-        salt=b"FixedSaltForTesting123",
+        salt=b"fixedsalt",
         time_cost=3,
         memory_cost=2**16,
         parallelism=4,
@@ -17,7 +17,7 @@ def deterministic_hash(password):
         type=Type.ID
     ).decode()
 
-ADMIN_HASH = deterministic_hash("StaffTest")
+ADMIN_HASH = deterministic_hash("password")
 
 # HELPER FUNCTION FOR EXECUTING SQL QUERIES
 def insert(query, values):
@@ -48,22 +48,22 @@ def populate_db():
 
    # users
    insert("""INSERT INTO users (name, email, phone, birthday, password_hash, role) VALUES (%s, %s, %s, %s, %s, %s)""",
-         [('Alice', 'alice@ncsu.edu', '555-1000', '1990-01-01', 'hash1', 'staff'),
+         [('Alice', 'alice@ncsu.edu', '555-1000', '1990-01-01', ADMIN_HASH, 'staff'),
             ('Bob', 'bob@ncsu.edu', '555-2000', '1990-01-02', ADMIN_HASH, 'staff'),
-            ('Charles', 'charles@ncsu.edu', '555-3000', '1990-01-03', 'hash3', 'staff'),
-            ('Daisy', 'daisy@ncsu.edu', '555-4000', '1990-01-04', 'hash4', 'staff'),
-            ('Evelyn', 'evelyn@ncsu.edu', '555-5000', '1990-01-04', 'hash5', 'customer'),
-            ('Fergus', 'fergus@ncsu.edu', '555-6000', '1990-01-06', 'hash6', 'customer'),
-            ('Grace', 'grace@ncsu.edu', '555-7000', '1990-01-07', 'hash7', 'customer' ),
-            ('Hunter', 'hunter@ncsu.edu', '555-8000', '1990-01-08', 'hash8', 'customer'),
-            ('Ingrid', 'ingrid@ncsu.edu', '555-9000', '1990-01-09', 'hash9', 'driver'),
-            ('Jack', 'jack@ncsu.edu', '555-0100', '1990-01-10', 'hash10', 'driver'),
-            ('Kyle', 'kyle@ncsu.edu', '555-0200', '1990-01-11', 'hash11', 'driver' ),
-            ('Linda', 'linda@ncsu.edu', '555-0300', '1990-01-12', 'hash12', 'driver'),
-            ('Molly', 'molly@ncsu.edu', '555-0400', '1990-01-13', 'hash13', 'supplier'),
-            ('Nick', 'nick@ncsu.edu', '555-0500', '1990-01-14', 'hash14', 'supplier'),
-            ('Oscar', 'oscar@ncsu.edu', '555-0600', '1990-01-15', 'hash15', 'supplier' ),
-            ('Patricia', 'patricia@ncsu.edu', '555-0700', '1990-01-16', 'hash16', 'supplier')])
+            ('Charles', 'charles@ncsu.edu', '555-3000', '1990-01-03', ADMIN_HASH, 'staff'),
+            ('Daisy', 'daisy@ncsu.edu', '555-4000', '1990-01-04', ADMIN_HASH, 'staff'),
+            ('Evelyn', 'evelyn@ncsu.edu', '555-5000', '1990-01-04', ADMIN_HASH, 'customer'),
+            ('Fergus', 'fergus@ncsu.edu', '555-6000', '1990-01-06', ADMIN_HASH, 'customer'),
+            ('Grace', 'grace@ncsu.edu', '555-7000', '1990-01-07', ADMIN_HASH, 'customer' ),
+            ('Hunter', 'hunter@ncsu.edu', '555-8000', '1990-01-08', ADMIN_HASH, 'customer'),
+            ('Ingrid', 'ingrid@ncsu.edu', '555-9000', '1990-01-09', ADMIN_HASH, 'driver'),
+            ('Jack', 'jack@ncsu.edu', '555-0100', '1990-01-10', ADMIN_HASH, 'driver'),
+            ('Kyle', 'kyle@ncsu.edu', '555-0200', '1990-01-11', ADMIN_HASH, 'driver' ),
+            ('Linda', 'linda@ncsu.edu', '555-0300', '1990-01-12', ADMIN_HASH, 'driver'),
+            ('Molly', 'molly@ncsu.edu', '555-0400', '1990-01-13', ADMIN_HASH, 'supplier'),
+            ('Nick', 'nick@ncsu.edu', '555-0500', '1990-01-14', ADMIN_HASH, 'supplier'),
+            ('Oscar', 'oscar@ncsu.edu', '555-0600', '1990-01-15', ADMIN_HASH, 'supplier' ),
+            ('Patricia', 'patricia@ncsu.edu', '555-0700', '1990-01-16', ADMIN_HASH, 'supplier')])
    # staff
    insert("""INSERT INTO staff (user_id, theatre_id, role, is_available) VALUES (%s, %s, %s, %s)""",
          [(1, 1, 'runner', True),
