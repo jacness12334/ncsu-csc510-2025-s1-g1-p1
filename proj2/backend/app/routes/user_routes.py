@@ -142,6 +142,7 @@ def get_current_user():
         'role': current_user.role
     }), 200
 
+# Get user from given id
 @user_bp.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = user_service.get_user(user_id)
