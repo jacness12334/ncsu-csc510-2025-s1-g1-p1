@@ -119,12 +119,14 @@ class DriverService:
     # Update the given driver using the given fields
     def update_driver_details(self, user_id, license_plate, vehicle_type, vehicle_color):
         driver = self.validate_driver(user_id=user_id)
-        # Make sure plate is unique
-        driver.license_plate = self.validate_license_plate(license_plate=license_plate)
-        driver.vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
-        driver.vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
-        db.session.commit()
-        return driver
+        plate_owner = Drivers.query.filter_by(license_plate=license_plate).first()
+        if plate_owner and plate_owner.user_id == driver.user_id:
+            driver.license_plate = self.validate_license_plate(license_plate=license_plate)
+            driver.vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
+            driver.vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
+            db.session.commit()
+            return driver
+        raise ValueError("License plate already in use")
     
     # Update the duty status of the given driver
     def update_driver_status(self, user_id, new_status):

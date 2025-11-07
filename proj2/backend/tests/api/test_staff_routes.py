@@ -328,6 +328,23 @@ class TestStaffRoutes:
         assert 'deliveries' in data
         assert data['deliveries'] == []
 
+    def test_get_staff_by_id_successful(self, client, sample_admin):
+        response = client.get(f'/api/staff/{sample_admin}', json={
+            'user_id': sample_admin
+        })
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert 'theatre_id' in data
+        assert data['role'] == 'admin'
+
+    def test_get_staff_by_id_unauthorized(self, client, sample_staff):
+        response = client.get(f'/api/staff/{sample_staff}', json={
+            'user_id': sample_staff
+        })
+        assert response.status_code == 404
+        data = json.loads(response.data)
+        assert 'error' in data
+
 
 
     
