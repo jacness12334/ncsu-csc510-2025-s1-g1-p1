@@ -385,3 +385,21 @@ class TestCustomerService:
             assert refunded_delivery.delivery_status == 'cancelled'
             pm_after = PaymentMethods.query.filter_by(id=refunded_delivery.payment_method_id).first()
             assert float(pm_after.balance) == old_balance + float(refunded_delivery.total_price)
+
+    def test_get_customer_showings_success(self, app, sample_customer, sample_customer_showing):
+        from app.models import CustomerShowings
+        with app.app_context():
+            svc = CustomerService()
+            showings = svc.get_all_showings(sample_customer)
+
+            assert isinstance(showings, list)
+            assert len(showings) == 1
+            showing = showings[0]
+
+            assert "movie_title" in showing
+            assert "start_time" in showing
+            assert "auditorium" in showing
+            assert "seat" in showing
+            sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
+            assert showing["id"] == sample_customer_showing
+            assert showing["seat"]["id"] == sample_showing.seat_id

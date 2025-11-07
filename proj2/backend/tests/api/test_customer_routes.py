@@ -461,3 +461,19 @@ class TestCustomerRoutes:
 
         response = client.delete(f'/api/customers/{user_id}')
         assert response.status_code == 200
+
+   # Test getting showings for given customer
+    def test_get_showings_for_customer_success(self, client, app, sample_customer, sample_customer_showing):
+        with app.app_context():
+            response = client.get(f"/api/customers/{sample_customer}/showings")
+            assert response.status_code == 200 
+            data = response.get_json()  
+            assert "showings" in data and isinstance(data["showings"], list) 
+            assert len(data["showings"]) == 1 
+            showing = data["showings"][0]
+            for key in ("id", "movie_title", "seat", "start_time", "auditorium"):
+                assert key in showing  
+            from app.models import CustomerShowings
+            sample_showing = CustomerShowings.query.filter_by(id=sample_customer_showing).first()
+            assert showing["id"] == sample_customer_showing 
+            assert showing["seat"]["id"] == sample_showing.seat_id  
