@@ -42,7 +42,7 @@ export default function LoginPage() {
 
       // Success path:
       setCookie('user_id', rj.user_id, 1);
-      // router.push("/order");
+      router.push("/menu");
       alert("Login successful!");
 
     } catch (error: unknown) {
@@ -56,7 +56,7 @@ export default function LoginPage() {
   return (
     <section className="max-w-md mx-auto mt-10">
       <h1 className="text-2xl font-bold mb-2">Log In</h1>
-      <p className="text-sm text-gray-600 mb-6">Sign in to manage your orders.</p>
+      <p className="text-sm text-gray-600 mb-6">Sign in to start ordering delicious snacks.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

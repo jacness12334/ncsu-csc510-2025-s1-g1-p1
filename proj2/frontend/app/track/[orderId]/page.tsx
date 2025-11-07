@@ -10,10 +10,10 @@ export default function TrackPage({ params }: { params: { orderId: string } }) {
       </p>
       
       <Link
-        href="/order"
+        href="/menu"
         className="inline-block rounded-xl border border-gray-300 px-5 py-2 text-sm hover:bg-gray-100 transition"
       >
-        Back to Ordering
+        Back to Menu
       </Link>
     </section>
   );

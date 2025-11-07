@@ -12,7 +12,8 @@ export default function Navbar() {
         <div className="flex items-center gap-5 text-sm">
           <Link href="/">Home</Link>
           <Link href="/editdetails">Edit Details</Link>
-          <Link href="/order">Order</Link>
+          <Link href="/menu">Menu</Link>
+          <Link href="/staff">Staff</Link>
           <Link href="/track/12345">Track Order</Link>
           <Link href="/suppliers">Suppliers</Link>
           <CartButton />

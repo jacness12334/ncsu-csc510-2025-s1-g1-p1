@@ -17,7 +17,7 @@ export default function SignupPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     // TODO: Add validation and actual signup logic when backend is ready
-    // For now, just navigate to order page
+    // Navigate to menu page after successful registration
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -48,9 +48,9 @@ export default function SignupPage() {
             throw new Error(errorData.message || response.statusText);
           }
 
-          // Success path:
-          router.push("/login");
-          alert("Registration successful!");
+          // Success path: Customer goes directly to menu
+          router.push("/menu");
+          alert("Registration successful! Welcome to Movie Munchers!");
 
           break;
 
