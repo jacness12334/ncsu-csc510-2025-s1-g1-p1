@@ -188,7 +188,7 @@ class DriverService:
         if not delivery:
             raise ValueError(f"Delivery {delivery_id} not found")
         
-        if delivery.delivery_status != 'fulfilled':
+        if delivery.delivery_status != 'fulfilled': 
             raise ValueError("Can only rate fulfilled deliveries")
         
         if delivery.is_rated:
@@ -213,16 +213,22 @@ class DriverService:
     # Show past deliveries for the given driver
     def show_completed_deliveries(self, driver_id):
         driver = self.validate_driver(driver_id)
-        deliveries = Deliveries.query.filter(Deliveries.driver_id == driver.id, Deliveries.delivery_status == 'fulfilled').all()
+        deliveries = Deliveries.query.filter(Deliveries.driver_id == driver.user_id, Deliveries.delivery_status == 'fulfilled').all()
         if not deliveries:
-            raise ValueError(f"No previous deliveries found for driver {driver.id}")
+            raise ValueError(f"No previous deliveries found for driver {driver.user_id}")
         return deliveries
     
     # Get the given driver's active delivery
     def get_active_delivery(self, driver_id):
         driver = self.validate_driver(driver_id)
-        delivery = Deliveries.query.filter_by(driver_id=driver.id).first()
+        
+        active_statuses = ['pending', 'accepted', 'in_progress', 'ready_for_pickup', 'in_transit']
+        
+        delivery = Deliveries.query.filter(
+            Deliveries.driver_id == driver.user_id,
+            Deliveries.delivery_status.in_(active_statuses)
+        ).first()
+        
         if not delivery:
-            raise ValueError(f"No active delivery found for driver {driver.id}")
+            raise ValueError(f"No active delivery found for driver {driver.user_id}") 
         return delivery
-

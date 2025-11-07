@@ -47,10 +47,12 @@ def create_app(config_name):
     from app.routes.user_routes import user_bp
     from app.routes.staff_routes import staff_bp
     from app.routes.supplier_routes import supplier_bp
+    from app.routes.driver_routes import driver_bp
 
     app.register_blueprint(customer_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(staff_bp)
     app.register_blueprint(supplier_bp)
+    app.register_blueprint(driver_bp)
 
     return app
