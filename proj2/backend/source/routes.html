@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Service Layer" href="services.html"><link rel="prev" title="API Reference" href="api.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.09.25 -->
         <title>API Routes - MovieMunchers v1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
@@ -470,7 +470,7 @@ customer_showing_id: {type: integer}</p>
 <dd><p>Create Delivery Order
 —
 tags: [Delivery Operations (Customer)]
-description: Places a new delivery order based on the current cart items. Cart is cleared upon creation.
+description: Places a new delivery order based on the current cart items.
 :param - in: body</p>
 <blockquote>
 <div><p>name: delivery_creation
@@ -600,7 +600,7 @@ properties:</p>
 <dd><p>Get Shopping Cart
 —
 tags: [Shopping Cart]
-description: Retrieves all items currently in the customer’s shopping cart.
+description: Retrieves all items currently in the customer’s shopping cart; returns an empty list if the cart is empty.
 :param - in: path</p>
 <blockquote>
 <div><p>name: customer_id
@@ -625,7 +625,6 @@ items: {$ref: ‘#/definitions/CartItemDetails’}</p>
 </div></blockquote>
 </dd>
 </dl>
-<p>404: {description: Customer not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -651,6 +650,41 @@ schema: {$ref: ‘#/definitions/CustomerProfile’}</p>
 </dd>
 </dl>
 <p>404: {description: Customer not found}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend.app.routes.customer_routes.get_customer_showing">
+<span class="sig-prename descclassname"><span class="pre">backend.app.routes.customer_routes.</span></span><span class="sig-name descname"><span class="pre">get_customer_showing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.customer_routes.get_customer_showing" title="Link to this definition">¶</a></dt>
+<dd><p>Get Customer Showing ID
+—
+tags: [Movie Booking]
+description: Retrieves the first customer_showing id for the specified customer.
+:param - in: path</p>
+<blockquote>
+<div><p>name: user_id
+type: integer
+required: true
+description: The ID of the customer user.</p>
+</div></blockquote>
+<dl>
+<dt>responses:</dt><dd><dl>
+<dt>200:</dt><dd><p>description: Customer showing ID retrieved successfully
+schema:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><p>id: {type: integer}</p>
+</div></blockquote>
+</div></blockquote>
+</dd>
+<dt>400:</dt><dd><p>description: Invalid input or no showing found for the customer</p>
+</dd>
+<dt>500:</dt><dd><p>description: Server error while retrieving the showing ID</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -692,12 +726,66 @@ items: {$ref: ‘#/definitions/DeliveryDetails’}</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="backend.app.routes.customer_routes.get_delivery_details">
+<span class="sig-prename descclassname"><span class="pre">backend.app.routes.customer_routes.</span></span><span class="sig-name descname"><span class="pre">get_delivery_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delivery_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.customer_routes.get_delivery_details" title="Link to this definition">¶</a></dt>
+<dd><p>Get Delivery Details
+—
+summary: Get Delivery Details
+tags: [Delivery Operations (Customer)]
+description: Retrieves delivery details including items, theatre information, and movie title for the given delivery.
+:param - in: path</p>
+<blockquote>
+<div><p>name: delivery_id
+type: integer
+required: true
+description: The ID of the delivery to fetch.</p>
+</div></blockquote>
+<dl>
+<dt>responses:</dt><dd><dl>
+<dt>200:</dt><dd><p>description: Delivery details retrieved
+schema:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><p>id: {type: integer}
+driver_id: {type: integer, nullable: true}
+total_price: {type: number, format: float}
+delivery_time: {type: string, nullable: true, description: ISO 8601 datetime}
+delivery_status: {type: string}
+items:</p>
+<blockquote>
+<div><p>type: array
+items:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><p>name: {type: string, nullable: true}
+quantity: {type: integer}</p>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+<p>theatre_name: {type: string, nullable: true}
+theatre_address: {type: string, nullable: true}
+movie_title: {type: string, nullable: true}</p>
+</div></blockquote>
+</div></blockquote>
+</dd>
+<dt>404:</dt><dd><p>description: Delivery not found</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="backend.app.routes.customer_routes.get_payment_methods">
 <span class="sig-prename descclassname"><span class="pre">backend.app.routes.customer_routes.</span></span><span class="sig-name descname"><span class="pre">get_payment_methods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">customer_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.customer_routes.get_payment_methods" title="Link to this definition">¶</a></dt>
 <dd><p>Get Customer Payment Methods
 —
 tags: [Payment Methods]
-description: Retrieves all saved payment methods for a customer.
+description: Retrieves all saved payment methods for a customer; returns an empty list if none are saved.
 :param - in: path</p>
 <blockquote>
 <div><p>name: customer_id
@@ -722,7 +810,56 @@ items: {$ref: ‘#/definitions/PaymentMethodDetails’}</p>
 </div></blockquote>
 </dd>
 </dl>
-<p>404: {description: Customer not found}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend.app.routes.customer_routes.get_showings_for_customer">
+<span class="sig-prename descclassname"><span class="pre">backend.app.routes.customer_routes.</span></span><span class="sig-name descname"><span class="pre">get_showings_for_customer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.customer_routes.get_showings_for_customer" title="Link to this definition">¶</a></dt>
+<dd><p>List Customer Showings
+—
+summary: List Customer Showings
+tags: [Movie Booking]
+description: Retrieves all showings for a customer, including movie title, seat (e.g., “A 10”), start time, auditorium label (e.g., “Auditorium 2”), and theatre name.
+:param - in: path</p>
+<blockquote>
+<div><p>name: user_id
+type: integer
+required: true
+description: The ID of the customer user.</p>
+</div></blockquote>
+<dl>
+<dt>responses:</dt><dd><dl>
+<dt>200:</dt><dd><p>description: Showings retrieved
+schema:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><dl>
+<dt>showings:</dt><dd><p>type: array
+items:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><p>id: {type: integer}
+movie_title: {type: string}
+seat: {type: string, nullable: true}
+start_time: {type: string, description: ISO 8601 datetime}
+auditorium: {type: string, nullable: true}
+theatre_name: {type: string}</p>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+</dd>
+<dt>404:</dt><dd><p>description: Customer not found</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -884,7 +1021,7 @@ customer: {$ref: ‘#/definitions/CustomerProfile’}</p>
 <dd><p>Change User Password
 —
 tags: [User Management]
-description: Changes the password for the current authenticated user.
+description: Changes the password for the current authenticated user after verifying the current password.
 :param - in: body</p>
 <blockquote>
 <div><p>name: password_change
@@ -901,8 +1038,13 @@ schema:</p>
 </dl>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing fields or current password incorrect</p>
+</dd>
+<dt>401:</dt><dd><p>description: Unauthorized (login required)</p>
+</dd>
+<dt>500:</dt><dd><p>description: Server error during password change</p>
+</dd>
 </dl>
-<p>400: {description: Invalid input or current password incorrect}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -932,9 +1074,13 @@ schema:</p>
 </dl>
 </div></blockquote>
 </dd>
+<dt>403:</dt><dd><p>description: Forbidden (cannot delete another user)</p>
+</dd>
+<dt>404:</dt><dd><p>description: User not found</p>
+</dd>
+<dt>401:</dt><dd><p>description: Unauthorized (login required)</p>
+</dd>
 </dl>
-<p>403: {description: Unauthorized}
-404: {description: User not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -945,16 +1091,43 @@ schema:</p>
 <dd><p>Get Current User Profile
 —
 tags: [User Management]
-description: Retrieves the profile details of the current authenticated user.
+description: Retrieves the profile details for the current authenticated user session.
 responses:</p>
 <blockquote>
 <div><dl class="simple">
 <dt>200:</dt><dd><p>description: User profile retrieved successfully
 schema: {$ref: ‘#/definitions/UserProfile’}</p>
 </dd>
+<dt>401:</dt><dd><p>description: Unauthorized (login required)</p>
+</dd>
 </dl>
-<p>401: {description: Unauthorized - Login required}</p>
 </div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend.app.routes.user_routes.get_user">
+<span class="sig-prename descclassname"><span class="pre">backend.app.routes.user_routes.</span></span><span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.user_routes.get_user" title="Link to this definition">¶</a></dt>
+<dd><p>Get User By ID
+—
+tags: [User Management]
+description: Retrieves a user’s public profile by id.
+:param - in: path</p>
+<blockquote>
+<div><p>name: user_id
+type: integer
+required: true
+description: The user id to fetch.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>responses:</dt><dd><dl class="simple">
+<dt>200:</dt><dd><p>description: User profile retrieved
+schema: {$ref: ‘#/definitions/UserProfile’}</p>
+</dd>
+<dt>500:</dt><dd><p>description: Server error</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -963,19 +1136,24 @@ schema: {$ref: ‘#/definitions/UserProfile’}</p>
 <dd><p>Log In User
 —
 tags: [User Management]
-description: Authenticates a user and starts a session.
+description: Authenticates a user and starts a session cookie.
 :param - in: body</p>
 <blockquote>
 <div><p>name: login_credentials
 schema: {$ref: ‘#/definitions/UserLogin’}</p>
 </div></blockquote>
-<dl>
+<dl class="simple">
 <dt>responses:</dt><dd><dl class="simple">
 <dt>200:</dt><dd><p>description: Logged in successfully
 schema: {$ref: ‘#/definitions/UserResponse’}</p>
 </dd>
+<dt>400:</dt><dd><p>description: Missing email or password</p>
+</dd>
+<dt>401:</dt><dd><p>description: Invalid email or password</p>
+</dd>
+<dt>500:</dt><dd><p>description: Server error during login</p>
+</dd>
 </dl>
-<p>401: {description: Invalid email or password}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -999,6 +1177,8 @@ schema:</p>
 </dl>
 </div></blockquote>
 </dd>
+<dt>401:</dt><dd><p>description: Unauthorized (not logged in)</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
@@ -1009,19 +1189,22 @@ schema:</p>
 <dd><p>Register User
 —
 tags: [User Management]
-description: Registers a new user account.
+description: Registers a new user account with unique email and phone.
 :param - in: body</p>
 <blockquote>
 <div><p>name: registration_data
 schema: {$ref: ‘#/definitions/UserRegistration’}</p>
 </div></blockquote>
-<dl>
+<dl class="simple">
 <dt>responses:</dt><dd><dl class="simple">
 <dt>201:</dt><dd><p>description: User registered successfully
 schema: {$ref: ‘#/definitions/UserResponse’}</p>
 </dd>
+<dt>400:</dt><dd><p>description: Missing fields, invalid role, or duplicate email/phone</p>
+</dd>
+<dt>500:</dt><dd><p>description: Server error during registration</p>
+</dd>
 </dl>
-<p>400: {description: Invalid input}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1032,7 +1215,7 @@ schema: {$ref: ‘#/definitions/UserResponse’}</p>
 <dd><p>Update User Profile
 —
 tags: [User Management]
-description: Updates the profile information for the current authenticated user.
+description: Updates the current authenticated user’s profile (name, email, phone, birthday).
 :param - in: body</p>
 <blockquote>
 <div><p>name: profile_update
@@ -1050,8 +1233,13 @@ user: {$ref: ‘#/definitions/UserProfile’}</p>
 </dl>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing fields or duplicate email/phone</p>
+</dd>
+<dt>401:</dt><dd><p>description: Unauthorized (login required)</p>
+</dd>
+<dt>500:</dt><dd><p>description: Server error during update</p>
+</dd>
 </dl>
-<p>400: {description: Invalid input}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1062,7 +1250,7 @@ user: {$ref: ‘#/definitions/UserProfile’}</p>
 <dd><p>Add New Product
 —
 tags: [Product Management]
-description: Creates a new product entry under the authenticated supplier. Requires user_id in body.
+description: Creates a new product under the authenticated supplier. Requires user_id in the request body.
 :param - in: body</p>
 <blockquote>
 <div><p>name: product_details
@@ -1081,9 +1269,11 @@ product_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing or invalid fields</p>
+</dd>
+<dt>404:</dt><dd><p>description: Supplier not found</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Supplier not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1094,13 +1284,13 @@ product_id: {type: integer}</p>
 <dd><p>Edit Existing Product
 —
 tags: [Product Management]
-description: Updates the details of an existing product. Requires user_id in body.
+description: Updates fields for an existing product owned by the authenticated supplier. Requires user_id in the request body.
 :param - in: path</p>
 <blockquote>
 <div><p>name: product_id
 type: integer
 required: true
-description: The ID of the product to update.</p>
+description: The product ID to update.</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1122,9 +1312,11 @@ product_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing or invalid fields</p>
+</dd>
+<dt>404:</dt><dd><p>description: Product or Supplier not found</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Product or Supplier not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1135,7 +1327,7 @@ product_id: {type: integer}</p>
 <dd><p>Update Supplier Profile
 —
 tags: [Supplier Management]
-description: Updates the contact and company details for the authenticated supplier. Requires user_id in body.
+description: Updates the authenticated supplier’s company name, address, phone, and open state. Requires user_id in the request body.
 :param - in: body</p>
 <blockquote>
 <div><p>name: supplier_update
@@ -1154,9 +1346,11 @@ supplier_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing or invalid fields</p>
+</dd>
+<dt>404:</dt><dd><p>description: Supplier not found</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Supplier not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1164,13 +1358,19 @@ supplier_id: {type: integer}</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="backend.app.routes.supplier_routes.get_products">
 <span class="sig-prename descclassname"><span class="pre">backend.app.routes.supplier_routes.</span></span><span class="sig-name descname"><span class="pre">get_products</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">supplier_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.supplier_routes.get_products" title="Link to this definition">¶</a></dt>
-<dd><p>List All Products (for a supplier)
+<dd><p>List Supplier Products
 —
 tags: [Product Management]
-description: Retrieves all products managed by a specific supplier (supplier_id is determined internally).
-responses:</p>
+description: Retrieves all products managed by the specified supplier.
+:param - in: path</p>
 <blockquote>
-<div><dl>
+<div><p>name: supplier_id
+type: integer
+required: true
+description: The supplier’s user ID.</p>
+</div></blockquote>
+<dl>
+<dt>responses:</dt><dd><dl>
 <dt>200:</dt><dd><p>description: Products retrieved successfully
 schema:</p>
 <blockquote>
@@ -1185,9 +1385,11 @@ items: {$ref: ‘#/definitions/Product’}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Supplier not found</p>
+</dd>
 </dl>
-<p>404: {description: Supplier not found}</p>
-</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1196,13 +1398,13 @@ items: {$ref: ‘#/definitions/Product’}</p>
 <dd><p>Get Supplier Details
 —
 tags: [Supplier Management]
-description: Retrieves detailed information for a specific supplier by ID.
+description: Retrieves company profile details for a supplier by user ID.
 :param - in: path</p>
 <blockquote>
 <div><p>name: supplier_id
 type: integer
 required: true
-description: The ID of the supplier (which is their user ID).</p>
+description: The supplier’s user ID.</p>
 </div></blockquote>
 <dl>
 <dt>responses:</dt><dd><dl>
@@ -1216,8 +1418,9 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Supplier not found</p>
+</dd>
 </dl>
-<p>404: {description: Supplier not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1225,14 +1428,14 @@ properties:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="backend.app.routes.supplier_routes.list_open_suppliers">
 <span class="sig-prename descclassname"><span class="pre">backend.app.routes.supplier_routes.</span></span><span class="sig-name descname"><span class="pre">list_open_suppliers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.supplier_routes.list_open_suppliers" title="Link to this definition">¶</a></dt>
-<dd><p>List All Suppliers
+<dd><p>List Open Suppliers
 —
 tags: [Supplier Management]
-description: Retrieves a list of all suppliers, regardless of their open status.
+description: Retrieves all suppliers that are currently open (is_open = true).
 responses:</p>
 <blockquote>
 <div><dl>
-<dt>200:</dt><dd><p>description: List of suppliers retrieved successfully
+<dt>200:</dt><dd><p>description: Open suppliers retrieved successfully
 schema:</p>
 <blockquote>
 <div><p>type: object
@@ -1256,13 +1459,13 @@ items: {$ref: ‘#/definitions/SupplierDetails’}</p>
 <dd><p>Remove Product
 —
 tags: [Product Management]
-description: Deletes a product by its ID. Requires user_id in body.
+description: Deletes a product by ID for the authenticated supplier. Requires user_id in the request body.
 :param - in: path</p>
 <blockquote>
 <div><p>name: product_id
 type: integer
 required: true
-description: The ID of the product to remove.</p>
+description: The product ID to remove.</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1291,8 +1494,9 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Product or Supplier not found</p>
+</dd>
 </dl>
-<p>404: {description: Product or Supplier not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1300,10 +1504,10 @@ properties:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="backend.app.routes.supplier_routes.set_availability">
 <span class="sig-prename descclassname"><span class="pre">backend.app.routes.supplier_routes.</span></span><span class="sig-name descname"><span class="pre">set_availability</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.supplier_routes.set_availability" title="Link to this definition">¶</a></dt>
-<dd><p>Set Supplier Availability Status
+<dd><p>Set Supplier Availability
 —
 tags: [Supplier Management]
-description: Toggles the supplier’s open/closed status. Requires user_id in body.
+description: Sets the supplier’s is_open status (open/closed). Requires user_id in the request body.
 :param - in: body</p>
 <blockquote>
 <div><p>name: status_update
@@ -1321,9 +1525,11 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing is_open field</p>
+</dd>
+<dt>404:</dt><dd><p>description: Supplier not found</p>
+</dd>
 </dl>
-<p>400: {description: Missing is_open field}
-404: {description: Supplier not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1334,7 +1540,7 @@ properties:</p>
 <dd><p>Assign Driver to Delivery
 —
 tags: [Delivery Operations]
-description: Attempts to find and assign an available driver to a specific delivery order.
+description: Attempts to find and assign the highest-rated available driver to a specific delivery.
 :param - in: path</p>
 <blockquote>
 <div><p>name: delivery_id
@@ -1359,7 +1565,8 @@ delivery_status: {type: string}</p>
 </div></blockquote>
 </dd>
 </dl>
-<p>404: {description: No available drivers found or Delivery not found}</p>
+<p>400: {description: Delivery not found}
+404: {description: No available drivers found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1370,7 +1577,7 @@ delivery_status: {type: string}</p>
 <dd><p>Complete Delivery Order
 —
 tags: [Delivery Operations]
-description: Marks the delivery order as completed by the driver.
+description: Marks the delivery order as completed by the driver (transitions to ‘delivered’).
 :param - in: path</p>
 <blockquote>
 <div><p>name: delivery_id
@@ -1405,7 +1612,7 @@ new_status: {type: string}</p>
 <dd><p>Create New Driver Account
 —
 tags: [Driver Management (Admin)]
-description: Creates a new driver account with vehicle details.
+description: Creates a new driver account with vehicle details and initial duty/rating stats.
 :param - in: body</p>
 <blockquote>
 <div><p>name: driver_registration
@@ -1424,8 +1631,9 @@ user_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing required fields or invalid input</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1468,7 +1676,7 @@ properties:</p>
 <dd><p>Get Active Delivery
 —
 tags: [Driver Views]
-description: Retrieves the single delivery currently assigned to and being worked on by the driver.
+description: Retrieves the currently active delivery for the driver, or a message if none is active.
 :param - in: path</p>
 <blockquote>
 <div><p>name: driver_id
@@ -1478,18 +1686,24 @@ description: The ID of the driver’s user account.</p>
 </div></blockquote>
 <dl>
 <dt>responses:</dt><dd><dl>
-<dt>200:</dt><dd><p>description: Active delivery retrieved successfully
+<dt>200:</dt><dd><p>description: Active delivery retrieved or no active delivery
 schema:</p>
 <blockquote>
 <div><p>type: object
 properties:</p>
 <blockquote>
-<div><p>active_delivery: {$ref: ‘#/definitions/DeliveryHistoryItem’}</p>
+<div><dl class="simple">
+<dt>active_delivery:</dt><dd><p>$ref: ‘#/definitions/DeliveryHistoryItem’</p>
+</dd>
+<dt>message:</dt><dd><p>type: string
+description: Present when there is no active delivery.</p>
+</dd>
+</dl>
 </div></blockquote>
 </div></blockquote>
 </dd>
 </dl>
-<p>404: {description: Driver not found or no active delivery}</p>
+<p>404: {description: Driver not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1532,7 +1746,7 @@ properties:</p>
 <dd><p>Rate Driver
 —
 tags: [Delivery Operations]
-description: Allows a customer to rate the driver after the delivery is complete.
+description: Allows a customer to rate the driver after the delivery is fulfilled.
 :param - in: path</p>
 <blockquote>
 <div><p>name: delivery_id
@@ -1562,7 +1776,7 @@ new_rating: {type: number, format: float}</p>
 </div></blockquote>
 </dd>
 </dl>
-<p>400: {description: Missing rating field or invalid value}
+<p>400: {description: Missing rating field, invalid rating, or delivery not fulfilled}
 404: {description: Delivery or Driver not found}</p>
 </dd>
 </dl>
@@ -1574,7 +1788,7 @@ new_rating: {type: number, format: float}</p>
 <dd><p>Get Delivery History
 —
 tags: [Driver Views]
-description: Retrieves a history of all completed delivery orders for a specific driver.
+description: Retrieves a history of fulfilled delivery orders for a specific driver. Returns an informational message when none are found.
 :param - in: path</p>
 <blockquote>
 <div><p>name: driver_id
@@ -1584,7 +1798,7 @@ description: The ID of the driver’s user account.</p>
 </div></blockquote>
 <dl>
 <dt>responses:</dt><dd><dl>
-<dt>200:</dt><dd><p>description: Delivery history retrieved successfully
+<dt>200:</dt><dd><p>description: Delivery history retrieved or none found
 schema:</p>
 <blockquote>
 <div><p>type: object
@@ -1593,6 +1807,9 @@ properties:</p>
 <div><dl class="simple">
 <dt>history:</dt><dd><p>type: array
 items: {$ref: ‘#/definitions/DeliveryHistoryItem’}</p>
+</dd>
+<dt>message:</dt><dd><p>type: string
+description: Present when no previous deliveries exist.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1651,7 +1868,7 @@ user_id: {type: integer}</p>
 <dd><p>Update Driver Duty Status
 —
 tags: [Driver Profile]
-description: Updates the driver’s duty status (e.g., on_duty, off_duty, delivering).
+description: Updates the driver’s duty status. Allowed values are ‘unavailable’, ‘available’, or ‘on_delivery’.
 :param - in: path</p>
 <blockquote>
 <div><p>name: driver_user_id
@@ -1680,7 +1897,7 @@ duty_status: {type: string}</p>
 </div></blockquote>
 </dd>
 </dl>
-<p>400: {description: Missing new_status field}
+<p>400: {description: Missing new_status field or invalid value}
 404: {description: Driver not found}</p>
 </dd>
 </dl>
@@ -1692,7 +1909,7 @@ duty_status: {type: string}</p>
 <dd><p>Accept Delivery Order
 —
 tags: [Delivery Management]
-description: Staff member accepts a delivery order for fulfillment. Requires staff user_id in the body.
+description: Staff member accepts a pending delivery for fulfillment. Requires staff user_id in the body.
 :param - in: path</p>
 <blockquote>
 <div><p>name: delivery_id
@@ -1727,8 +1944,11 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Staff not available or delivery not pending</p>
+</dd>
+<dt>404:</dt><dd><p>description: Delivery or Staff not found</p>
+</dd>
 </dl>
-<p>404: {description: Delivery or Staff not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1739,7 +1959,7 @@ properties:</p>
 <dd><p>Add New Movie
 —
 tags: [Movie Management]
-description: Adds a new movie to the system. Requires staff user_id in the body for authorization.
+description: Adds a new movie. Requires staff user_id in the body for authorization (admin only).
 :param - in: body</p>
 <blockquote>
 <div><p>name: new_movie
@@ -1758,8 +1978,11 @@ movie_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing or invalid fields</p>
+</dd>
+<dt>404:</dt><dd><p>description: Unauthorized</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1770,7 +1993,7 @@ movie_id: {type: integer}</p>
 <dd><p>Add New Movie Showing
 —
 tags: [Showings Scheduling]
-description: Schedules a new movie showing. Requires staff user_id in the body for authorization.
+description: Schedules a new movie showing. Requires staff user_id in the body for authorization (admin only). Expects start_time as ISO 8601 string.
 :param - in: body</p>
 <blockquote>
 <div><p>name: new_showing
@@ -1789,8 +2012,11 @@ showing_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing fields or invalid start_time</p>
+</dd>
+<dt>404:</dt><dd><p>description: Movie/Auditorium not found or unauthorized</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1801,7 +2027,7 @@ showing_id: {type: integer}</p>
 <dd><p>Add New Staff Member
 —
 tags: [Staff Management]
-description: Adds a new staff member to the system. Requires the manager’s user_id in the body for authorization.
+description: Adds a new staff member. Requires manager user_id in the request body for authorization.
 :param - in: body</p>
 <blockquote>
 <div><p>name: staff_registration
@@ -1821,8 +2047,11 @@ staff_role: {type: string}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing or invalid fields</p>
+</dd>
+<dt>404:</dt><dd><p>description: Unauthorized (manager not admin) or theatre not found</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1833,7 +2062,7 @@ staff_role: {type: string}</p>
 <dd><p>Edit Existing Movie
 —
 tags: [Movie Management]
-description: Updates details for an existing movie. Requires staff user_id in the body for authorization.
+description: Updates an existing movie. Requires staff user_id in the body for authorization (admin only).
 :param - in: path</p>
 <blockquote>
 <div><p>name: movie_id
@@ -1861,9 +2090,11 @@ movie_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing or invalid fields</p>
+</dd>
+<dt>404:</dt><dd><p>description: Movie not found or unauthorized</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Movie not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1874,7 +2105,7 @@ movie_id: {type: integer}</p>
 <dd><p>Edit Existing Showing
 —
 tags: [Showings Scheduling]
-description: Updates the details of an existing movie showing. Requires staff user_id in the body for authorization.
+description: Updates an existing movie showing. Requires staff user_id in the body for authorization (admin only). Expects start_time as ISO 8601 string.
 :param - in: path</p>
 <blockquote>
 <div><p>name: showing_id
@@ -1902,9 +2133,11 @@ showing_id: {type: integer}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing fields or invalid start_time</p>
+</dd>
+<dt>404:</dt><dd><p>description: Showing not found or unauthorized</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Showing not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1915,7 +2148,7 @@ showing_id: {type: integer}</p>
 <dd><p>Fulfill Delivery Order
 —
 tags: [Delivery Management]
-description: Staff member marks a delivery order as fulfilled (ready for pickup/delivery). Requires staff user_id in the body.
+description: Staff member marks a delivered order as fulfilled. Requires staff user_id in the body.
 :param - in: path</p>
 <blockquote>
 <div><p>name: delivery_id
@@ -1950,8 +2183,11 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Delivery status is not ‘delivered’</p>
+</dd>
+<dt>404:</dt><dd><p>description: Delivery or Staff not found</p>
+</dd>
 </dl>
-<p>404: {description: Delivery or Staff not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1959,22 +2195,81 @@ properties:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="backend.app.routes.staff_routes.get_all_theatres">
 <span class="sig-prename descclassname"><span class="pre">backend.app.routes.staff_routes.</span></span><span class="sig-name descname"><span class="pre">get_all_theatres</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.staff_routes.get_all_theatres" title="Link to this definition">¶</a></dt>
-<dd><p>TODO: doc this method pls mr. gemini</p>
+<dd><p>List All Theatres
+—
+tags: [Theatre Operations]
+description: Retrieves all theatres without filtering or authorization.
+responses:</p>
+<blockquote>
+<div><dl>
+<dt>200:</dt><dd><p>description: Theatres retrieved successfully
+schema:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>theatres:</dt><dd><p>type: array
+items: {$ref: ‘#/definitions/TheatreDetails’}</p>
+</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="backend.app.routes.staff_routes.get_theatres">
-<span class="sig-prename descclassname"><span class="pre">backend.app.routes.staff_routes.</span></span><span class="sig-name descname"><span class="pre">get_theatres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">staff_user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.staff_routes.get_theatres" title="Link to this definition">¶</a></dt>
-<dd><p>Get Theatres Managed by Staff
+<dt class="sig sig-object py" id="backend.app.routes.staff_routes.get_staff">
+<span class="sig-prename descclassname"><span class="pre">backend.app.routes.staff_routes.</span></span><span class="sig-name descname"><span class="pre">get_staff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">staff_user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.staff_routes.get_staff" title="Link to this definition">¶</a></dt>
+<dd><p>Get Staff Profile
 —
-tags: [Theatre Operations]
-description: Retrieves a list of theatres associated with a given staff member’s ID.
+summary: Get Staff Profile
+tags: [Staff Management]
+description: Retrieves staff profile details by staff user ID.
 :param - in: path</p>
 <blockquote>
 <div><p>name: staff_user_id
 type: integer
 required: true
-description: The user ID of the staff member.</p>
+description: The ID of the staff user.</p>
+</div></blockquote>
+<dl>
+<dt>responses:</dt><dd><dl>
+<dt>200:</dt><dd><p>description: Staff profile retrieved
+schema:</p>
+<blockquote>
+<div><p>type: object
+properties:</p>
+<blockquote>
+<div><p>user_id: {type: integer}
+theatre_id: {type: integer}
+role: {type: string}
+is_available: {type: boolean}</p>
+</div></blockquote>
+</div></blockquote>
+</dd>
+<dt>404:</dt><dd><p>description: Staff member not found or unauthorized</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend.app.routes.staff_routes.get_theatres">
+<span class="sig-prename descclassname"><span class="pre">backend.app.routes.staff_routes.</span></span><span class="sig-name descname"><span class="pre">get_theatres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">staff_user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend.app.routes.staff_routes.get_theatres" title="Link to this definition">¶</a></dt>
+<dd><p>Get Theatres
+—
+tags: [Theatre Operations]
+description: Retrieves a list of all theatres.
+:param - in: path</p>
+<blockquote>
+<div><p>name: staff_user_id
+type: integer
+required: true
+description: The staff user ID (context only).</p>
 </div></blockquote>
 <dl>
 <dt>responses:</dt><dd><dl>
@@ -1993,7 +2288,6 @@ items: {$ref: ‘#/definitions/TheatreDetails’}</p>
 </div></blockquote>
 </dd>
 </dl>
-<p>404: {description: Staff member not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2004,7 +2298,7 @@ items: {$ref: ‘#/definitions/TheatreDetails’}</p>
 <dd><p>List Deliveries by Theatre
 —
 tags: [Delivery Management]
-description: Retrieves a list of all current delivery orders associated with a specific theatre ID.
+description: Retrieves deliveries associated with a theatre ID. Intended for staff views.
 :param - in: path</p>
 <blockquote>
 <div><p>name: theatre_id
@@ -2028,8 +2322,9 @@ items: {$ref: ‘#/definitions/DeliveryDetails’}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Theatre not found or unauthorized</p>
+</dd>
 </dl>
-<p>404: {description: Theatre not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2040,7 +2335,7 @@ items: {$ref: ‘#/definitions/DeliveryDetails’}</p>
 <dd><p>List Staff by Theatre
 —
 tags: [Staff Management]
-description: Retrieves a list of all staff members working at a specific theatre ID. Requires staff user_id in the body for authorization.
+description: Retrieves staff working at a theatre. Requires staff user_id in the body for authorization.
 :param - in: path</p>
 <blockquote>
 <div><p>name: theatre_id
@@ -2079,8 +2374,9 @@ items: {$ref: ‘#/definitions/StaffMemberDetails’}</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Theatre not found or unauthorized</p>
+</dd>
 </dl>
-<p>404: {description: Theatre or Staff not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2091,7 +2387,7 @@ items: {$ref: ‘#/definitions/StaffMemberDetails’}</p>
 <dd><p>Remove Movie
 —
 tags: [Movie Management]
-description: Removes a movie by its ID. Requires staff user_id in the body for authorization.
+description: Removes a movie by ID. Requires staff user_id in the body for authorization (admin only).
 :param - in: path</p>
 <blockquote>
 <div><p>name: movie_id
@@ -2126,8 +2422,9 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Movie not found or unauthorized</p>
+</dd>
 </dl>
-<p>404: {description: Movie or Staff not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2138,7 +2435,7 @@ properties:</p>
 <dd><p>Remove Movie Showing
 —
 tags: [Showings Scheduling]
-description: Removes a movie showing by its ID. Requires staff user_id in the body for authorization.
+description: Removes a movie showing by ID. Requires staff user_id in the body for authorization (admin only).
 :param - in: path</p>
 <blockquote>
 <div><p>name: showing_id
@@ -2173,8 +2470,9 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Showing not found or unauthorized</p>
+</dd>
 </dl>
-<p>404: {description: Showing or Staff not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2185,7 +2483,7 @@ properties:</p>
 <dd><p>Remove Staff Member
 —
 tags: [Staff Management]
-description: Removes a staff member from the system. Requires the manager’s user_id in the body for authorization.
+description: Removes a staff member. Requires manager user_id in the request body for authorization.
 :param - in: path</p>
 <blockquote>
 <div><p>name: staff_user_id
@@ -2220,8 +2518,9 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>404:</dt><dd><p>description: Staff member not found or unauthorized</p>
+</dd>
 </dl>
-<p>404: {description: Staff member not found or unauthorized}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2232,7 +2531,7 @@ properties:</p>
 <dd><p>Set Staff Availability
 —
 tags: [Staff Management]
-description: Sets the staff member’s availability status.
+description: Sets the staff member’s availability status. Requires staff user_id in the body.
 :param - in: body</p>
 <blockquote>
 <div><p>name: availability_update
@@ -2250,9 +2549,11 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing is_available field</p>
+</dd>
+<dt>404:</dt><dd><p>description: Staff member not found</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Staff member not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2263,7 +2564,7 @@ properties:</p>
 <dd><p>Set Theatre Open/Close Status
 —
 tags: [Theatre Operations]
-description: Opens or closes a theatre location. Requires staff user_id in the body for authorization.
+description: Opens or closes a theatre location. Requires staff user_id in the body for authorization (admin only).
 :param - in: body</p>
 <blockquote>
 <div><p>name: theatre_status_update
@@ -2281,9 +2582,11 @@ properties:</p>
 </div></blockquote>
 </div></blockquote>
 </dd>
+<dt>400:</dt><dd><p>description: Missing theatre_id or is_open</p>
+</dd>
+<dt>404:</dt><dd><p>description: Theatre not found or unauthorized</p>
+</dd>
 </dl>
-<p>400: {description: Missing required fields}
-404: {description: Theatre or Staff not found}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2358,8 +2661,11 @@ properties:</p>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.delete_payment_method"><code class="docutils literal notranslate"><span class="pre">delete_payment_method()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.get_cart"><code class="docutils literal notranslate"><span class="pre">get_cart()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.get_customer"><code class="docutils literal notranslate"><span class="pre">get_customer()</span></code></a></li>
+<li><a class="reference internal" href="#backend.app.routes.customer_routes.get_customer_showing"><code class="docutils literal notranslate"><span class="pre">get_customer_showing()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.get_deliveries_for_customer"><code class="docutils literal notranslate"><span class="pre">get_deliveries_for_customer()</span></code></a></li>
+<li><a class="reference internal" href="#backend.app.routes.customer_routes.get_delivery_details"><code class="docutils literal notranslate"><span class="pre">get_delivery_details()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.get_payment_methods"><code class="docutils literal notranslate"><span class="pre">get_payment_methods()</span></code></a></li>
+<li><a class="reference internal" href="#backend.app.routes.customer_routes.get_showings_for_customer"><code class="docutils literal notranslate"><span class="pre">get_showings_for_customer()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.list_products"><code class="docutils literal notranslate"><span class="pre">list_products()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.rate_delivery"><code class="docutils literal notranslate"><span class="pre">rate_delivery()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.customer_routes.update_cart_item"><code class="docutils literal notranslate"><span class="pre">update_cart_item()</span></code></a></li>
@@ -2367,6 +2673,7 @@ properties:</p>
 <li><a class="reference internal" href="#backend.app.routes.user_routes.change_password"><code class="docutils literal notranslate"><span class="pre">change_password()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.user_routes.delete_user"><code class="docutils literal notranslate"><span class="pre">delete_user()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.user_routes.get_current_user"><code class="docutils literal notranslate"><span class="pre">get_current_user()</span></code></a></li>
+<li><a class="reference internal" href="#backend.app.routes.user_routes.get_user"><code class="docutils literal notranslate"><span class="pre">get_user()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.user_routes.login"><code class="docutils literal notranslate"><span class="pre">login()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.user_routes.logout"><code class="docutils literal notranslate"><span class="pre">logout()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.user_routes.register"><code class="docutils literal notranslate"><span class="pre">register()</span></code></a></li>
@@ -2397,6 +2704,7 @@ properties:</p>
 <li><a class="reference internal" href="#backend.app.routes.staff_routes.edit_showing"><code class="docutils literal notranslate"><span class="pre">edit_showing()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.staff_routes.fulfill_delivery"><code class="docutils literal notranslate"><span class="pre">fulfill_delivery()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.staff_routes.get_all_theatres"><code class="docutils literal notranslate"><span class="pre">get_all_theatres()</span></code></a></li>
+<li><a class="reference internal" href="#backend.app.routes.staff_routes.get_staff"><code class="docutils literal notranslate"><span class="pre">get_staff()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.staff_routes.get_theatres"><code class="docutils literal notranslate"><span class="pre">get_theatres()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.staff_routes.list_deliveries_by_theatre"><code class="docutils literal notranslate"><span class="pre">list_deliveries_by_theatre()</span></code></a></li>
 <li><a class="reference internal" href="#backend.app.routes.staff_routes.list_staff_by_theatre"><code class="docutils literal notranslate"><span class="pre">list_staff_by_theatre()</span></code></a></li>
@@ -2417,7 +2725,7 @@ properties:</p>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5cb08e4e"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     </body>

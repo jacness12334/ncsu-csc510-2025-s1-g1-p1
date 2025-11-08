@@ -3,13 +3,16 @@ from app.models import *
 from app.services.staff_service import StaffService
 from datetime import datetime
 
+
 # Blueprint for staff-related endpoints
 staff_bp = Blueprint("staff", __name__, url_prefix="/api")
+
 
 # Helper function to retrieve the current user's id
 def get_user_id():
     data = request.json
     return data.get('user_id')
+
 
 @staff_bp.route('/staff', methods=['POST'])
 def add_staff():
@@ -17,7 +20,7 @@ def add_staff():
     Add New Staff Member
     ---
     tags: [Staff Management]
-    description: Adds a new staff member to the system. Requires the manager's user_id in the body for authorization.
+    description: Adds a new staff member. Requires manager user_id in the request body for authorization.
     parameters:
       - in: body
         name: staff_registration
@@ -31,7 +34,10 @@ def add_staff():
             message: {type: string}
             user_id: {type: integer}
             staff_role: {type: string}
-      400: {description: Missing required fields}
+      400:
+        description: Missing or invalid fields
+      404:
+        description: Unauthorized (manager not admin) or theatre not found
     """
     try:
         user_id = get_user_id()
@@ -64,7 +70,7 @@ def remove_staff(staff_user_id):
     Remove Staff Member
     ---
     tags: [Staff Management]
-    description: Removes a staff member from the system. Requires the manager's user_id in the body for authorization.
+    description: Removes a staff member. Requires manager user_id in the request body for authorization.
     parameters:
       - in: path
         name: staff_user_id
@@ -84,7 +90,8 @@ def remove_staff(staff_user_id):
           type: object
           properties:
             message: {type: string}
-      404: {description: Staff member not found or unauthorized}
+      404:
+        description: Staff member not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -100,16 +107,16 @@ def remove_staff(staff_user_id):
 @staff_bp.route('/theatres/<int:staff_user_id>', methods=['GET'])
 def get_theatres(staff_user_id):
     """
-    Get Theatres Managed by Staff
+    Get Theatres
     ---
     tags: [Theatre Operations]
-    description: Retrieves a list of theatres associated with a given staff member's ID.
+    description: Retrieves a list of all theatres.
     parameters:
       - in: path
         name: staff_user_id
         type: integer
         required: true
-        description: The user ID of the staff member.
+        description: The staff user ID (context only).
     responses:
       200:
         description: Theatres retrieved successfully
@@ -119,7 +126,6 @@ def get_theatres(staff_user_id):
             theatres:
               type: array
               items: {$ref: '#/definitions/TheatreDetails'}
-      404: {description: Staff member not found}
     """
     try:
         service = StaffService(staff_user_id)
@@ -134,7 +140,19 @@ def get_theatres(staff_user_id):
 @staff_bp.route('/theatres', methods=['GET'])
 def get_all_theatres():
     """
-    TODO: doc this method pls mr. gemini
+    List All Theatres
+    ---
+    tags: [Theatre Operations]
+    description: Retrieves all theatres without filtering or authorization.
+    responses:
+      200:
+        description: Theatres retrieved successfully
+        schema:
+          type: object
+          properties:
+            theatres:
+              type: array
+              items: {$ref: '#/definitions/TheatreDetails'}
     """
     try:
         return jsonify({'theatres': [{"id": t.id, "name": t.name, "address": t.address, "phone": t.phone, "is_open": t.is_open} for t in Theatres.query.all()]}), 200
@@ -144,13 +162,14 @@ def get_all_theatres():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @staff_bp.route('/theatres', methods=['PUT'])
 def set_theatre_status():
     """
     Set Theatre Open/Close Status
     ---
     tags: [Theatre Operations]
-    description: Opens or closes a theatre location. Requires staff user_id in the body for authorization.
+    description: Opens or closes a theatre location. Requires staff user_id in the body for authorization (admin only).
     parameters:
       - in: body
         name: theatre_status_update
@@ -162,8 +181,10 @@ def set_theatre_status():
           type: object
           properties:
             message: {type: string}
-      400: {description: Missing required fields}
-      404: {description: Theatre or Staff not found}
+      400:
+        description: Missing theatre_id or is_open
+      404:
+        description: Theatre not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -185,7 +206,7 @@ def add_movie():
     Add New Movie
     ---
     tags: [Movie Management]
-    description: Adds a new movie to the system. Requires staff user_id in the body for authorization.
+    description: Adds a new movie. Requires staff user_id in the body for authorization (admin only).
     parameters:
       - in: body
         name: new_movie
@@ -198,7 +219,10 @@ def add_movie():
           properties:
             message: {type: string}
             movie_id: {type: integer}
-      400: {description: Missing required fields}
+      400:
+        description: Missing or invalid fields
+      404:
+        description: Unauthorized
     """
     try:
         user_id = get_user_id()
@@ -228,7 +252,7 @@ def edit_movie(movie_id):
     Edit Existing Movie
     ---
     tags: [Movie Management]
-    description: Updates details for an existing movie. Requires staff user_id in the body for authorization.
+    description: Updates an existing movie. Requires staff user_id in the body for authorization (admin only).
     parameters:
       - in: path
         name: movie_id
@@ -246,8 +270,10 @@ def edit_movie(movie_id):
           properties:
             message: {type: string}
             movie_id: {type: integer}
-      400: {description: Missing required fields}
-      404: {description: Movie not found}
+      400:
+        description: Missing or invalid fields
+      404:
+        description: Movie not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -278,7 +304,7 @@ def remove_movie(movie_id):
     Remove Movie
     ---
     tags: [Movie Management]
-    description: Removes a movie by its ID. Requires staff user_id in the body for authorization.
+    description: Removes a movie by ID. Requires staff user_id in the body for authorization (admin only).
     parameters:
       - in: path
         name: movie_id
@@ -298,7 +324,8 @@ def remove_movie(movie_id):
           type: object
           properties:
             message: {type: string}
-      404: {description: Movie or Staff not found}
+      404:
+        description: Movie not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -317,7 +344,7 @@ def add_showing():
     Add New Movie Showing
     ---
     tags: [Showings Scheduling]
-    description: Schedules a new movie showing. Requires staff user_id in the body for authorization.
+    description: Schedules a new movie showing. Requires staff user_id in the body for authorization (admin only). Expects start_time as ISO 8601 string.
     parameters:
       - in: body
         name: new_showing
@@ -330,7 +357,10 @@ def add_showing():
           properties:
             message: {type: string}
             showing_id: {type: integer}
-      400: {description: Missing required fields}
+      400:
+        description: Missing fields or invalid start_time
+      404:
+        description: Movie/Auditorium not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -357,7 +387,7 @@ def edit_showing(showing_id):
     Edit Existing Showing
     ---
     tags: [Showings Scheduling]
-    description: Updates the details of an existing movie showing. Requires staff user_id in the body for authorization.
+    description: Updates an existing movie showing. Requires staff user_id in the body for authorization (admin only). Expects start_time as ISO 8601 string.
     parameters:
       - in: path
         name: showing_id
@@ -375,8 +405,10 @@ def edit_showing(showing_id):
           properties:
             message: {type: string}
             showing_id: {type: integer}
-      400: {description: Missing required fields}
-      404: {description: Showing not found}
+      400:
+        description: Missing fields or invalid start_time
+      404:
+        description: Showing not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -404,7 +436,7 @@ def remove_showing(showing_id):
     Remove Movie Showing
     ---
     tags: [Showings Scheduling]
-    description: Removes a movie showing by its ID. Requires staff user_id in the body for authorization.
+    description: Removes a movie showing by ID. Requires staff user_id in the body for authorization (admin only).
     parameters:
       - in: path
         name: showing_id
@@ -424,7 +456,8 @@ def remove_showing(showing_id):
           type: object
           properties:
             message: {type: string}
-      404: {description: Showing or Staff not found}
+      404:
+        description: Showing not found or unauthorized
     """
     try:
         user_id = get_user_id()
@@ -443,7 +476,7 @@ def set_availability():
     Set Staff Availability
     ---
     tags: [Staff Management]
-    description: Sets the staff member's availability status.
+    description: Sets the staff member's availability status. Requires staff user_id in the body.
     parameters:
       - in: body
         name: availability_update
@@ -455,8 +488,10 @@ def set_availability():
           type: object
           properties:
             message: {type: string}
-      400: {description: Missing required fields}
-      404: {description: Staff member not found}
+      400:
+        description: Missing is_available field
+      404:
+        description: Staff member not found
     """
     try:
         user_id = get_user_id()
@@ -478,7 +513,7 @@ def accept_delivery(delivery_id):
     Accept Delivery Order
     ---
     tags: [Delivery Management]
-    description: Staff member accepts a delivery order for fulfillment. Requires staff user_id in the body.
+    description: Staff member accepts a pending delivery for fulfillment. Requires staff user_id in the body.
     parameters:
       - in: path
         name: delivery_id
@@ -498,7 +533,10 @@ def accept_delivery(delivery_id):
           type: object
           properties:
             message: {type: string}
-      404: {description: Delivery or Staff not found}
+      400:
+        description: Staff not available or delivery not pending
+      404:
+        description: Delivery or Staff not found
     """
     try:
         user_id = get_user_id()
@@ -510,13 +548,14 @@ def accept_delivery(delivery_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @staff_bp.route('/deliveries/<int:delivery_id>/fulfill', methods=['PUT'])
 def fulfill_delivery(delivery_id):
     """
     Fulfill Delivery Order
     ---
     tags: [Delivery Management]
-    description: Staff member marks a delivery order as fulfilled (ready for pickup/delivery). Requires staff user_id in the body.
+    description: Staff member marks a delivered order as fulfilled. Requires staff user_id in the body.
     parameters:
       - in: path
         name: delivery_id
@@ -536,7 +575,10 @@ def fulfill_delivery(delivery_id):
           type: object
           properties:
             message: {type: string}
-      404: {description: Delivery or Staff not found}
+      400:
+        description: Delivery status is not 'delivered'
+      404:
+        description: Delivery or Staff not found
     """
     try:
         user_id = get_user_id()
@@ -549,13 +591,14 @@ def fulfill_delivery(delivery_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @staff_bp.route('/staff/list/<int:theatre_id>', methods=['PUT'])
 def list_staff_by_theatre(theatre_id):
     """
     List Staff by Theatre
     ---
     tags: [Staff Management]
-    description: Retrieves a list of all staff members working at a specific theatre ID. Requires staff user_id in the body for authorization.
+    description: Retrieves staff working at a theatre. Requires staff user_id in the body for authorization.
     parameters:
       - in: path
         name: theatre_id
@@ -577,7 +620,8 @@ def list_staff_by_theatre(theatre_id):
             staff:
               type: array
               items: {$ref: '#/definitions/StaffMemberDetails'}
-      404: {description: Theatre or Staff not found}
+      404:
+        description: Theatre not found or unauthorized
     """
     try:
         user_id = get_user_id()  
@@ -602,7 +646,7 @@ def list_deliveries_by_theatre(theatre_id):
     List Deliveries by Theatre
     ---
     tags: [Delivery Management]
-    description: Retrieves a list of all current delivery orders associated with a specific theatre ID.
+    description: Retrieves deliveries associated with a theatre ID. Intended for staff views.
     parameters:
       - in: path
         name: theatre_id
@@ -618,7 +662,8 @@ def list_deliveries_by_theatre(theatre_id):
             deliveries:
               type: array
               items: {$ref: '#/definitions/DeliveryDetails'}
-      404: {description: Theatre not found}
+      404:
+        description: Theatre not found or unauthorized
     """
     try:
         service = StaffService(Staff.query.first().user_id)
@@ -639,6 +684,7 @@ def list_deliveries_by_theatre(theatre_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @staff_bp.route('/staff/<int:staff_user_id>', methods=['GET'])
 def get_staff(staff_user_id):
@@ -665,7 +711,7 @@ def get_staff(staff_user_id):
             role: {type: string}
             is_available: {type: boolean}
       404:
-        description: Staff member not found
+        description: Staff member not found or unauthorized
     """
     try:
         service = StaffService(staff_user_id)

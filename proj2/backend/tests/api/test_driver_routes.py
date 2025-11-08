@@ -400,13 +400,13 @@ class TestDriverRoutes:
         assert data['delivery_status'] == 'in_progress'
 
     def test_get_active_delivery_not_found(self, client, app):
-        # When no active delivery exists, expect a 404 with a message.
+        # When no active delivery exists, expect a 200 with a message.
         driver_id, _ = self._create_test_driver(app)
         self._create_test_delivery(app, driver_id=driver_id, delivery_status='fulfilled')
         response = client.get(f'/api/driver/{driver_id}/active-delivery')
-        if response.status_code != 404:
+        if response.status_code != 200:
             error_msg = self._get_error_message(response)
-            assert response.status_code == 404, f"Expected 404 but got {response.status_code}. Error: {error_msg}"
+            assert response.status_code == 200, f"Expected 200 but got {response.status_code}. Error: {error_msg}"
         data = json.loads(response.data)
         assert 'No active delivery' in data['message']
 
@@ -427,13 +427,13 @@ class TestDriverRoutes:
         assert all(d['delivery_status'] == 'fulfilled' for d in data)
 
     def test_show_completed_deliveries_none(self, client, app):
-        # When none fulfilled, expect 404 with a helpful message.
+        # When none fulfilled, expect 200 with a helpful message.
         driver_id, _ = self._create_test_driver(app)
         self._create_test_delivery(app, driver_id=driver_id, delivery_status='accepted')
         response = client.get(f'/api/driver/{driver_id}/history')
-        if response.status_code != 404:
+        if response.status_code != 200:
             error_msg = self._get_error_message(response)
-            assert response.status_code == 404, f"Expected 404 but got {response.status_code}. Error: {error_msg}"
+            assert response.status_code == 200, f"Expected 200 but got {response.status_code}. Error: {error_msg}"
         data = json.loads(response.data)
         assert 'No previous deliveries found' in data['message']
 

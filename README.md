@@ -65,6 +65,7 @@ https://drive.google.com/drive/folders/1tsO8Q6qzF6KXDPT4G35aEQn0aarRmzRl?usp=sha
 - Tracking:  Customers can track their delivery.
 - Staff: Staff can manage orders.
 - Profiles: Users can view and edit their profiles.
+- Drivers: Drivers can manage active and past deliveries, update duty/vehicle details, and finalize orders.
 
 ## Future Milestones
 - Snack Bundles: Create an interface for custom snack bundles.
@@ -73,7 +74,6 @@ https://drive.google.com/drive/folders/1tsO8Q6qzF6KXDPT4G35aEQn0aarRmzRl?usp=sha
 - Restaurant Partners: Allow local restaurants to join via secure endpoints.
 - Donations: Each purchase adds 1% of earnings to our donation program. 
 - Nutritional Info: Meals have Nutritional Info. 
-- Drivers: Drivers can view and select deliveries
 
 ## Software use cases
 1. Moviegoer – Order Food During a Movie

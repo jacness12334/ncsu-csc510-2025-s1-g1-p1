@@ -3,8 +3,10 @@ from app.models import *
 from app.app import db
 from app.services.supplier_service import SupplierService
 
+
 # Blueprint for supplier-related endpoints
 supplier_bp = Blueprint("suppliers", __name__, url_prefix="/api")
+
 
 # Helper function to get the current user's id
 def get_user_id():
@@ -18,13 +20,13 @@ def get_supplier(supplier_id):
     Get Supplier Details
     ---
     tags: [Supplier Management]
-    description: Retrieves detailed information for a specific supplier by ID.
+    description: Retrieves company profile details for a supplier by user ID.
     parameters:
       - in: path
         name: supplier_id
         type: integer
         required: true
-        description: The ID of the supplier (which is their user ID).
+        description: The supplier's user ID.
     responses:
       200:
         description: Supplier details retrieved successfully
@@ -32,7 +34,8 @@ def get_supplier(supplier_id):
           type: object
           properties:
             supplier: {$ref: '#/definitions/SupplierDetails'}
-      404: {description: Supplier not found}
+      404:
+        description: Supplier not found
     """
     try:
         service = SupplierService(supplier_id)
@@ -44,13 +47,14 @@ def get_supplier(supplier_id):
         return jsonify({'error': str(e)}), 500
 
 
+
 @supplier_bp.route('/suppliers', methods=['PUT'])
 def edit_supplier():
     """
     Update Supplier Profile
     ---
     tags: [Supplier Management]
-    description: Updates the contact and company details for the authenticated supplier. Requires user_id in body.
+    description: Updates the authenticated supplier's company name, address, phone, and open state. Requires user_id in the request body.
     parameters:
       - in: body
         name: supplier_update
@@ -63,8 +67,10 @@ def edit_supplier():
           properties:
             message: {type: string}
             supplier_id: {type: integer}
-      400: {description: Missing required fields}
-      404: {description: Supplier not found}
+      400:
+        description: Missing or invalid fields
+      404:
+        description: Supplier not found
     """
     try:
         user_id = get_user_id()
@@ -86,13 +92,14 @@ def edit_supplier():
         return jsonify({'error': str(e)}), 500
 
 
+
 @supplier_bp.route('/suppliers/status', methods=['PUT'])
 def set_availability():
     """
-    Set Supplier Availability Status
+    Set Supplier Availability
     ---
     tags: [Supplier Management]
-    description: Toggles the supplier's open/closed status. Requires user_id in body.
+    description: Sets the supplier's is_open status (open/closed). Requires user_id in the request body.
     parameters:
       - in: body
         name: status_update
@@ -104,8 +111,10 @@ def set_availability():
           type: object
           properties:
             message: {type: string}
-      400: {description: Missing is_open field}
-      404: {description: Supplier not found}
+      400:
+        description: Missing is_open field
+      404:
+        description: Supplier not found
     """
     try:
         user_id = get_user_id()
@@ -121,13 +130,20 @@ def set_availability():
         return jsonify({'error': str(e)}), 500
 
 
+
 @supplier_bp.route('/products/<int:supplier_id>', methods=['GET'])
 def get_products(supplier_id):
     """
-    List All Products (for a supplier)
+    List Supplier Products
     ---
     tags: [Product Management]
-    description: Retrieves all products managed by a specific supplier (supplier_id is determined internally).
+    description: Retrieves all products managed by the specified supplier.
+    parameters:
+      - in: path
+        name: supplier_id
+        type: integer
+        required: true
+        description: The supplier's user ID.
     responses:
       200:
         description: Products retrieved successfully
@@ -137,7 +153,8 @@ def get_products(supplier_id):
             products:
               type: array
               items: {$ref: '#/definitions/Product'}
-      404: {description: Supplier not found}
+      404:
+        description: Supplier not found
     """
     try:
         service = SupplierService(supplier_id)
@@ -149,13 +166,14 @@ def get_products(supplier_id):
         return jsonify({'error': str(e)}), 500
 
 
+
 @supplier_bp.route('/products', methods=['POST'])
 def add_product():
     """
     Add New Product
     ---
     tags: [Product Management]
-    description: Creates a new product entry under the authenticated supplier. Requires user_id in body.
+    description: Creates a new product under the authenticated supplier. Requires user_id in the request body.
     parameters:
       - in: body
         name: product_details
@@ -168,8 +186,10 @@ def add_product():
           properties:
             message: {type: string}
             product_id: {type: integer}
-      400: {description: Missing required fields}
-      404: {description: Supplier not found}
+      400:
+        description: Missing or invalid fields
+      404:
+        description: Supplier not found
     """
     try:
         user_id = get_user_id()
@@ -195,19 +215,20 @@ def add_product():
         return jsonify({'error': str(e)}), 500
 
 
+
 @supplier_bp.route('/products/<int:product_id>', methods=['PUT'])
 def edit_product(product_id):
     """
     Edit Existing Product
     ---
     tags: [Product Management]
-    description: Updates the details of an existing product. Requires user_id in body.
+    description: Updates fields for an existing product owned by the authenticated supplier. Requires user_id in the request body.
     parameters:
       - in: path
         name: product_id
         type: integer
         required: true
-        description: The ID of the product to update.
+        description: The product ID to update.
       - in: body
         name: product_details
         schema: {$ref: '#/definitions/ProductCreateEdit'}
@@ -219,8 +240,10 @@ def edit_product(product_id):
           properties:
             message: {type: string}
             product_id: {type: integer}
-      400: {description: Missing required fields}
-      404: {description: Product or Supplier not found}
+      400:
+        description: Missing or invalid fields
+      404:
+        description: Product or Supplier not found
     """
     try:
         user_id = get_user_id()
@@ -247,19 +270,20 @@ def edit_product(product_id):
         return jsonify({'error': str(e)}), 500
 
 
+
 @supplier_bp.route('/products/<int:product_id>', methods=['DELETE'])
 def remove_product(product_id):
     """
     Remove Product
     ---
     tags: [Product Management]
-    description: Deletes a product by its ID. Requires user_id in body.
+    description: Deletes a product by ID for the authenticated supplier. Requires user_id in the request body.
     parameters:
       - in: path
         name: product_id
         type: integer
         required: true
-        description: The ID of the product to remove.
+        description: The product ID to remove.
       - in: body
         name: user_id
         schema: 
@@ -273,7 +297,8 @@ def remove_product(product_id):
           type: object
           properties:
             message: {type: string}
-      404: {description: Product or Supplier not found}
+      404:
+        description: Product or Supplier not found
     """
     try:
         user_id = get_user_id()
@@ -289,13 +314,13 @@ def remove_product(product_id):
 @supplier_bp.route('/suppliers/all', methods=['GET'])
 def list_open_suppliers():
     """
-    List All Suppliers
+    List Open Suppliers
     ---
     tags: [Supplier Management]
-    description: Retrieves a list of all suppliers, regardless of their open status.
+    description: Retrieves all suppliers that are currently open (is_open = true).
     responses:
       200:
-        description: List of suppliers retrieved successfully
+        description: Open suppliers retrieved successfully
         schema:
           type: object
           properties:

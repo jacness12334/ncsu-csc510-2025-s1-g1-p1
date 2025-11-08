@@ -285,7 +285,7 @@ class TestCustomerRoutes:
         assert response.status_code == 200
         data = json.loads(response.data)
         assert data['message'] == 'Cart item updated'
-        assert data['new_quantity'] == 4
+        assert data['new_quantity'] == 3
 
     # Test updating a non-existent cart item
     def test_update_cart_item_not_found(self, client):

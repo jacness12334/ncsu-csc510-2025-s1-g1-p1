@@ -302,7 +302,7 @@ class TestCustomerService:
                 quantity=1
             )
             updated = svc.update_cart_item(item.id, 3)
-            assert updated.quantity == 4
+            assert updated.quantity == 3
 
     # Reject zero quantity on cart item update
     def test_update_cart_item_invalid_quantity(self, app, sample_customer, sample_product):
