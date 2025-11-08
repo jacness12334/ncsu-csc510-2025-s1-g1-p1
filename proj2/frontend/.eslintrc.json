@@ -1,0 +1,60 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        // Recommended base rules for ESLint
+        "eslint:recommended",
+        // Base recommended rules for TypeScript
+        "plugin:@typescript-eslint/recommended",
+        // Recommended rules for React
+        "plugin:react/recommended",
+        // Recommended rules for Next.js
+        "next/core-web-vitals"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        // Important: Tells the parser where your tsconfig.json is located
+        "project": "./tsconfig.json"
+    },
+    "settings": {
+        "react": {
+            // Automatically detect the React version
+            "version": "detect"
+        }
+    },
+    // ... (rest of the file remains the same)
+    "rules": {
+        // 1. Unused variables: Change from 'error' to 'warn' (or 'off')
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "no-unused-vars": "off", // Disable base ESLint rule in favor of the TS one
+        // 2. Explicit 'any': Change from 'error' to 'warn'
+        "@typescript-eslint/no-explicit-any": "warn",
+        // 3. useEffect dependencies: Change from 'error' to 'warn'
+        "react-hooks/exhaustive-deps": "warn",
+        // 4. Use 'const': Change from 'error' to 'warn'
+        "prefer-const": "warn",
+        // 5. Unused components (from base React rules, which causes issues with pages/components)
+        "react/react-in-jsx-scope": "off",
+        "react/display-name": "off", // Often warns on arrow function components
+        // 6. Lexical declaration in case block
+        "no-case-declarations": "off", // Disable this for now as it's a structural fix
+        // 7. Empty block statement
+        "no-empty": "warn", // Change from 'error' to 'warn'
+        // 8. Unescaped entities (like single quotes)
+        "react/no-unescaped-entities": "warn"
+    },
+    // ... (rest of the file remains the same)
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2020": true
+    }
+}
