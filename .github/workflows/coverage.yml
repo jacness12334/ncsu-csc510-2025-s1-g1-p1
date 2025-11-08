@@ -21,9 +21,8 @@ jobs:
         env:
             PYTHONPATH: ${{ github.workspace }}/proj2/backend
         run: |
-          mkdir -p ./githubactions
-          
           cd proj2/backend
+          
           python -m pytest --cov=. --cov-branch \
             --cov-report=xml:"${{ github.workspace }}/proj2/backend/coverage.xml"
 
