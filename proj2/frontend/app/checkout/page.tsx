@@ -119,7 +119,6 @@ export default function CheckoutPage() {
       alert('Order placed successfully!');
     } catch (error) {
       console.error('Checkout error:', error);
-      setError('Checkout failed: ' + error.message);
     } finally {
       setIsLoading(false);
     }
