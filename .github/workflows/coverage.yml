@@ -39,7 +39,7 @@ jobs:
         
       - name: Run Database Setup and Tests
         env:
-          DB_HOST: mysql 
+          DB_HOST: 127.0.0.1 
           DB_USER: root  
           DB_PASSWORD: '' 
           DB_NAME: movie_munchers_test
@@ -47,7 +47,7 @@ jobs:
           echo "Waiting for MySQL service to start (10s)..."
           sleep 10 
           
-          echo "Checking connection to MySQL via hostname 'mysql'..."
+          echo "Checking connection to MySQL via hostname '127.0.0.1'..."
           mysql -h $DB_HOST -u $DB_USER -e "SELECT 1;" || { echo "MySQL connection check failed!"; exit 1; }
           
           cd proj2/backend
