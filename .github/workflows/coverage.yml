@@ -24,8 +24,7 @@ jobs:
           mkdir -p ./githubactions
           
           cd proj2/backend
-          
-          pytest --cov=. --cov-branch \
+          python -m pytest --cov=. --cov-branch \
             --cov-report=xml:"${{ github.workspace }}/proj2/backend/coverage.xml"
 
       - name: Upload coverage to Codecov
