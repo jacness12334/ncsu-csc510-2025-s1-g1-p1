@@ -12,6 +12,7 @@
 
 
 [![🎨 Style Checks](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/actions/workflows/style-check.yml/badge.svg)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/actions/workflows/style-check.yml)
+
 [![codecov](https://codecov.io/gh/jacness12334/ncsu-csc510-2025-s1-g1-p1/graph/badge.svg?token=95QLVABM82)](https://codecov.io/gh/jacness12334/ncsu-csc510-2025-s1-g1-p1)
 
 [![GitHub issues](https://img.shields.io/github/issues/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/issues) 
