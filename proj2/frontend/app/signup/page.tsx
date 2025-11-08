@@ -28,6 +28,11 @@ export default function SignupPage() {
   const [totalDeliveries, setTotalDeliveries] = useState("");
 
 
+  /**
+   * create new user api call
+   * @param e submits new user data
+   * @returns 
+   */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     // TODO: Add validation and actual signup logic when backend is ready
@@ -142,6 +147,7 @@ export default function SignupPage() {
     }
   };
 
+  /** load theatre data */
   useEffect(() => {
     const get_theatre_options = async () => {
       const response = await fetch("http://localhost:5000/api/theatres", {
@@ -167,6 +173,7 @@ export default function SignupPage() {
     get_theatre_options();
   }, []);
 
+  /** main page logic */
   return (
     <section className="max-w-md mx-auto mt-10">
       <h1 className="text-2xl font-bold mb-2">Sign Up</h1>

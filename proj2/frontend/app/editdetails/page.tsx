@@ -46,6 +46,9 @@ export default function EditDetailsPage() {
   const [newExpYear, setNewExpYear] = useState("");
   const [newBillingAddress, setNewBillingAddress] = useState("");
 
+  /**
+   * deletes user api call
+   */
   const deleteUser = async () => {
 
     try {
@@ -80,6 +83,10 @@ export default function EditDetailsPage() {
     }
   }
 
+  /**
+   * adds CC / Debit / other payment method
+   * @returns none
+   */
   const handleAddPayment = async () => {
     if (!newCardNumber || !newExpMonth || !newExpYear || !newBillingAddress) {
       alert("Please fill in all payment fields.");
@@ -128,6 +135,10 @@ export default function EditDetailsPage() {
     setShowAddPayment(false);
   };
 
+  /**
+   * edits payment method api call
+   * @param id of payment method to edit
+   */
   const handleEditPayment = async (id: string) => {
 
     const method = paymentMethods.find((m) => m.id === id);
@@ -202,6 +213,10 @@ export default function EditDetailsPage() {
 
   };
 
+  /**
+   * unfinished method to save new payment edits
+   * @returns none
+   */
   const handleSaveEditPayment = () => {
     if (!newCardNumber || !newExpMonth || !newExpYear || !newBillingAddress) {
       alert("Please fill in all payment fields.");
@@ -234,6 +249,7 @@ export default function EditDetailsPage() {
 
 
 
+  /** fetches user data and payment methods */
   useEffect(() => {
     const f = async () => {
       try {
@@ -328,7 +344,11 @@ export default function EditDetailsPage() {
   }, []);
 
 
-
+  /**
+   * password change
+   * @param e new password form data
+   * @returns noeon
+   */
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (newPassword || confirmNewPassword) {

@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
+/**
+ * stores info about driver user
+ */
 interface Driver {
     id: number;
     name: string;
@@ -14,18 +17,21 @@ interface Driver {
     duty_status: "available" | "unavailable" | "on_delivery";
 }
 
+/**
+ * stores info about delivery order
+ */
 interface Delivery {
     id: number;
     total_price: number;
     delivery_status:
-        | "pending"
-        | "accepted"
-        | "in_progress"
-        | "ready_for_pickup"
-        | "in_transit"
-        | "delivered"
-        | "fulfilled"
-        | "cancelled";
+    | "pending"
+    | "accepted"
+    | "in_progress"
+    | "ready_for_pickup"
+    | "in_transit"
+    | "delivered"
+    | "fulfilled"
+    | "cancelled";
     delivery_time: string;
     address?: string;
     items?: { name: string; quantity: number }[];
@@ -48,10 +54,20 @@ export default function DriverDashboardPage() {
 
     const driverId = Number(Cookies.get("user_id") || 0);
 
+    /**
+     * toggles each heading
+     * @param section to toggle
+     */
     const toggle = (section: "profile" | "activeDelivery" | "history") => {
         setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
     };
 
+    /**
+     * changes text type
+     * @param text to change
+     * @param type what color
+     * @returns 
+     */
     const statusBadge = (text: string, type: "green" | "red" | "yellow") => {
         const colors: Record<string, string> = {
             green: "bg-green-100 text-green-700 border border-green-300",
@@ -96,11 +112,14 @@ export default function DriverDashboardPage() {
         }
     };
 
+    /** on load, fetch driver data */
     useEffect(() => {
         if (driverId) fetchAllDriverData();
     }, [driverId]);
 
-    /** Actions */
+    /** 
+     * change vehicle info
+     */
     const updateVehicleInfo = async () => {
         try {
             await fetch(`http://localhost:5000/api/driver/${driverId}`, {
@@ -114,6 +133,10 @@ export default function DriverDashboardPage() {
         }
     };
 
+    /**
+     * sets active or inactive
+     * @returns 
+     */
     const toggleDutyStatus = async () => {
         if (!driver) return;
 
@@ -135,6 +158,10 @@ export default function DriverDashboardPage() {
         }
     };
 
+    /**
+     * complete delivery when done api call
+     * @param id of delivery
+     */
     const completeDelivery = async (id: number) => {
         try {
             await fetch(`http://localhost:5000/api/deliveries/${id}/complete`, {
@@ -177,19 +204,18 @@ export default function DriverDashboardPage() {
                     <button
                         onClick={toggleDutyStatus}
                         disabled={driver.duty_status === "on_delivery"}
-                        className={`ml-2 px-3 py-1 rounded font-medium transition ${
-                            driver.duty_status === "available"
+                        className={`ml-2 px-3 py-1 rounded font-medium transition ${driver.duty_status === "available"
                                 ? "bg-red-100 text-red-700 hover:bg-red-200"
                                 : driver.duty_status === "unavailable"
-                                ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        }`}
+                                    ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                            }`}
                     >
                         {driver.duty_status === "available"
                             ? "Change to Unavailable"
                             : driver.duty_status === "unavailable"
-                            ? "Change to Available"
-                            : "On Delivery"}
+                                ? "Change to Available"
+                                : "On Delivery"}
                     </button>
                 </p>
             </div>
@@ -215,7 +241,7 @@ export default function DriverDashboardPage() {
                                         activeDelivery.delivery_status ===
                                             "delivered" ||
                                             activeDelivery.delivery_status ===
-                                                "fulfilled"
+                                            "fulfilled"
                                             ? "green"
                                             : "yellow"
                                     )}
@@ -251,15 +277,15 @@ export default function DriverDashboardPage() {
 
                                 {activeDelivery.delivery_status ===
                                     "accepted" && (
-                                    <button
-                                        onClick={() =>
-                                            completeDelivery(activeDelivery.id)
-                                        }
-                                        className="mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
-                                    >
-                                        Mark as Completed
-                                    </button>
-                                )}
+                                        <button
+                                            onClick={() =>
+                                                completeDelivery(activeDelivery.id)
+                                            }
+                                            className="mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
+                                        >
+                                            Mark as Completed
+                                        </button>
+                                    )}
                             </>
                         ) : (
                             <p className="text-gray-500 italic">
@@ -311,7 +337,7 @@ export default function DriverDashboardPage() {
                                                         d.delivery_status ===
                                                             "delivered" ||
                                                             d.delivery_status ===
-                                                                "fulfilled"
+                                                            "fulfilled"
                                                             ? "green"
                                                             : "yellow"
                                                     )}

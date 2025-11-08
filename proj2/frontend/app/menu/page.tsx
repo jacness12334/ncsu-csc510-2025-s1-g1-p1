@@ -153,6 +153,9 @@ const App = () => {
     }
   };
 
+  /**
+   * stores products to state
+   */
   const fetchProducts = async () => {
     setLoading(true);
     setError("");

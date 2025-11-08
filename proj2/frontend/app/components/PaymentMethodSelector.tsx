@@ -9,6 +9,11 @@ interface PaymentMethodSelectorProps {
   onAddNewPaymentMethod: () => void;
 }
 
+/**
+ * selects a payment method
+ * @param param0 what to select
+ * @returns 
+ */
 export default function PaymentMethodSelector({
   paymentMethods,
   selectedPaymentMethod,
@@ -26,7 +31,7 @@ export default function PaymentMethodSelector({
           + Add New
         </button>
       </div>
-      
+
       {paymentMethods.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center">
           <p className="text-gray-600 mb-2">No payment methods found</p>
@@ -42,11 +47,10 @@ export default function PaymentMethodSelector({
           {paymentMethods.map((method) => (
             <div
               key={method.id}
-              className={`cursor-pointer rounded-lg border p-4 transition ${
-                selectedPaymentMethod === method.id
+              className={`cursor-pointer rounded-lg border p-4 transition ${selectedPaymentMethod === method.id
                   ? "border-black bg-gray-50"
                   : "border-gray-300 hover:border-gray-400"
-              }`}
+                }`}
               onClick={() => onSelectPaymentMethod(method.id)}
             >
               <div className="flex items-center justify-between">

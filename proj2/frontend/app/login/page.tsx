@@ -8,6 +8,10 @@ import Cookies from 'js-cookie';
 export default function LoginPage() {
   const router = useRouter();
 
+  /**
+   * submits form data
+   * @param e user and pass to login
+   */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const formElements: any = e.target;

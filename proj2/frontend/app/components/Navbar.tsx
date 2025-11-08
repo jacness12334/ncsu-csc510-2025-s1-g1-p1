@@ -20,6 +20,9 @@ export default function Navbar({ updateTrigger }: any) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
 
+  /**
+   * determine whether to show login/signup or logout
+   */
   const determine_if_logged_in = async () => {
     const response = await fetch("http://localhost:5000/api/users/me", {
       method: "GET",
@@ -40,12 +43,18 @@ export default function Navbar({ updateTrigger }: any) {
     }
   };
 
+  /**
+   * on page load determine to show or no
+   */
   useEffect(() => {
     determine_if_logged_in();
   }, [updateTrigger]);
 
   const router = useRouter();
 
+  /**
+   * log out user
+   */
   const logOut = async () => {
     const response = await fetch("http://localhost:5000/api/users/logout", {
       method: "POST",

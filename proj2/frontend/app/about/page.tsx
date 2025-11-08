@@ -1,3 +1,7 @@
+/**
+ * 
+ * @returns about us information
+ */
 export default function AboutPage() {
   return (
     <section className="max-w-2xl mx-auto text-center">

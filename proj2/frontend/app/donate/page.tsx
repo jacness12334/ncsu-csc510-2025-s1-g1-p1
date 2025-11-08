@@ -1,3 +1,7 @@
+/**
+ * basic page to encourage users to support us
+ * @returns 
+ */
 export default function DonatePage() {
   return (
     <section className="max-w-2xl mx-auto text-center">

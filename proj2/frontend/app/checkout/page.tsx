@@ -124,6 +124,10 @@ export default function CheckoutPage() {
     }
   };
 
+  /**
+   * item to remove
+   * @param itemId of removing
+   */
   const removeCartItem = async (itemId: string) => {
     try {
       await fetch(`${API_BASE_URL}/cart/${itemId}`, {
@@ -137,6 +141,12 @@ export default function CheckoutPage() {
     }
   };
 
+  /**
+   * 
+   * @param itemId of item to change
+   * @param newQuantity new quantity
+   * @returns 
+   */
   const changeCartItemCount = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) {
       // IMPORTANT: Using window.confirm here as per current app implementation, but recommend custom modal.
@@ -160,6 +170,12 @@ export default function CheckoutPage() {
     }
   };
 
+  /**
+   * 
+   * @param paymentMethodId to add funds to
+   * @param amount how much to add
+   * @returns 
+   */
   const addFundsToPaymentMethod = async (
     paymentMethodId: string,
     amount: number
@@ -220,6 +236,9 @@ export default function CheckoutPage() {
     }
   };
 
+  /**
+   * products -> state
+   */
   const loadProducts = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/products/menu`, {
@@ -234,6 +253,10 @@ export default function CheckoutPage() {
     }
   };
 
+  /**
+   * items -> state
+   * @returns 
+   */
   const loadItems = async () => {
     const customerId = Cookies.get('user_id') || '17';
     if (!customerId) return;
@@ -291,6 +314,10 @@ export default function CheckoutPage() {
     }
   };
 
+  /**
+   * 
+   * @returns payemnt methods -> state
+   */
   const loadPaymentMethods = async () => {
     const customerId = Cookies.get('user_id') || '17';
     if (!customerId) return;
@@ -594,11 +621,10 @@ export default function CheckoutPage() {
                       <div
                         key={method.id}
                         onClick={() => setSelectedPaymentMethodId(method.id)}
-                        className={`cursor-pointer rounded-xl border-2 p-4 transition ${
-                          isSelected
-                            ? 'border-indigo-500 ring-4 ring-indigo-100 shadow-md'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className={`cursor-pointer rounded-xl border-2 p-4 transition ${isSelected
+                          ? 'border-indigo-500 ring-4 ring-indigo-100 shadow-md'
+                          : 'border-gray-200 hover:border-gray-300'
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
@@ -622,11 +648,10 @@ export default function CheckoutPage() {
                             </div>
                           </div>
                           <p
-                            className={`text-sm font-medium ${
-                              data.balance < total
-                                ? 'text-red-500'
-                                : 'text-green-600'
-                            }`}
+                            className={`text-sm font-medium ${data.balance < total
+                              ? 'text-red-500'
+                              : 'text-green-600'
+                              }`}
                           >
                             Balance: ${data.balance.toFixed(2)}
                           </p>
@@ -712,11 +737,10 @@ export default function CheckoutPage() {
                   disabled={
                     !selectedPaymentMethodId || !hasSufficientFunds || isLoading
                   }
-                  className={`w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md ${
-                    !selectedPaymentMethodId || !hasSufficientFunds || isLoading
-                      ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                      : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg' // Changed color to red to indicate
-                  }`}
+                  className={`w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md ${!selectedPaymentMethodId || !hasSufficientFunds || isLoading
+                    ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                    : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg' // Changed color to red to indicate
+                    }`}
                 >
                   {isLoading
                     ? ' Processing Order...'

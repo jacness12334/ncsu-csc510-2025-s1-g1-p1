@@ -14,9 +14,10 @@ interface OrderSummaryProps {
   checkoutButtonText?: string;
 }
 
-export default function OrderSummary({ 
-  items, 
-  className = "", 
+
+export default function OrderSummary({
+  items,
+  className = "",
   showControls = false,
   onUpdateQuantity,
   onRemoveItem,
@@ -43,7 +44,7 @@ export default function OrderSummary({
           </button>
         )}
       </div>
-      
+
       {items.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-600 mb-4">Your cart is empty</p>
@@ -67,7 +68,7 @@ export default function OrderSummary({
                     ${item.price.toFixed(2)} each
                   </p>
                 </div>
-                
+
                 {showControls ? (
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
@@ -106,7 +107,7 @@ export default function OrderSummary({
               </div>
             ))}
           </div>
-          
+
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
@@ -125,7 +126,7 @@ export default function OrderSummary({
               <span>${total.toFixed(2)}</span>
             </div>
           </div>
-          
+
           {/* Checkout Button */}
           {showCheckoutButton && onContinueToPayment && items.length > 0 && (
             <div className="mt-6">

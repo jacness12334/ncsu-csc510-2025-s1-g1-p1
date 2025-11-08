@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
+/**
+ * delivery object
+ */
 interface Delivery {
     id: number;
     customer_showing_id: number;
@@ -11,18 +14,21 @@ interface Delivery {
     total_price: number;
     payment_status: string;
     delivery_status:
-        | "pending"
-        | "accepted"
-        | "in_progress"
-        | "ready_for_pickup"
-        | "in_transit"
-        | "delivered"
-        | "fulfilled"
-        | "completed"
-        | "cancelled";
+    | "pending"
+    | "accepted"
+    | "in_progress"
+    | "ready_for_pickup"
+    | "in_transit"
+    | "delivered"
+    | "fulfilled"
+    | "completed"
+    | "cancelled";
     is_rated: boolean;
 }
 
+/**
+ * extra details if necessary
+ */
 interface DeliveryDetails {
     id: number;
     driver_id: number | null;
@@ -52,6 +58,12 @@ export default function CustomerDashboardPage() {
 
     const customerId = Number(Cookies.get("user_id") || 0);
 
+    /**
+     * set status text
+     * @param text what to set status
+     * @param type color
+     * @returns html element
+     */
     const statusBadge = (
         text: string,
         type: "green" | "red" | "yellow" | "gray" | "blue"
@@ -72,6 +84,9 @@ export default function CustomerDashboardPage() {
         );
     };
 
+    /**
+     * onload and on customer id change: get information
+     */
     useEffect(() => {
         fetch(`http://localhost:5000/api/users/${customerId}`)
             .then((res) => res.json())
@@ -81,6 +96,9 @@ export default function CustomerDashboardPage() {
             .catch((err) => console.error("Error fetching showings:", err));
     }, [customerId]);
 
+    /**
+     * get your current deliveries
+     */
     const fetchDeliveries = async () => {
         try {
             const res = await fetch(
@@ -95,10 +113,12 @@ export default function CustomerDashboardPage() {
         }
     };
 
+    /** get deliveries on load and relog */
     useEffect(() => {
         if (customerId) fetchDeliveries();
     }, [customerId]);
 
+    /** get your current showings on load and relog */
     useEffect(() => {
         fetch(`http://localhost:5000/api/customers/${customerId}/showings`)
             .then((res) => res.json())
@@ -218,8 +238,15 @@ export default function CustomerDashboardPage() {
         }
     };
 
+    /**
+     * set details when closing
+     * @returns 
+     */
     const closeDetails = () => setDetails(null);
 
+    /**
+     * if you're loading put this text
+     */
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen text-gray-500">
@@ -289,8 +316,8 @@ export default function CustomerDashboardPage() {
                                             <td className="border px-4 py-2 text-gray-700">
                                                 {d.driver_id
                                                     ? driverNames[
-                                                            d.driver_id
-                                                        ] || "Loading..."
+                                                    d.driver_id
+                                                    ] || "Loading..."
                                                     : "Unassigned"}
                                             </td>
                                             <td className="border px-4 py-2">
@@ -299,8 +326,8 @@ export default function CustomerDashboardPage() {
                                                     isCompleted
                                                         ? "green"
                                                         : isCancelled
-                                                        ? "red"
-                                                        : "yellow"
+                                                            ? "red"
+                                                            : "yellow"
                                                 )}
                                             </td>
                                             <td className="border px-4 py-2 text-gray-700">
@@ -323,7 +350,7 @@ export default function CustomerDashboardPage() {
                                                     className="w-full px-3 py-1 rounded font-medium text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                                                 >
                                                     {detailsLoading &&
-                                                    details?.id === d.id
+                                                        details?.id === d.id
                                                         ? "Loading..."
                                                         : "View Details"}
                                                 </button>
@@ -341,15 +368,14 @@ export default function CustomerDashboardPage() {
                                                                 canceling ===
                                                                 d.id
                                                             }
-                                                            className={`w-full px-3 py-1 rounded font-medium text-sm ${
-                                                                canceling ===
-                                                                d.id
+                                                            className={`w-full px-3 py-1 rounded font-medium text-sm ${canceling ===
+                                                                    d.id
                                                                     ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                                                                     : "bg-red-100 text-red-700 hover:bg-red-200 transition"
-                                                            }`}
+                                                                }`}
                                                         >
                                                             {canceling ===
-                                                            d.id
+                                                                d.id
                                                                 ? "Cancelling..."
                                                                 : "Cancel"}
                                                         </button>
@@ -361,7 +387,7 @@ export default function CustomerDashboardPage() {
                                                         <select
                                                             value={
                                                                 ratings[
-                                                                    d.id
+                                                                d.id
                                                                 ] || ""
                                                             }
                                                             onChange={(
@@ -416,15 +442,14 @@ export default function CustomerDashboardPage() {
                                                                 submitting ===
                                                                 d.id
                                                             }
-                                                            className={`px-3 py-1 rounded font-medium ${
-                                                                submitting ===
-                                                                d.id
+                                                            className={`px-3 py-1 rounded font-medium ${submitting ===
+                                                                    d.id
                                                                     ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                                                                     : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                                                            }`}
+                                                                }`}
                                                         >
                                                             {submitting ===
-                                                            d.id
+                                                                d.id
                                                                 ? "Submitting..."
                                                                 : "Submit"}
                                                         </button>

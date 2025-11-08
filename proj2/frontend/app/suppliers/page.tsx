@@ -21,6 +21,7 @@ export default function SuppliersPage() {
   const [userId, setUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+
   const [metrics, setMetrics] = useState({
     totalProducts: 0,
     availableProducts: 0,
@@ -143,11 +144,10 @@ export default function SuppliersPage() {
             <button
               onClick={handleToggleStore}
               disabled={isLoading}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${
-                isOpen 
-                  ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${isOpen
+                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
                   : 'bg-green-100 text-green-700 hover:bg-green-200'
-              }`}
+                }`}
             >
               {isLoading ? 'Updating...' : isOpen ? 'Close Store' : 'Open Store'}
             </button>
@@ -224,11 +224,10 @@ export default function SuppliersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                        product.is_available 
-                          ? 'bg-green-100 text-green-800' 
+                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${product.is_available
+                          ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
-                      }`}>
+                        }`}>
                         {product.is_available ? 'Available' : 'Unavailable'}
                       </span>
                     </td>

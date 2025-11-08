@@ -65,6 +65,11 @@ export default function SupplierProfilePage() {
     }
   };
 
+  /**
+   * submits profile change
+   * @param e data to submit
+   * @returns 
+   */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 

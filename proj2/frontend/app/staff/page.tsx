@@ -26,14 +26,14 @@ interface Delivery {
   quantity: number;
   staff_id: number;
   delivery_status:
-    | 'pending'
-    | 'accepted'
-    | 'in_progress'
-    | 'ready_for_pickup'
-    | 'in_transit'
-    | 'delivered'
-    | 'fulfilled'
-    | 'cancelled';
+  | 'pending'
+  | 'accepted'
+  | 'in_progress'
+  | 'ready_for_pickup'
+  | 'in_transit'
+  | 'delivered'
+  | 'fulfilled'
+  | 'cancelled';
 }
 
 export default function StaffPage() {
@@ -62,6 +62,10 @@ export default function StaffPage() {
 
   const userId = Number(Cookies.get('user_id') || 0);
 
+  /**
+   * swaps section
+   * @param section which section to swap
+   */
   const toggle = (section: 'theatres' | 'staff' | 'deliveries') => {
     setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
   };
@@ -183,6 +187,10 @@ export default function StaffPage() {
     }
   };
 
+  /**
+   * toggles logged staff availability
+   * @returns none
+   */
   const toggleMyAvailability = async () => {
     if (!currentStaff) return;
     try {
@@ -208,6 +216,10 @@ export default function StaffPage() {
     }
   };
 
+  /**
+   * deletes staff
+   * @param staffUserId to delete
+   */
   const removeStaff = async (staffUserId: number) => {
     try {
       await fetch(`http://localhost:5000/api/staff/${staffUserId}`, {
@@ -239,6 +251,10 @@ export default function StaffPage() {
     }
   };
 
+  /**
+   * fulfill delivery to customer
+   * @param id of who is fulfilling
+   */
   const fulfillDelivery = async (id: number) => {
     try {
       await fetch(`http://localhost:5000/api/deliveries/${id}/fulfill`, {
@@ -318,11 +334,10 @@ export default function StaffPage() {
             {currentStaff && (
               <button
                 onClick={toggleMyAvailability}
-                className={`ml-2 px-3 py-1 rounded font-medium transition ${
-                  currentStaff.is_available
-                    ? 'bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300'
-                    : 'bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300'
-                }`}
+                className={`ml-2 px-3 py-1 rounded font-medium transition ${currentStaff.is_available
+                  ? 'bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300'
+                  : 'bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300'
+                  }`}
               >
                 {currentStaff.is_available
                   ? 'Set Unavailable'
@@ -361,11 +376,10 @@ export default function StaffPage() {
                     {role === 'admin' && (
                       <button
                         onClick={() => toggleTheatreStatus(t.id)}
-                        className={`px-3 py-1 rounded font-medium transition ${
-                          t.is_open
-                            ? 'bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300'
-                            : 'bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300'
-                        }`}
+                        className={`px-3 py-1 rounded font-medium transition ${t.is_open
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-300'
+                          : 'bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300'
+                          }`}
                       >
                         {t.is_open ? 'Close' : 'Open'}
                       </button>

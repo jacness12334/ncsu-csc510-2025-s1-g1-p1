@@ -15,6 +15,11 @@ interface AddPaymentMethodProps {
   isLoading?: boolean;
 }
 
+/**
+ * adds new payment method
+ * @param param0 new payment method
+ * @returns new payment method
+ */
 export default function AddPaymentMethod({
   onAdd,
   onCancel,
@@ -30,6 +35,10 @@ export default function AddPaymentMethod({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  /**
+   * submit form data api call
+   * @returns 
+   */
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -66,6 +75,11 @@ export default function AddPaymentMethod({
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * validates and submits
+   * @param e form data
+   * @returns 
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -80,6 +94,11 @@ export default function AddPaymentMethod({
     });
   };
 
+  /**
+   * formats card number
+   * @param value card number
+   * @returns card number formatted
+   */
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
     const matches = v.match(/\d{4,16}/g);
@@ -98,7 +117,7 @@ export default function AddPaymentMethod({
   return (
     <div className="rounded-lg border p-6">
       <h3 className="text-lg font-semibold mb-4">Add Payment Method</h3>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="card_number" className="block text-sm font-medium mb-1">
@@ -116,9 +135,8 @@ export default function AddPaymentMethod({
             }
             placeholder="1234 5678 9012 3456"
             maxLength={19}
-            className={`w-full rounded-lg border px-3 py-2 ${
-              errors.card_number ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full rounded-lg border px-3 py-2 ${errors.card_number ? "border-red-500" : "border-gray-300"
+              }`}
             disabled={isLoading}
           />
           {errors.card_number && (
@@ -137,9 +155,8 @@ export default function AddPaymentMethod({
               onChange={(e) =>
                 setFormData({ ...formData, expiration_month: e.target.value })
               }
-              className={`w-full rounded-lg border px-3 py-2 ${
-                errors.expiration_month ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full rounded-lg border px-3 py-2 ${errors.expiration_month ? "border-red-500" : "border-gray-300"
+                }`}
               disabled={isLoading}
             >
               <option value="">Month</option>
@@ -164,9 +181,8 @@ export default function AddPaymentMethod({
               onChange={(e) =>
                 setFormData({ ...formData, expiration_year: e.target.value })
               }
-              className={`w-full rounded-lg border px-3 py-2 ${
-                errors.expiration_year ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full rounded-lg border px-3 py-2 ${errors.expiration_year ? "border-red-500" : "border-gray-300"
+                }`}
               disabled={isLoading}
             >
               <option value="">Year</option>
@@ -196,9 +212,8 @@ export default function AddPaymentMethod({
             }
             placeholder="123 Main St, City, State 12345"
             rows={3}
-            className={`w-full rounded-lg border px-3 py-2 ${
-              errors.billing_address ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full rounded-lg border px-3 py-2 ${errors.billing_address ? "border-red-500" : "border-gray-300"
+              }`}
             disabled={isLoading}
           />
           {errors.billing_address && (
@@ -221,9 +236,8 @@ export default function AddPaymentMethod({
               onChange={(e) =>
                 setFormData({ ...formData, balance: e.target.value })
               }
-              className={`w-full rounded-lg border pl-8 pr-3 py-2 ${
-                errors.balance ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full rounded-lg border pl-8 pr-3 py-2 ${errors.balance ? "border-red-500" : "border-gray-300"
+                }`}
               disabled={isLoading}
             />
           </div>

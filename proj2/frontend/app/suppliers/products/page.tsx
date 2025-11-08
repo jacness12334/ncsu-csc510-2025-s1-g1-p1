@@ -55,6 +55,10 @@ export default function ManageProductsPage() {
         }
     }, []);
 
+    /**
+     * loads products into state
+     * @param userIdParam = who is loading?
+     */
     const loadProducts = async (userIdParam: number) => {
         setIsLoading(true);
         try {
@@ -456,9 +460,9 @@ export default function ManageProductsPage() {
                                             e.target.value === ""
                                                 ? null
                                                 : (e.target.value as
-                                                      | "small"
-                                                      | "medium"
-                                                      | "large"),
+                                                    | "small"
+                                                    | "medium"
+                                                    | "large"),
                                     })
                                 }
                                 aria-label="Product size"
@@ -524,8 +528,8 @@ export default function ManageProductsPage() {
                             {isLoading
                                 ? "Processing..."
                                 : editingProduct
-                                ? "Save Changes"
-                                : "Add Product"}
+                                    ? "Save Changes"
+                                    : "Add Product"}
                         </button>
                         <button
                             onClick={resetForm}
@@ -592,25 +596,23 @@ export default function ManageProductsPage() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`font-medium ${
-                                                product.inventory_quantity === 0
+                                            className={`font-medium ${product.inventory_quantity === 0
                                                     ? "text-red-600"
                                                     : product.inventory_quantity <=
-                                                      5
-                                                    ? "text-yellow-600"
-                                                    : "text-green-600"
-                                            }`}
+                                                        5
+                                                        ? "text-yellow-600"
+                                                        : "text-green-600"
+                                                }`}
                                         >
                                             {product.inventory_quantity}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                                                product.is_available
+                                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${product.is_available
                                                     ? "bg-green-100 text-green-800"
                                                     : "bg-red-100 text-red-800"
-                                            }`}
+                                                }`}
                                         >
                                             {product.is_available
                                                 ? "Available"
