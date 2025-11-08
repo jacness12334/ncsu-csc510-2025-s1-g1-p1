@@ -33,28 +33,37 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install mysql-connector-python pytest-cov
+
+      - name: Install MySQL Client for Debugging
+        run: sudo apt-get update && sudo apt-get install -y default-mysql-client
         
-      - name: Wait for MySQL and Run Tests
+      - name: Run Database Setup and Tests
         env:
-          DB_HOST: mysql
-          DB_USER: root
+          DB_HOST: mysql 
+          DB_USER: root  
+          DB_PASSWORD: '' 
+          DB_NAME: movie_munchers_test
         run: |
-          echo "Waiting for MySQL service to start..."
-          sleep 5 
+          echo "Waiting for MySQL service to start (10s)..."
+          sleep 10 
+          
+          echo "Checking connection to MySQL via hostname 'mysql'..."
+          mysql -h $DB_HOST -u $DB_USER -e "SELECT 1;" || { echo "MySQL connection check failed!"; exit 1; }
           
           cd proj2/backend
-
+          
           echo "Running database.py to initialize tables..."
           python database.py
-
+          
           echo "Running load_database.py to populate data..."
           python load_database.py
           
+          echo "Starting Pytest..."
           python -m pytest --cov=. --cov-branch \
             --cov-report=xml:"${{ github.workspace }}/proj2/backend/coverage.xml"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./proj2/backend/coverage.xml
