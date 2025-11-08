@@ -11,10 +11,9 @@ jobs:
         image: mysql:8.0 
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' 
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD || 'password' }} 
-          MYSQL_DATABASE: movie_munchers_prod
+          MYSQL_DATABASE: movie_munchers_test
         ports:
-          - 3306:3306
+          - 3306:3306 
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -39,8 +38,6 @@ jobs:
         env:
           DB_HOST: mysql
           DB_USER: root
-          DB_PASSWORD: '' 
-          DB_NAME: movie_munchers_prod 
         run: |
           echo "Waiting for MySQL service to start..."
           sleep 5 
