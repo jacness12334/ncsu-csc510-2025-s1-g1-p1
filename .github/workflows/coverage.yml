@@ -12,17 +12,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.11' 
           
       - name: Install dependencies
         run: pip install -r requirements.txt
         
       - name: Run tests and generate coverage report
-        env:
-            PYTHONPATH: ${{ github.workspace }}/proj2/backend
         run: |
           cd proj2/backend
-          
           python -m pytest --cov=. --cov-branch \
             --cov-report=xml:"${{ github.workspace }}/proj2/backend/coverage.xml"
 
@@ -30,6 +27,6 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./proj2/backend/coverage.xml
-        fail_ci_if_error: true
+          files: ./proj2/backend/coverage.xml
+          fail_ci_if_error: true
   
