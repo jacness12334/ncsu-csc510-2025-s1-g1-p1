@@ -67,4 +67,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./proj2/backend/coverage.xml
-          fail_ci_if_error: true
+          fail_ci_if_error: false
+        if: always()
