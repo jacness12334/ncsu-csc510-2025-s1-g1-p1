@@ -5,6 +5,21 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0 
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD || 'password' }} 
+          MYSQL_DATABASE: movie_munchers_prod
+        ports:
+          - 3306:3306 
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,11 +32,20 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install mysql-connector-python
+          pip install mysql-connector-python pytest-cov
         
-      - name: Run tests and generate coverage report
+      - name: Wait for MySQL and Run Tests
+        env:
+          DB_HOST: mysql
+          DB_USER: root
+          DB_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD || 'password' }}
+          DB_NAME: movie_munchers_prod 
         run: |
+          echo "Waiting for MySQL service to start..."
+          sleep 5 
+          
           cd proj2/backend
+          
           python -m pytest --cov=. --cov-branch \
             --cov-report=xml:"${{ github.workspace }}/proj2/backend/coverage.xml"
 
@@ -31,4 +55,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./proj2/backend/coverage.xml
           fail_ci_if_error: true
-  
