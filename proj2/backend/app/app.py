@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from flask_cors import CORS
 from datetime import timedelta
 from flasgger import Swagger
+import os 
 
 from .swagger_config import swagger_template
 
@@ -24,9 +25,10 @@ def create_app(config_name):
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=1)
 
     # Basic DB credentials (consider env vars or a config object per environment).
-    user = 'root'
-    password = ''
-    host = 'localhost'
+    user = os.getenv('DB_USER', 'root')
+    password = os.getenv('DB_PASSWORD', '')
+    host = os.getenv('DB_HOST', 'localhost')
+
 
     # Environment-specific database URIs; testing enables Flask’s TESTING flag.
     if config_name == 'production':
