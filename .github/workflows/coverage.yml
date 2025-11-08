@@ -43,6 +43,12 @@ jobs:
           sleep 5 
           
           cd proj2/backend
+
+          echo "Running database.py to initialize tables..."
+          python database.py
+
+          echo "Running load_database.py to populate data..."
+          python load_database.py
           
           python -m pytest --cov=. --cov-branch \
             --cov-report=xml:"${{ github.workspace }}/proj2/backend/coverage.xml"
