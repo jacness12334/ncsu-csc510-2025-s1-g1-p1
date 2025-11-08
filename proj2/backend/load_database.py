@@ -1,7 +1,8 @@
 from database import get_database
+import os
 
 # Create development database and define cursor object
-db_name = "movie_munchers_dev"
+db_name = os.getenv("DB_NAME", "movie_munchers_dev")
 database = get_database(db_name)
 cursor_object = database.cursor()
 
