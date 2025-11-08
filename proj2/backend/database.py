@@ -1,4 +1,5 @@
 import mysql.connector
+import os
 
 # Schema table names
 tables = ['theatres', 'auditoriums', 'seats', 'users', 'staff', 'movies', 'movie_showings',
