@@ -1,0 +1,1553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>services.staff_service API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>services.staff_service</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="services.staff_service.StaffService"><code class="flex name class">
+<span>class <span class="ident">StaffService</span></span>
+<span>(</span><span>user_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class StaffService:
+    
+    &#34;&#34;&#34;Service layer for staff profiles, authorization checks, theatre/movie management,
+    and delivery maintenance operations.
+    &#34;&#34;&#34;
+
+    def __init__(self, user_id):
+        &#34;&#34;&#34;Initialize the staff service with the acting user context.
+
+        Args:
+            user_id: The id of the user performing actions (authorization context).
+        &#34;&#34;&#34;
+        self.user_id = user_id
+        self.user_service = UserService()
+
+    def validate_admin(self):
+        &#34;&#34;&#34;Ensure the current user is a staff admin.
+
+        Returns:
+            Staff: The admin staff record.
+
+        Raises:
+            ValueError: If the user is not a staff admin.
+        &#34;&#34;&#34;
+        admin = Staff.query.filter_by(user_id=self.user_id).first()
+        if not admin or admin.role != &#39;admin&#39;:
+            raise ValueError(&#34;Unauthorized User - Not an admin&#34;)
+        return admin
+
+    def validate_staff(self):
+        &#34;&#34;&#34;Ensure the current user is a staff member (any role).
+
+        Returns:
+            Staff: The staff record.
+
+        Raises:
+            ValueError: If the user is not a staff member.
+        &#34;&#34;&#34;
+        staff = Staff.query.filter_by(user_id=self.user_id).first()
+        if not staff:
+            raise ValueError(&#34;Unauthorized User - Not a staff member&#34;)
+        return staff
+
+    def add_staff(self, name, email, phone, birthday, password, theatre_id, role):
+        &#34;&#34;&#34;Create a new staff user and staff record (admin only).
+
+        Args:
+            name: Staff member name.
+            email: Unique email for the new staff user.
+            phone: Unique phone for the new staff user.
+            birthday: Date of birth (YYYY-MM-DD or date).
+            password: Plaintext password to hash.
+            theatre_id: Theatre id for the staff assignment.
+            role: &#39;admin&#39; or &#39;runner&#39;.
+
+        Returns:
+            Staff: The created staff record.
+
+        Raises:
+            ValueError: If the acting user is not admin or role is invalid.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+        
+        if role not in [&#39;admin&#39;, &#39;runner&#39;]:
+            raise ValueError(&#34;Invalid role. Must be &#39;admin&#39; or &#39;runner&#39;.&#34;)
+        
+        user = self.user_service.create_user(name, email, phone, birthday, password, &#39;staff&#39;)
+        db.session.flush()
+
+        staff = Staff(user_id=user.id, theatre_id=theatre_id, role=role, is_available=True)
+        db.session.add(staff)
+        db.session.commit()
+        return staff
+
+    def remove_staff(self, staff_user_id):
+        &#34;&#34;&#34;Remove a staff user and associated staff record (admin only).
+
+        Args:
+            staff_user_id: The user id of the staff member to remove.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the acting user is not admin or the staff user is not found.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+
+        staff = Staff.query.filter_by(user_id=staff_user_id).first()
+        if not staff:
+            raise ValueError(f&#34;User {staff_user_id} not found&#34;)
+        
+        self.user_service.delete_user(staff.user_id)
+
+    def get_theatres(self):
+        &#34;&#34;&#34;Return all theatres.
+
+        Returns:
+            list[Theatres]: All theatres in the system.
+        &#34;&#34;&#34;
+        theatres = Theatres.query.all()
+        return theatres
+
+    def set_theatre_status(self, theatre_id, is_open):
+        &#34;&#34;&#34;Set open/closed status for a theatre (admin only).
+
+        Args:
+            theatre_id: Target theatre id.
+            is_open: Boolean open flag to set.
+
+        Returns:
+            Theatres: The updated theatre.
+
+        Raises:
+            ValueError: If acting user is not admin or the theatre id is invalid.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+        
+        theatre = Theatres.query.filter_by(id=theatre_id).first()
+        if not theatre:
+            raise ValueError(f&#34;Theatre {theatre_id} not found&#34;)
+        
+        theatre.is_open = is_open
+        db.session.commit()
+        return theatre
+
+    def add_movie(self, title, genre, length_mins, release_year, keywords, rating):
+        &#34;&#34;&#34;Create a movie (admin only).
+
+        Args:
+            title: Movie title.
+            genre: Movie genre.
+            length_mins: Duration in minutes.
+            release_year: Year of release.
+            keywords: Search keywords.
+            rating: Decimal or float rating in model-defined bounds.
+
+        Returns:
+            Movies: The created movie.
+
+        Raises:
+            ValueError: If acting user is not admin.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+        
+        movie = Movies(title=title, genre=genre, length_mins=length_mins, release_year=release_year, keywords=keywords, rating=rating)
+        db.session.add(movie)
+        db.session.commit()
+        return movie
+
+    def edit_movie(self, movie_id, title, genre, length_mins, release_year, keywords, rating):
+        &#34;&#34;&#34;Edit a movie by id (admin only).
+
+        Args:
+            movie_id: Movie primary key.
+            title: New title.
+            genre: New genre.
+            length_mins: New duration in minutes.
+            release_year: New release year.
+            keywords: New keywords.
+            rating: New rating.
+
+        Returns:
+            Movies: The updated movie.
+
+        Raises:
+            ValueError: If acting user is not admin or movie not found.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+        
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+
+        movie.title = title
+        movie.genre = genre
+        movie.length_mins = length_mins
+        movie.release_year = release_year
+        movie.keywords = keywords
+        movie.rating = rating
+        db.session.commit()
+        return movie
+
+    def remove_movie(self, movie_id):
+        &#34;&#34;&#34;Delete a movie by id (admin only).
+
+        Args:
+            movie_id: Movie primary key.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If acting user is not admin or movie not found.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+        
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+        
+        db.session.delete(movie)
+        db.session.commit()
+
+    def add_showing(self, movie_id, auditorium_id, start_time):
+        &#34;&#34;&#34;Create a movie showing (admin only).
+
+        Args:
+            movie_id: Movie id to show.
+            auditorium_id: Auditorium id where it screens.
+            start_time: datetime start time.
+
+        Returns:
+            MovieShowings: The created showing.
+
+        Raises:
+            ValueError: If acting user is not admin, movie/auditorium missing,
+                or start_time is not a datetime.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+        auditorium = Auditoriums.query.filter_by(id=auditorium_id).first()
+        if not auditorium:
+            raise ValueError(f&#34;Auditorium {auditorium_id} not found&#34;)
+        if not isinstance(start_time, datetime):
+            raise ValueError(f&#34;Movie start time must be in DateTime format&#34;)
+        
+        showing = MovieShowings(movie_id=movie_id, auditorium_id=auditorium_id, start_time=start_time)
+        db.session.add(showing)
+        db.session.commit()
+        return showing
+
+    def edit_showing(self, showing_id, movie_id, auditorium_id, start_time):
+        &#34;&#34;&#34;Edit a movie showing (admin only).
+
+        Args:
+            showing_id: Showing primary key.
+            movie_id: New movie id.
+            auditorium_id: New auditorium id.
+            start_time: New datetime start time.
+
+        Returns:
+            MovieShowings: The updated showing.
+
+        Raises:
+            ValueError: If acting user is not admin, any id not found,
+                or start_time is not a datetime.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+
+        movie = Movies.query.filter_by(id=movie_id).first()
+        if not movie:
+            raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+        auditorium = Auditoriums.query.filter_by(id=auditorium_id).first()
+        if not auditorium:
+            raise ValueError(f&#34;Auditorium {auditorium_id} not found&#34;)
+        
+        showing = MovieShowings.query.filter_by(id=showing_id).first()
+        if not showing:
+            raise ValueError(f&#34;Movie Showing {showing_id} not found&#34;)
+        
+        if not isinstance(start_time, datetime):
+            raise ValueError(f&#34;Movie start time must be in DateTime format&#34;)
+        
+        showing.movie_id = movie_id
+        showing.auditorium_id = auditorium_id
+        showing.start_time = start_time
+        db.session.commit()
+        return showing
+
+    def remove_showing(self, showing_id):
+        &#34;&#34;&#34;Delete a movie showing by id (admin only).
+
+        Args:
+            showing_id: Showing primary key.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If acting user is not admin or showing not found.
+        &#34;&#34;&#34;
+        admin = self.validate_admin()
+        
+        showing = MovieShowings.query.filter_by(id=showing_id).first()
+        if not showing:
+            raise ValueError(f&#34;Movie Showing {showing_id} not found&#34;)
+        
+        db.session.delete(showing)
+        db.session.commit()
+
+    def set_availability(self, is_available):
+        &#34;&#34;&#34;Set the current staff member&#39;s availability.
+
+        Args:
+            is_available: Boolean availability flag.
+
+        Returns:
+            Staff: The updated staff record.
+
+        Raises:
+            ValueError: If the user is not a staff member.
+        &#34;&#34;&#34;
+        staff = self.validate_staff()
+        
+        staff.is_available = is_available
+        db.session.commit()
+        return staff
+
+    def accept_delivery(self, delivery_id):
+        &#34;&#34;&#34;Accept a pending delivery for the current staff member.
+
+        Sets the delivery staff_id, moves status to &#39;accepted&#39;, and marks
+        the staff member unavailable.
+
+        Args:
+            delivery_id: Delivery primary key.
+
+        Returns:
+            Deliveries: The updated delivery.
+
+        Raises:
+            ValueError: If staff not available, delivery missing, or not pending.
+        &#34;&#34;&#34;
+        staff = self.validate_staff()
+
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
+
+        if not staff.is_available:
+            raise ValueError(&#34;Staff not available&#34;)
+        if not delivery:
+            raise ValueError(&#34;Delivery not found&#34;)
+        if delivery.delivery_status != &#39;pending&#39;:
+            raise ValueError(&#34;Delivery not available to accept&#34;)
+
+        self.set_availability(False)
+        delivery.staff_id = staff.user_id
+        delivery.delivery_status = &#39;accepted&#39;
+        db.session.commit()
+        return delivery
+
+    def fulfill_delivery(self, delivery_id):
+        &#34;&#34;&#34;Mark a delivered order as fulfilled and free up the staff member.
+
+        Args:
+            delivery_id: Delivery primary key.
+
+        Returns:
+            Deliveries: The updated delivery.
+
+        Raises:
+            ValueError: If delivery missing or status is not &#39;delivered&#39;.
+        &#34;&#34;&#34;
+        staff = self.validate_staff()
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
+
+        if not delivery:
+            raise ValueError(f&#34;Delivery {delivery_id} not found&#34;)
+        if delivery.delivery_status != &#39;delivered&#39;:
+            raise ValueError(&#34;Delivery status must be &#39;delivered&#39; to be fulfilled&#34;)
+
+        delivery.delivery_status = &#39;fulfilled&#39;
+        self.set_availability(True)
+        db.session.commit()
+        return delivery
+    
+    def get_available_staff(self, theatre_id):
+        &#34;&#34;&#34;Return the next available staff member at a theatre (oldest update first).
+
+        Args:
+            theatre_id: Theatre identifier.
+
+        Returns:
+            Staff | None: The selected staff member or None if none available.
+        &#34;&#34;&#34;
+        staff = Staff.query.filter_by(theatre_id=theatre_id, is_available=True).order_by(Staff.last_updated.asc(), Staff.user_id.asc()).all()
+        if staff:
+            staff = staff[0]
+        return staff
+    
+    def try_assign_staff(self, theatre_id, delivery):
+        &#34;&#34;&#34;Assign an available staff member to a delivery if possible.
+
+        Args:
+            theatre_id: Theatre to search at.
+            delivery: Delivery instance to assign.
+
+        Returns:
+            bool: True if an assignment occurred, else False.
+
+        Raises:
+            ValueError: If the delivery reference is missing.
+        &#34;&#34;&#34;
+        if not delivery:
+            raise ValueError(&#34;Delivery not found&#34;)
+        staff = self.get_available_staff(theatre_id=theatre_id)
+        print(staff)
+        if not staff:
+            return False
+        delivery.staff_id = staff.user_id
+        ss = StaffService(staff.user_id)
+        ss.set_availability(False)
+        db.session.commit()
+        return True
+    
+    def show_all_staff(self, theatre_id):
+        &#34;&#34;&#34;List all staff at a theatre (admin only).
+
+        Args:
+            theatre_id: Theatre identifier.
+
+        Returns:
+            list[Staff]: Staff ordered by user id.
+
+        Raises:
+            ValueError: If the acting user is not admin.
+        &#34;&#34;&#34;
+        self.validate_admin()
+        return Staff.query.filter(Staff.theatre_id == theatre_id).order_by(Staff.user_id.asc()).all()
+    
+    def show_all_deliveries(self, theatre_id):
+        &#34;&#34;&#34;List all deliveries related to a theatre (staff only).
+
+        Orders by delivery status then id descending.
+
+        Args:
+            theatre_id: Theatre identifier.
+
+        Returns:
+            list[Deliveries]: Matching deliveries.
+
+        Raises:
+            ValueError: If the acting user is not staff.
+        &#34;&#34;&#34;
+        self.validate_staff()
+        deliveries = (
+            Deliveries.query
+            .join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id)
+            .join(Seats, CustomerShowings.seat_id == Seats.id)
+            .join(Auditoriums, Seats.auditorium_id == Auditoriums.id)
+            .filter(Auditoriums.theatre_id == theatre_id)
+            .order_by(Deliveries.delivery_status.asc(), Deliveries.id.desc())
+            .all()
+        )
+        return deliveries
+
+    def get_staff(self, staff_id):
+        &#34;&#34;&#34;Return a staff record by user id (staff only).
+
+        Args:
+            staff_id: Staff user id to fetch.
+
+        Returns:
+            Staff | None: The staff record or None if not found.
+
+        Raises:
+            ValueError: If the acting user is not staff.
+        &#34;&#34;&#34;
+        self.validate_staff()
+        staff = Staff.query.filter_by(user_id=staff_id).first()
+        return staff</code></pre>
+</details>
+<div class="desc"><p>Service layer for staff profiles, authorization checks, theatre/movie management,
+and delivery maintenance operations.</p>
+<p>Initialize the staff service with the acting user context.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong></dt>
+<dd>The id of the user performing actions (authorization context).</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="services.staff_service.StaffService.accept_delivery"><code class="name flex">
+<span>def <span class="ident">accept_delivery</span></span>(<span>self, delivery_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def accept_delivery(self, delivery_id):
+    &#34;&#34;&#34;Accept a pending delivery for the current staff member.
+
+    Sets the delivery staff_id, moves status to &#39;accepted&#39;, and marks
+    the staff member unavailable.
+
+    Args:
+        delivery_id: Delivery primary key.
+
+    Returns:
+        Deliveries: The updated delivery.
+
+    Raises:
+        ValueError: If staff not available, delivery missing, or not pending.
+    &#34;&#34;&#34;
+    staff = self.validate_staff()
+
+    delivery = Deliveries.query.filter_by(id=delivery_id).first()
+
+    if not staff.is_available:
+        raise ValueError(&#34;Staff not available&#34;)
+    if not delivery:
+        raise ValueError(&#34;Delivery not found&#34;)
+    if delivery.delivery_status != &#39;pending&#39;:
+        raise ValueError(&#34;Delivery not available to accept&#34;)
+
+    self.set_availability(False)
+    delivery.staff_id = staff.user_id
+    delivery.delivery_status = &#39;accepted&#39;
+    db.session.commit()
+    return delivery</code></pre>
+</details>
+<div class="desc"><p>Accept a pending delivery for the current staff member.</p>
+<p>Sets the delivery staff_id, moves status to 'accepted', and marks
+the staff member unavailable.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delivery_id</code></strong></dt>
+<dd>Delivery primary key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Deliveries</code></dt>
+<dd>The updated delivery.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If staff not available, delivery missing, or not pending.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.add_movie"><code class="name flex">
+<span>def <span class="ident">add_movie</span></span>(<span>self, title, genre, length_mins, release_year, keywords, rating)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_movie(self, title, genre, length_mins, release_year, keywords, rating):
+    &#34;&#34;&#34;Create a movie (admin only).
+
+    Args:
+        title: Movie title.
+        genre: Movie genre.
+        length_mins: Duration in minutes.
+        release_year: Year of release.
+        keywords: Search keywords.
+        rating: Decimal or float rating in model-defined bounds.
+
+    Returns:
+        Movies: The created movie.
+
+    Raises:
+        ValueError: If acting user is not admin.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+    
+    movie = Movies(title=title, genre=genre, length_mins=length_mins, release_year=release_year, keywords=keywords, rating=rating)
+    db.session.add(movie)
+    db.session.commit()
+    return movie</code></pre>
+</details>
+<div class="desc"><p>Create a movie (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>title</code></strong></dt>
+<dd>Movie title.</dd>
+<dt><strong><code>genre</code></strong></dt>
+<dd>Movie genre.</dd>
+<dt><strong><code>length_mins</code></strong></dt>
+<dd>Duration in minutes.</dd>
+<dt><strong><code>release_year</code></strong></dt>
+<dd>Year of release.</dd>
+<dt><strong><code>keywords</code></strong></dt>
+<dd>Search keywords.</dd>
+<dt><strong><code>rating</code></strong></dt>
+<dd>Decimal or float rating in model-defined bounds.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Movies</code></dt>
+<dd>The created movie.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.add_showing"><code class="name flex">
+<span>def <span class="ident">add_showing</span></span>(<span>self, movie_id, auditorium_id, start_time)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_showing(self, movie_id, auditorium_id, start_time):
+    &#34;&#34;&#34;Create a movie showing (admin only).
+
+    Args:
+        movie_id: Movie id to show.
+        auditorium_id: Auditorium id where it screens.
+        start_time: datetime start time.
+
+    Returns:
+        MovieShowings: The created showing.
+
+    Raises:
+        ValueError: If acting user is not admin, movie/auditorium missing,
+            or start_time is not a datetime.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+
+    movie = Movies.query.filter_by(id=movie_id).first()
+    if not movie:
+        raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+    auditorium = Auditoriums.query.filter_by(id=auditorium_id).first()
+    if not auditorium:
+        raise ValueError(f&#34;Auditorium {auditorium_id} not found&#34;)
+    if not isinstance(start_time, datetime):
+        raise ValueError(f&#34;Movie start time must be in DateTime format&#34;)
+    
+    showing = MovieShowings(movie_id=movie_id, auditorium_id=auditorium_id, start_time=start_time)
+    db.session.add(showing)
+    db.session.commit()
+    return showing</code></pre>
+</details>
+<div class="desc"><p>Create a movie showing (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>movie_id</code></strong></dt>
+<dd>Movie id to show.</dd>
+<dt><strong><code>auditorium_id</code></strong></dt>
+<dd>Auditorium id where it screens.</dd>
+<dt><strong><code>start_time</code></strong></dt>
+<dd>datetime start time.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>MovieShowings</code></dt>
+<dd>The created showing.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin, movie/auditorium missing,
+or start_time is not a datetime.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.add_staff"><code class="name flex">
+<span>def <span class="ident">add_staff</span></span>(<span>self, name, email, phone, birthday, password, theatre_id, role)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_staff(self, name, email, phone, birthday, password, theatre_id, role):
+    &#34;&#34;&#34;Create a new staff user and staff record (admin only).
+
+    Args:
+        name: Staff member name.
+        email: Unique email for the new staff user.
+        phone: Unique phone for the new staff user.
+        birthday: Date of birth (YYYY-MM-DD or date).
+        password: Plaintext password to hash.
+        theatre_id: Theatre id for the staff assignment.
+        role: &#39;admin&#39; or &#39;runner&#39;.
+
+    Returns:
+        Staff: The created staff record.
+
+    Raises:
+        ValueError: If the acting user is not admin or role is invalid.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+    
+    if role not in [&#39;admin&#39;, &#39;runner&#39;]:
+        raise ValueError(&#34;Invalid role. Must be &#39;admin&#39; or &#39;runner&#39;.&#34;)
+    
+    user = self.user_service.create_user(name, email, phone, birthday, password, &#39;staff&#39;)
+    db.session.flush()
+
+    staff = Staff(user_id=user.id, theatre_id=theatre_id, role=role, is_available=True)
+    db.session.add(staff)
+    db.session.commit()
+    return staff</code></pre>
+</details>
+<div class="desc"><p>Create a new staff user and staff record (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>Staff member name.</dd>
+<dt><strong><code>email</code></strong></dt>
+<dd>Unique email for the new staff user.</dd>
+<dt><strong><code>phone</code></strong></dt>
+<dd>Unique phone for the new staff user.</dd>
+<dt><strong><code>birthday</code></strong></dt>
+<dd>Date of birth (YYYY-MM-DD or date).</dd>
+<dt><strong><code>password</code></strong></dt>
+<dd>Plaintext password to hash.</dd>
+<dt><strong><code>theatre_id</code></strong></dt>
+<dd>Theatre id for the staff assignment.</dd>
+<dt><strong><code>role</code></strong></dt>
+<dd>'admin' or 'runner'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Staff</code></dt>
+<dd>The created staff record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the acting user is not admin or role is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.edit_movie"><code class="name flex">
+<span>def <span class="ident">edit_movie</span></span>(<span>self, movie_id, title, genre, length_mins, release_year, keywords, rating)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def edit_movie(self, movie_id, title, genre, length_mins, release_year, keywords, rating):
+    &#34;&#34;&#34;Edit a movie by id (admin only).
+
+    Args:
+        movie_id: Movie primary key.
+        title: New title.
+        genre: New genre.
+        length_mins: New duration in minutes.
+        release_year: New release year.
+        keywords: New keywords.
+        rating: New rating.
+
+    Returns:
+        Movies: The updated movie.
+
+    Raises:
+        ValueError: If acting user is not admin or movie not found.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+    
+    movie = Movies.query.filter_by(id=movie_id).first()
+    if not movie:
+        raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+
+    movie.title = title
+    movie.genre = genre
+    movie.length_mins = length_mins
+    movie.release_year = release_year
+    movie.keywords = keywords
+    movie.rating = rating
+    db.session.commit()
+    return movie</code></pre>
+</details>
+<div class="desc"><p>Edit a movie by id (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>movie_id</code></strong></dt>
+<dd>Movie primary key.</dd>
+<dt><strong><code>title</code></strong></dt>
+<dd>New title.</dd>
+<dt><strong><code>genre</code></strong></dt>
+<dd>New genre.</dd>
+<dt><strong><code>length_mins</code></strong></dt>
+<dd>New duration in minutes.</dd>
+<dt><strong><code>release_year</code></strong></dt>
+<dd>New release year.</dd>
+<dt><strong><code>keywords</code></strong></dt>
+<dd>New keywords.</dd>
+<dt><strong><code>rating</code></strong></dt>
+<dd>New rating.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Movies</code></dt>
+<dd>The updated movie.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin or movie not found.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.edit_showing"><code class="name flex">
+<span>def <span class="ident">edit_showing</span></span>(<span>self, showing_id, movie_id, auditorium_id, start_time)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def edit_showing(self, showing_id, movie_id, auditorium_id, start_time):
+    &#34;&#34;&#34;Edit a movie showing (admin only).
+
+    Args:
+        showing_id: Showing primary key.
+        movie_id: New movie id.
+        auditorium_id: New auditorium id.
+        start_time: New datetime start time.
+
+    Returns:
+        MovieShowings: The updated showing.
+
+    Raises:
+        ValueError: If acting user is not admin, any id not found,
+            or start_time is not a datetime.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+
+    movie = Movies.query.filter_by(id=movie_id).first()
+    if not movie:
+        raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+    auditorium = Auditoriums.query.filter_by(id=auditorium_id).first()
+    if not auditorium:
+        raise ValueError(f&#34;Auditorium {auditorium_id} not found&#34;)
+    
+    showing = MovieShowings.query.filter_by(id=showing_id).first()
+    if not showing:
+        raise ValueError(f&#34;Movie Showing {showing_id} not found&#34;)
+    
+    if not isinstance(start_time, datetime):
+        raise ValueError(f&#34;Movie start time must be in DateTime format&#34;)
+    
+    showing.movie_id = movie_id
+    showing.auditorium_id = auditorium_id
+    showing.start_time = start_time
+    db.session.commit()
+    return showing</code></pre>
+</details>
+<div class="desc"><p>Edit a movie showing (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>showing_id</code></strong></dt>
+<dd>Showing primary key.</dd>
+<dt><strong><code>movie_id</code></strong></dt>
+<dd>New movie id.</dd>
+<dt><strong><code>auditorium_id</code></strong></dt>
+<dd>New auditorium id.</dd>
+<dt><strong><code>start_time</code></strong></dt>
+<dd>New datetime start time.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>MovieShowings</code></dt>
+<dd>The updated showing.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin, any id not found,
+or start_time is not a datetime.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.fulfill_delivery"><code class="name flex">
+<span>def <span class="ident">fulfill_delivery</span></span>(<span>self, delivery_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fulfill_delivery(self, delivery_id):
+    &#34;&#34;&#34;Mark a delivered order as fulfilled and free up the staff member.
+
+    Args:
+        delivery_id: Delivery primary key.
+
+    Returns:
+        Deliveries: The updated delivery.
+
+    Raises:
+        ValueError: If delivery missing or status is not &#39;delivered&#39;.
+    &#34;&#34;&#34;
+    staff = self.validate_staff()
+    delivery = Deliveries.query.filter_by(id=delivery_id).first()
+
+    if not delivery:
+        raise ValueError(f&#34;Delivery {delivery_id} not found&#34;)
+    if delivery.delivery_status != &#39;delivered&#39;:
+        raise ValueError(&#34;Delivery status must be &#39;delivered&#39; to be fulfilled&#34;)
+
+    delivery.delivery_status = &#39;fulfilled&#39;
+    self.set_availability(True)
+    db.session.commit()
+    return delivery</code></pre>
+</details>
+<div class="desc"><p>Mark a delivered order as fulfilled and free up the staff member.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delivery_id</code></strong></dt>
+<dd>Delivery primary key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Deliveries</code></dt>
+<dd>The updated delivery.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If delivery missing or status is not 'delivered'.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.get_available_staff"><code class="name flex">
+<span>def <span class="ident">get_available_staff</span></span>(<span>self, theatre_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_available_staff(self, theatre_id):
+    &#34;&#34;&#34;Return the next available staff member at a theatre (oldest update first).
+
+    Args:
+        theatre_id: Theatre identifier.
+
+    Returns:
+        Staff | None: The selected staff member or None if none available.
+    &#34;&#34;&#34;
+    staff = Staff.query.filter_by(theatre_id=theatre_id, is_available=True).order_by(Staff.last_updated.asc(), Staff.user_id.asc()).all()
+    if staff:
+        staff = staff[0]
+    return staff</code></pre>
+</details>
+<div class="desc"><p>Return the next available staff member at a theatre (oldest update first).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>theatre_id</code></strong></dt>
+<dd>Theatre identifier.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Staff | None</code></dt>
+<dd>The selected staff member or None if none available.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.get_staff"><code class="name flex">
+<span>def <span class="ident">get_staff</span></span>(<span>self, staff_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_staff(self, staff_id):
+    &#34;&#34;&#34;Return a staff record by user id (staff only).
+
+    Args:
+        staff_id: Staff user id to fetch.
+
+    Returns:
+        Staff | None: The staff record or None if not found.
+
+    Raises:
+        ValueError: If the acting user is not staff.
+    &#34;&#34;&#34;
+    self.validate_staff()
+    staff = Staff.query.filter_by(user_id=staff_id).first()
+    return staff</code></pre>
+</details>
+<div class="desc"><p>Return a staff record by user id (staff only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>staff_id</code></strong></dt>
+<dd>Staff user id to fetch.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Staff | None</code></dt>
+<dd>The staff record or None if not found.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the acting user is not staff.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.get_theatres"><code class="name flex">
+<span>def <span class="ident">get_theatres</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_theatres(self):
+    &#34;&#34;&#34;Return all theatres.
+
+    Returns:
+        list[Theatres]: All theatres in the system.
+    &#34;&#34;&#34;
+    theatres = Theatres.query.all()
+    return theatres</code></pre>
+</details>
+<div class="desc"><p>Return all theatres.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Theatres]</code></dt>
+<dd>All theatres in the system.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.remove_movie"><code class="name flex">
+<span>def <span class="ident">remove_movie</span></span>(<span>self, movie_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_movie(self, movie_id):
+    &#34;&#34;&#34;Delete a movie by id (admin only).
+
+    Args:
+        movie_id: Movie primary key.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If acting user is not admin or movie not found.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+    
+    movie = Movies.query.filter_by(id=movie_id).first()
+    if not movie:
+        raise ValueError(f&#34;Movie {movie_id} not found&#34;)
+    
+    db.session.delete(movie)
+    db.session.commit()</code></pre>
+</details>
+<div class="desc"><p>Delete a movie by id (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>movie_id</code></strong></dt>
+<dd>Movie primary key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin or movie not found.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.remove_showing"><code class="name flex">
+<span>def <span class="ident">remove_showing</span></span>(<span>self, showing_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_showing(self, showing_id):
+    &#34;&#34;&#34;Delete a movie showing by id (admin only).
+
+    Args:
+        showing_id: Showing primary key.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If acting user is not admin or showing not found.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+    
+    showing = MovieShowings.query.filter_by(id=showing_id).first()
+    if not showing:
+        raise ValueError(f&#34;Movie Showing {showing_id} not found&#34;)
+    
+    db.session.delete(showing)
+    db.session.commit()</code></pre>
+</details>
+<div class="desc"><p>Delete a movie showing by id (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>showing_id</code></strong></dt>
+<dd>Showing primary key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin or showing not found.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.remove_staff"><code class="name flex">
+<span>def <span class="ident">remove_staff</span></span>(<span>self, staff_user_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_staff(self, staff_user_id):
+    &#34;&#34;&#34;Remove a staff user and associated staff record (admin only).
+
+    Args:
+        staff_user_id: The user id of the staff member to remove.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the acting user is not admin or the staff user is not found.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+
+    staff = Staff.query.filter_by(user_id=staff_user_id).first()
+    if not staff:
+        raise ValueError(f&#34;User {staff_user_id} not found&#34;)
+    
+    self.user_service.delete_user(staff.user_id)</code></pre>
+</details>
+<div class="desc"><p>Remove a staff user and associated staff record (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>staff_user_id</code></strong></dt>
+<dd>The user id of the staff member to remove.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the acting user is not admin or the staff user is not found.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.set_availability"><code class="name flex">
+<span>def <span class="ident">set_availability</span></span>(<span>self, is_available)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_availability(self, is_available):
+    &#34;&#34;&#34;Set the current staff member&#39;s availability.
+
+    Args:
+        is_available: Boolean availability flag.
+
+    Returns:
+        Staff: The updated staff record.
+
+    Raises:
+        ValueError: If the user is not a staff member.
+    &#34;&#34;&#34;
+    staff = self.validate_staff()
+    
+    staff.is_available = is_available
+    db.session.commit()
+    return staff</code></pre>
+</details>
+<div class="desc"><p>Set the current staff member's availability.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>is_available</code></strong></dt>
+<dd>Boolean availability flag.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Staff</code></dt>
+<dd>The updated staff record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the user is not a staff member.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.set_theatre_status"><code class="name flex">
+<span>def <span class="ident">set_theatre_status</span></span>(<span>self, theatre_id, is_open)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_theatre_status(self, theatre_id, is_open):
+    &#34;&#34;&#34;Set open/closed status for a theatre (admin only).
+
+    Args:
+        theatre_id: Target theatre id.
+        is_open: Boolean open flag to set.
+
+    Returns:
+        Theatres: The updated theatre.
+
+    Raises:
+        ValueError: If acting user is not admin or the theatre id is invalid.
+    &#34;&#34;&#34;
+    admin = self.validate_admin()
+    
+    theatre = Theatres.query.filter_by(id=theatre_id).first()
+    if not theatre:
+        raise ValueError(f&#34;Theatre {theatre_id} not found&#34;)
+    
+    theatre.is_open = is_open
+    db.session.commit()
+    return theatre</code></pre>
+</details>
+<div class="desc"><p>Set open/closed status for a theatre (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>theatre_id</code></strong></dt>
+<dd>Target theatre id.</dd>
+<dt><strong><code>is_open</code></strong></dt>
+<dd>Boolean open flag to set.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Theatres</code></dt>
+<dd>The updated theatre.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If acting user is not admin or the theatre id is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.show_all_deliveries"><code class="name flex">
+<span>def <span class="ident">show_all_deliveries</span></span>(<span>self, theatre_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_all_deliveries(self, theatre_id):
+    &#34;&#34;&#34;List all deliveries related to a theatre (staff only).
+
+    Orders by delivery status then id descending.
+
+    Args:
+        theatre_id: Theatre identifier.
+
+    Returns:
+        list[Deliveries]: Matching deliveries.
+
+    Raises:
+        ValueError: If the acting user is not staff.
+    &#34;&#34;&#34;
+    self.validate_staff()
+    deliveries = (
+        Deliveries.query
+        .join(CustomerShowings, Deliveries.customer_showing_id == CustomerShowings.id)
+        .join(Seats, CustomerShowings.seat_id == Seats.id)
+        .join(Auditoriums, Seats.auditorium_id == Auditoriums.id)
+        .filter(Auditoriums.theatre_id == theatre_id)
+        .order_by(Deliveries.delivery_status.asc(), Deliveries.id.desc())
+        .all()
+    )
+    return deliveries</code></pre>
+</details>
+<div class="desc"><p>List all deliveries related to a theatre (staff only).</p>
+<p>Orders by delivery status then id descending.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>theatre_id</code></strong></dt>
+<dd>Theatre identifier.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Deliveries]</code></dt>
+<dd>Matching deliveries.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the acting user is not staff.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.show_all_staff"><code class="name flex">
+<span>def <span class="ident">show_all_staff</span></span>(<span>self, theatre_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_all_staff(self, theatre_id):
+    &#34;&#34;&#34;List all staff at a theatre (admin only).
+
+    Args:
+        theatre_id: Theatre identifier.
+
+    Returns:
+        list[Staff]: Staff ordered by user id.
+
+    Raises:
+        ValueError: If the acting user is not admin.
+    &#34;&#34;&#34;
+    self.validate_admin()
+    return Staff.query.filter(Staff.theatre_id == theatre_id).order_by(Staff.user_id.asc()).all()</code></pre>
+</details>
+<div class="desc"><p>List all staff at a theatre (admin only).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>theatre_id</code></strong></dt>
+<dd>Theatre identifier.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Staff]</code></dt>
+<dd>Staff ordered by user id.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the acting user is not admin.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.try_assign_staff"><code class="name flex">
+<span>def <span class="ident">try_assign_staff</span></span>(<span>self, theatre_id, delivery)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def try_assign_staff(self, theatre_id, delivery):
+    &#34;&#34;&#34;Assign an available staff member to a delivery if possible.
+
+    Args:
+        theatre_id: Theatre to search at.
+        delivery: Delivery instance to assign.
+
+    Returns:
+        bool: True if an assignment occurred, else False.
+
+    Raises:
+        ValueError: If the delivery reference is missing.
+    &#34;&#34;&#34;
+    if not delivery:
+        raise ValueError(&#34;Delivery not found&#34;)
+    staff = self.get_available_staff(theatre_id=theatre_id)
+    print(staff)
+    if not staff:
+        return False
+    delivery.staff_id = staff.user_id
+    ss = StaffService(staff.user_id)
+    ss.set_availability(False)
+    db.session.commit()
+    return True</code></pre>
+</details>
+<div class="desc"><p>Assign an available staff member to a delivery if possible.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>theatre_id</code></strong></dt>
+<dd>Theatre to search at.</dd>
+<dt><strong><code>delivery</code></strong></dt>
+<dd>Delivery instance to assign.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if an assignment occurred, else False.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the delivery reference is missing.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.validate_admin"><code class="name flex">
+<span>def <span class="ident">validate_admin</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_admin(self):
+    &#34;&#34;&#34;Ensure the current user is a staff admin.
+
+    Returns:
+        Staff: The admin staff record.
+
+    Raises:
+        ValueError: If the user is not a staff admin.
+    &#34;&#34;&#34;
+    admin = Staff.query.filter_by(user_id=self.user_id).first()
+    if not admin or admin.role != &#39;admin&#39;:
+        raise ValueError(&#34;Unauthorized User - Not an admin&#34;)
+    return admin</code></pre>
+</details>
+<div class="desc"><p>Ensure the current user is a staff admin.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Staff</code></dt>
+<dd>The admin staff record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the user is not a staff admin.</dd>
+</dl></div>
+</dd>
+<dt id="services.staff_service.StaffService.validate_staff"><code class="name flex">
+<span>def <span class="ident">validate_staff</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_staff(self):
+    &#34;&#34;&#34;Ensure the current user is a staff member (any role).
+
+    Returns:
+        Staff: The staff record.
+
+    Raises:
+        ValueError: If the user is not a staff member.
+    &#34;&#34;&#34;
+    staff = Staff.query.filter_by(user_id=self.user_id).first()
+    if not staff:
+        raise ValueError(&#34;Unauthorized User - Not a staff member&#34;)
+    return staff</code></pre>
+</details>
+<div class="desc"><p>Ensure the current user is a staff member (any role).</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Staff</code></dt>
+<dd>The staff record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the user is not a staff member.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="services" href="index.html">services</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="services.staff_service.StaffService" href="#services.staff_service.StaffService">StaffService</a></code></h4>
+<ul class="two-column">
+<li><code><a title="services.staff_service.StaffService.accept_delivery" href="#services.staff_service.StaffService.accept_delivery">accept_delivery</a></code></li>
+<li><code><a title="services.staff_service.StaffService.add_movie" href="#services.staff_service.StaffService.add_movie">add_movie</a></code></li>
+<li><code><a title="services.staff_service.StaffService.add_showing" href="#services.staff_service.StaffService.add_showing">add_showing</a></code></li>
+<li><code><a title="services.staff_service.StaffService.add_staff" href="#services.staff_service.StaffService.add_staff">add_staff</a></code></li>
+<li><code><a title="services.staff_service.StaffService.edit_movie" href="#services.staff_service.StaffService.edit_movie">edit_movie</a></code></li>
+<li><code><a title="services.staff_service.StaffService.edit_showing" href="#services.staff_service.StaffService.edit_showing">edit_showing</a></code></li>
+<li><code><a title="services.staff_service.StaffService.fulfill_delivery" href="#services.staff_service.StaffService.fulfill_delivery">fulfill_delivery</a></code></li>
+<li><code><a title="services.staff_service.StaffService.get_available_staff" href="#services.staff_service.StaffService.get_available_staff">get_available_staff</a></code></li>
+<li><code><a title="services.staff_service.StaffService.get_staff" href="#services.staff_service.StaffService.get_staff">get_staff</a></code></li>
+<li><code><a title="services.staff_service.StaffService.get_theatres" href="#services.staff_service.StaffService.get_theatres">get_theatres</a></code></li>
+<li><code><a title="services.staff_service.StaffService.remove_movie" href="#services.staff_service.StaffService.remove_movie">remove_movie</a></code></li>
+<li><code><a title="services.staff_service.StaffService.remove_showing" href="#services.staff_service.StaffService.remove_showing">remove_showing</a></code></li>
+<li><code><a title="services.staff_service.StaffService.remove_staff" href="#services.staff_service.StaffService.remove_staff">remove_staff</a></code></li>
+<li><code><a title="services.staff_service.StaffService.set_availability" href="#services.staff_service.StaffService.set_availability">set_availability</a></code></li>
+<li><code><a title="services.staff_service.StaffService.set_theatre_status" href="#services.staff_service.StaffService.set_theatre_status">set_theatre_status</a></code></li>
+<li><code><a title="services.staff_service.StaffService.show_all_deliveries" href="#services.staff_service.StaffService.show_all_deliveries">show_all_deliveries</a></code></li>
+<li><code><a title="services.staff_service.StaffService.show_all_staff" href="#services.staff_service.StaffService.show_all_staff">show_all_staff</a></code></li>
+<li><code><a title="services.staff_service.StaffService.try_assign_staff" href="#services.staff_service.StaffService.try_assign_staff">try_assign_staff</a></code></li>
+<li><code><a title="services.staff_service.StaffService.validate_admin" href="#services.staff_service.StaffService.validate_admin">validate_admin</a></code></li>
+<li><code><a title="services.staff_service.StaffService.validate_staff" href="#services.staff_service.StaffService.validate_staff">validate_staff</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

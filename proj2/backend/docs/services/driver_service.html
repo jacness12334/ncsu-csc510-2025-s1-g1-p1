@@ -1,0 +1,1460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>services.driver_service API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>services.driver_service</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="services.driver_service.DriverService"><code class="flex name class">
+<span>class <span class="ident">DriverService</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DriverService:
+    &#34;&#34;&#34;Service layer for driver accounts and delivery operations.
+
+    This module provides validation utilities and operations for drivers,
+    plus helpers for assignment, completion, rating, and basic queries.
+    &#34;&#34;&#34;
+    
+    def __init__(self):
+        &#34;&#34;&#34;Initialize dependencies used by driver operations.&#34;&#34;&#34;
+        self.user_service = UserService()   
+
+    def validate_driver(self, user_id):
+        &#34;&#34;&#34;Ensure the given user_id belongs to a driver.
+
+        Args:
+            user_id: The user&#39;s id to validate.
+
+        Returns:
+            Drivers: The driver record.
+
+        Raises:
+            ValueError: If no driver exists for the provided id.
+        &#34;&#34;&#34;
+        driver = Drivers.query.filter_by(user_id=user_id).first()
+        if not driver:
+            raise ValueError(f&#34;Driver {user_id} not found&#34;)
+        return driver
+
+    def validate_license_plate(self, license_plate):
+        &#34;&#34;&#34;Validate a license plate string (non-empty, ≤16 chars).
+
+        Args:
+            license_plate: The plate value to validate.
+
+        Returns:
+            str: The normalized plate string.
+
+        Raises:
+            ValueError: If not a string, empty/whitespace, or longer than 16.
+        &#34;&#34;&#34;
+        try:
+            str(license_plate)
+            if not license_plate.strip():
+                raise ValueError(&#34;License plate is required&#34;)
+            if len(license_plate) &gt; 16:
+                raise ValueError(&#34;License plate must be 16 characters or less&#34;)
+            return license_plate.strip()
+        except:
+            raise ValueError(&#34;License plate must be a string&#34;)
+
+    def validate_vehicle_type(self, vehicle_type):
+        &#34;&#34;&#34;Validate vehicle type against the allowed set.
+
+        Allowed values: &#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, &#39;other&#39;.
+
+        Args:
+            vehicle_type: The vehicle type to validate.
+
+        Returns:
+            str: The validated vehicle type.
+
+        Raises:
+            ValueError: If not a string or not in the allowed set.
+        &#34;&#34;&#34;
+        try:
+            str(vehicle_type)
+            if vehicle_type not in [&#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, &#39;other&#39;]:
+                raise ValueError(&#34;Vehicle type must be &#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, or &#39;other&#34;)
+            return vehicle_type
+        except:
+            raise ValueError(&#34;Vehicle type must be a string&#34;)
+
+    def validate_vehicle_color(self, vehicle_color):
+        &#34;&#34;&#34;Validate vehicle color string (non-empty, ≤16 chars).
+
+        Args:
+            vehicle_color: The color to validate.
+
+        Returns:
+            str: The normalized color string.
+
+        Raises:
+            ValueError: If not a string, empty/whitespace, or longer than 16.
+        &#34;&#34;&#34;
+        try:
+            str(vehicle_color)
+            if not vehicle_color.strip():
+                raise ValueError(&#34;Vehicle color is required&#34;)
+            if len(vehicle_color) &gt; 16:
+                raise ValueError(&#34;Vehicle color must be 16 characters or less&#34;)
+            return vehicle_color.strip()
+        except:
+            raise ValueError(&#34;Vehicle color must be a string&#34;)
+        
+    def validate_duty_status(self, duty_status):
+        &#34;&#34;&#34;Validate driver duty status against the allowed set.
+
+        Allowed values: &#39;unavailable&#39;, &#39;available&#39;, &#39;on_delivery&#39;.
+
+        Args:
+            duty_status: The status to validate.
+
+        Returns:
+            str: The validated duty status.
+
+        Raises:
+            ValueError: If not a string or not in the allowed set.
+        &#34;&#34;&#34;
+        try:
+            str(duty_status)
+            if duty_status not in [&#39;unavailable&#39;, &#39;available&#39;, &#39;on_delivery&#39;]:
+                raise ValueError(&#34;Duty status must be &#39;unavailable&#39;, &#39;available&#39;, or &#39;on_delivery&#39;&#34;)
+            return duty_status
+        except:
+            raise ValueError(&#34;Duty status must be a string&#34;)
+    
+    def validate_rating(self, rating):
+        &#34;&#34;&#34;Validate a numeric rating in the inclusive range [0.00, 5.00].
+
+        Args:
+            rating: A number (int/float/Decimal-like) to validate.
+
+        Returns:
+            Decimal: The normalized rating as Decimal.
+
+        Raises:
+            ValueError: If not numeric or out of bounds.
+        &#34;&#34;&#34;
+        try:
+            rating = decimal.Decimal(str(rating))
+            if rating &lt; decimal.Decimal(&#39;0.00&#39;) or rating &gt; decimal.Decimal(&#39;5.00&#39;):
+                raise ValueError(&#34;Rating must be between 0.00 and 5.00&#34;)
+            return rating
+        except:
+            raise ValueError(&#34;Rating must be a valid decimal number&#34;)
+    
+    def validate_total_deliveries(self, total_deliveries):
+        &#34;&#34;&#34;Validate total deliveries as a non-negative integer.
+
+        Args:
+            total_deliveries: The count to validate.
+
+        Returns:
+            int: The normalized deliveries count.
+
+        Raises:
+            ValueError: If not an integer or negative.
+        &#34;&#34;&#34;
+        try:
+            total_deliveries = int(total_deliveries)
+            if total_deliveries &lt; 0:
+                raise ValueError(&#34;Total deliveries cannot be negative&#34;)
+            return total_deliveries
+        except:
+            raise ValueError(&#34;Total deliveries must be an integer&#34;)
+
+    def create_driver(self, name, email, phone, birthday, password, role,
+                      license_plate, vehicle_type, vehicle_color,
+                      duty_status, rating, total_deliveries):
+        &#34;&#34;&#34;Create a user with the driver role and matching driver record.
+
+        Validation is performed for all driver-specific fields before creation.
+
+        Args:
+            name: Driver full name.
+            email: Unique email address.
+            phone: Unique phone number.
+            birthday: Date of birth (YYYY-MM-DD or date).
+            password: Plaintext password (will be hashed).
+            role: Must be &#39;driver&#39;.
+            license_plate: Plate string (≤16 chars).
+            vehicle_type: One of &#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, &#39;other&#39;.
+            vehicle_color: Color string (≤16 chars).
+            duty_status: One of &#39;unavailable&#39;, &#39;available&#39;, &#39;on_delivery&#39;.
+            rating: Initial rating in [0.00, 5.00].
+            total_deliveries: Initial completed deliveries count (≥0).
+
+        Returns:
+            Drivers: The created driver record.
+
+        Raises:
+            ValueError: If role is not &#39;driver&#39; or any validation fails.
+        &#34;&#34;&#34;
+        if role != &#39;driver&#39;:
+            raise ValueError(&#34;User role must be &#39;driver&#39;&#34;)
+        
+        license_plate = self.validate_license_plate(license_plate=license_plate)
+        vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
+        vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
+        duty_status = self.validate_duty_status(duty_status=duty_status)
+        rating = self.validate_rating(rating=rating)
+        total_deliveries = self.validate_total_deliveries(total_deliveries=total_deliveries)
+
+        user = self.user_service.create_user(
+            name=name, 
+            email=email, 
+            phone=phone, 
+            birthday=birthday, 
+            password=password, 
+            role=role
+        )
+        
+        driver = Drivers(
+            user_id=user.id, 
+            license_plate=license_plate, 
+            vehicle_type=vehicle_type, 
+            vehicle_color=vehicle_color, 
+            duty_status=duty_status, 
+            rating=rating, 
+            total_deliveries=total_deliveries
+        )
+
+        db.session.add(driver)
+        db.session.commit()
+        return driver
+    
+    def update_driver_details(self, user_id, license_plate, vehicle_type, vehicle_color):
+        &#34;&#34;&#34;Update a driver&#39;s plate, vehicle type, and color.
+
+        Args:
+            user_id: Driver&#39;s user id.
+            license_plate: New plate string.
+            vehicle_type: New vehicle type.
+            vehicle_color: New color string.
+
+        Returns:
+            Drivers: The updated driver record.
+
+        Raises:
+            ValueError: If the driver doesn&#39;t exist or plate is already used.
+        &#34;&#34;&#34;
+        driver = self.validate_driver(user_id=user_id)
+        plate_owner = Drivers.query.filter_by(license_plate=license_plate).first()
+        if not plate_owner or plate_owner.user_id == driver.user_id:
+            driver.license_plate = self.validate_license_plate(license_plate=license_plate)
+            driver.vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
+            driver.vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
+            db.session.commit()
+            return driver
+        raise ValueError(&#34;License plate already in use&#34;)
+    
+    def update_driver_status(self, user_id, new_status):
+        &#34;&#34;&#34;Set the duty status for a given driver.
+
+        Args:
+            user_id: Driver&#39;s user id.
+            new_status: New duty status string.
+
+        Returns:
+            Drivers: The updated driver record.
+
+        Raises:
+            ValueError: If the driver doesn&#39;t exist or status is invalid.
+        &#34;&#34;&#34;
+        driver = self.validate_driver(user_id=user_id)
+        driver.duty_status = self.validate_duty_status(duty_status=new_status)
+        db.session.commit()
+        return driver
+    
+    def get_available_drivers(self):
+        &#34;&#34;&#34;Return all drivers currently marked as available.
+
+        Returns:
+            list[Drivers]: Available driver records (possibly empty).
+        &#34;&#34;&#34;
+        return Drivers.query.filter(Drivers.duty_status == &#39;available&#39;).all()
+    
+    def get_best_available_driver(self):
+        &#34;&#34;&#34;Return the highest-rated available driver.
+
+        Returns:
+            Drivers | None: The best available driver or None if none available.
+        &#34;&#34;&#34;
+        best_driver = Drivers.query.filter_by(duty_status=&#39;available&#39;).order_by(Drivers.rating.desc()).first()
+        return best_driver
+    
+    def try_assign_driver(self, delivery):
+        &#34;&#34;&#34;Assign the best available driver to a delivery.
+
+        Sets delivery.driver_id, updates delivery_status to &#39;accepted&#39;,
+        and moves the driver&#39;s duty status to &#39;on_delivery&#39;.
+
+        Args:
+            delivery: A Deliveries model instance to be assigned.
+
+        Returns:
+            bool: True if assignment succeeded; False if no drivers available.
+
+        Raises:
+            ValueError: If the delivery reference is missing.
+        &#34;&#34;&#34;
+        if not delivery:
+            raise ValueError(&#34;Delievry not found&#34;)
+        driver = self.get_best_available_driver()
+        if not driver:
+            return False
+        delivery.driver_id = driver.user_id
+        delivery.delivery_status = &#39;accepted&#39;
+        self.update_driver_status(user_id=delivery.driver_id, new_status=&#39;on_delivery&#39;)
+        return True
+    
+    def delete_driver(self, user_id):
+        &#34;&#34;&#34;Delete a driver by removing the underlying user.
+
+        Args:
+            user_id: Driver&#39;s user id.
+
+        Returns:
+            bool: True if deletion succeeded.
+
+        Raises:
+            ValueError: If the driver does not exist.
+        &#34;&#34;&#34;
+        driver = self.validate_driver(user_id=user_id)
+        self.user_service.delete_user(driver.user_id)
+        return True
+    
+    def complete_delivery(self, delivery_id):
+        &#34;&#34;&#34;Mark an accepted delivery as delivered and update driver stats.
+
+        Increments driver&#39;s total_deliveries, sets delivery_status to &#39;delivered&#39;,
+        and moves driver back to &#39;available&#39;. Requires driver to be &#39;on_delivery&#39;.
+
+        Args:
+            delivery_id: The delivery id to complete.
+
+        Returns:
+            Deliveries: The updated delivery record.
+
+        Raises:
+            ValueError: If delivery is missing, not accepted, driver missing,
+                or driver is not currently &#39;on_delivery&#39;.
+        &#34;&#34;&#34;
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
+        if not delivery:
+            raise ValueError(f&#34;Delivery {delivery_id} not found&#34;)
+        
+        if delivery.delivery_status != &#39;accepted&#39;:
+            raise ValueError(&#34;Delivery must be accepted to be completed&#34;)
+        
+        driver = self.validate_driver(user_id=delivery.driver_id)
+        if not driver:
+            raise ValueError(&#34;Driver not found for this delivery&#34;)
+        
+        if driver.duty_status != &#39;on_delivery&#39;:
+            raise ValueError(&#34;Driver is not currently on a delivery&#34;)
+        
+        driver.total_deliveries += 1
+        delivery.delivery_status = &#39;delivered&#39;
+        driver.duty_status = &#39;available&#39;
+        db.session.commit()
+        return delivery
+    
+    def rate_driver(self, delivery_id, new_rating):
+        &#34;&#34;&#34;Rate the driver for a fulfilled delivery and update the average.
+
+        If the driver has no prior deliveries, the rating is set directly;
+        otherwise the new average is computed from the existing rating and count.
+
+        Args:
+            delivery_id: The delivery id to rate.
+            new_rating: The rating value to apply.
+
+        Returns:
+            tuple[Drivers, Deliveries]: The updated driver and delivery.
+
+        Raises:
+            ValueError: If delivery is missing, not fulfilled, already rated,
+                driver missing, or rating invalid.
+        &#34;&#34;&#34;
+        delivery = Deliveries.query.filter_by(id=delivery_id).first()
+        if not delivery:
+            raise ValueError(f&#34;Delivery {delivery_id} not found&#34;)
+        
+        if delivery.delivery_status != &#39;fulfilled&#39;: 
+            raise ValueError(&#34;Can only rate fulfilled deliveries&#34;)
+        
+        if delivery.is_rated:
+            raise ValueError(f&#34;Delivery {delivery_id} has already been rated&#34;)
+        
+        driver = self.validate_driver(user_id=delivery.driver_id)
+        if not driver:
+            raise ValueError(&#34;Driver not found for this delivery&#34;)
+        
+        new_rating = self.validate_rating(new_rating)
+
+        if driver.total_deliveries == 0:
+            driver.rating = new_rating
+        else:
+            total_rating = driver.rating * driver.total_deliveries + new_rating
+            driver.rating = total_rating / (driver.total_deliveries + 1)
+        
+        delivery.is_rated = True
+        db.session.commit()
+        return driver, delivery
+        
+    def show_completed_deliveries(self, driver_id):
+        &#34;&#34;&#34;List all fulfilled deliveries for the given driver.
+
+        Args:
+            driver_id: Driver&#39;s user id.
+
+        Returns:
+            list[Deliveries]: Fulfilled deliveries.
+
+        Raises:
+            ValueError: If the driver has no previous fulfilled deliveries.
+        &#34;&#34;&#34;
+        driver = self.validate_driver(driver_id)
+        deliveries = Deliveries.query.filter(
+            Deliveries.driver_id == driver.user_id,
+            Deliveries.delivery_status == &#39;fulfilled&#39;
+        ).all()
+        if not deliveries:
+            raise ValueError(f&#34;No previous deliveries found for driver {driver.user_id}&#34;)
+        return deliveries
+    
+    def get_active_delivery(self, driver_id):
+        &#34;&#34;&#34;Return the driver&#39;s active delivery if one exists.
+
+        Active statuses include: &#39;pending&#39;, &#39;accepted&#39;, &#39;in_progress&#39;,
+        &#39;ready_for_pickup&#39;, &#39;in_transit&#39;.
+
+        Args:
+            driver_id: Driver&#39;s user id.
+
+        Returns:
+            Deliveries: The active delivery.
+
+        Raises:
+            ValueError: If no active delivery is found for the driver.
+        &#34;&#34;&#34;
+        driver = self.validate_driver(driver_id)
+        active_statuses = [&#39;pending&#39;, &#39;accepted&#39;, &#39;in_progress&#39;, &#39;ready_for_pickup&#39;, &#39;in_transit&#39;]
+        delivery = Deliveries.query.filter(
+            Deliveries.driver_id == driver.user_id,
+            Deliveries.delivery_status.in_(active_statuses)
+        ).first()
+        if not delivery:
+            raise ValueError(f&#34;No active delivery found for driver {driver.user_id}&#34;) 
+        return delivery</code></pre>
+</details>
+<div class="desc"><p>Service layer for driver accounts and delivery operations.</p>
+<p>This module provides validation utilities and operations for drivers,
+plus helpers for assignment, completion, rating, and basic queries.</p>
+<p>Initialize dependencies used by driver operations.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="services.driver_service.DriverService.complete_delivery"><code class="name flex">
+<span>def <span class="ident">complete_delivery</span></span>(<span>self, delivery_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def complete_delivery(self, delivery_id):
+    &#34;&#34;&#34;Mark an accepted delivery as delivered and update driver stats.
+
+    Increments driver&#39;s total_deliveries, sets delivery_status to &#39;delivered&#39;,
+    and moves driver back to &#39;available&#39;. Requires driver to be &#39;on_delivery&#39;.
+
+    Args:
+        delivery_id: The delivery id to complete.
+
+    Returns:
+        Deliveries: The updated delivery record.
+
+    Raises:
+        ValueError: If delivery is missing, not accepted, driver missing,
+            or driver is not currently &#39;on_delivery&#39;.
+    &#34;&#34;&#34;
+    delivery = Deliveries.query.filter_by(id=delivery_id).first()
+    if not delivery:
+        raise ValueError(f&#34;Delivery {delivery_id} not found&#34;)
+    
+    if delivery.delivery_status != &#39;accepted&#39;:
+        raise ValueError(&#34;Delivery must be accepted to be completed&#34;)
+    
+    driver = self.validate_driver(user_id=delivery.driver_id)
+    if not driver:
+        raise ValueError(&#34;Driver not found for this delivery&#34;)
+    
+    if driver.duty_status != &#39;on_delivery&#39;:
+        raise ValueError(&#34;Driver is not currently on a delivery&#34;)
+    
+    driver.total_deliveries += 1
+    delivery.delivery_status = &#39;delivered&#39;
+    driver.duty_status = &#39;available&#39;
+    db.session.commit()
+    return delivery</code></pre>
+</details>
+<div class="desc"><p>Mark an accepted delivery as delivered and update driver stats.</p>
+<p>Increments driver's total_deliveries, sets delivery_status to 'delivered',
+and moves driver back to 'available'. Requires driver to be 'on_delivery'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delivery_id</code></strong></dt>
+<dd>The delivery id to complete.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Deliveries</code></dt>
+<dd>The updated delivery record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If delivery is missing, not accepted, driver missing,
+or driver is not currently 'on_delivery'.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.create_driver"><code class="name flex">
+<span>def <span class="ident">create_driver</span></span>(<span>self,<br>name,<br>email,<br>phone,<br>birthday,<br>password,<br>role,<br>license_plate,<br>vehicle_type,<br>vehicle_color,<br>duty_status,<br>rating,<br>total_deliveries)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_driver(self, name, email, phone, birthday, password, role,
+                  license_plate, vehicle_type, vehicle_color,
+                  duty_status, rating, total_deliveries):
+    &#34;&#34;&#34;Create a user with the driver role and matching driver record.
+
+    Validation is performed for all driver-specific fields before creation.
+
+    Args:
+        name: Driver full name.
+        email: Unique email address.
+        phone: Unique phone number.
+        birthday: Date of birth (YYYY-MM-DD or date).
+        password: Plaintext password (will be hashed).
+        role: Must be &#39;driver&#39;.
+        license_plate: Plate string (≤16 chars).
+        vehicle_type: One of &#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, &#39;other&#39;.
+        vehicle_color: Color string (≤16 chars).
+        duty_status: One of &#39;unavailable&#39;, &#39;available&#39;, &#39;on_delivery&#39;.
+        rating: Initial rating in [0.00, 5.00].
+        total_deliveries: Initial completed deliveries count (≥0).
+
+    Returns:
+        Drivers: The created driver record.
+
+    Raises:
+        ValueError: If role is not &#39;driver&#39; or any validation fails.
+    &#34;&#34;&#34;
+    if role != &#39;driver&#39;:
+        raise ValueError(&#34;User role must be &#39;driver&#39;&#34;)
+    
+    license_plate = self.validate_license_plate(license_plate=license_plate)
+    vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
+    vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
+    duty_status = self.validate_duty_status(duty_status=duty_status)
+    rating = self.validate_rating(rating=rating)
+    total_deliveries = self.validate_total_deliveries(total_deliveries=total_deliveries)
+
+    user = self.user_service.create_user(
+        name=name, 
+        email=email, 
+        phone=phone, 
+        birthday=birthday, 
+        password=password, 
+        role=role
+    )
+    
+    driver = Drivers(
+        user_id=user.id, 
+        license_plate=license_plate, 
+        vehicle_type=vehicle_type, 
+        vehicle_color=vehicle_color, 
+        duty_status=duty_status, 
+        rating=rating, 
+        total_deliveries=total_deliveries
+    )
+
+    db.session.add(driver)
+    db.session.commit()
+    return driver</code></pre>
+</details>
+<div class="desc"><p>Create a user with the driver role and matching driver record.</p>
+<p>Validation is performed for all driver-specific fields before creation.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>Driver full name.</dd>
+<dt><strong><code>email</code></strong></dt>
+<dd>Unique email address.</dd>
+<dt><strong><code>phone</code></strong></dt>
+<dd>Unique phone number.</dd>
+<dt><strong><code>birthday</code></strong></dt>
+<dd>Date of birth (YYYY-MM-DD or date).</dd>
+<dt><strong><code>password</code></strong></dt>
+<dd>Plaintext password (will be hashed).</dd>
+<dt><strong><code>role</code></strong></dt>
+<dd>Must be 'driver'.</dd>
+<dt><strong><code>license_plate</code></strong></dt>
+<dd>Plate string (≤16 chars).</dd>
+<dt><strong><code>vehicle_type</code></strong></dt>
+<dd>One of 'car', 'bike', 'scooter', 'other'.</dd>
+<dt><strong><code>vehicle_color</code></strong></dt>
+<dd>Color string (≤16 chars).</dd>
+<dt><strong><code>duty_status</code></strong></dt>
+<dd>One of 'unavailable', 'available', 'on_delivery'.</dd>
+<dt><strong><code>rating</code></strong></dt>
+<dd>Initial rating in [0.00, 5.00].</dd>
+<dt><strong><code>total_deliveries</code></strong></dt>
+<dd>Initial completed deliveries count (≥0).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Drivers</code></dt>
+<dd>The created driver record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If role is not 'driver' or any validation fails.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.delete_driver"><code class="name flex">
+<span>def <span class="ident">delete_driver</span></span>(<span>self, user_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def delete_driver(self, user_id):
+    &#34;&#34;&#34;Delete a driver by removing the underlying user.
+
+    Args:
+        user_id: Driver&#39;s user id.
+
+    Returns:
+        bool: True if deletion succeeded.
+
+    Raises:
+        ValueError: If the driver does not exist.
+    &#34;&#34;&#34;
+    driver = self.validate_driver(user_id=user_id)
+    self.user_service.delete_user(driver.user_id)
+    return True</code></pre>
+</details>
+<div class="desc"><p>Delete a driver by removing the underlying user.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong></dt>
+<dd>Driver's user id.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if deletion succeeded.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the driver does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.get_active_delivery"><code class="name flex">
+<span>def <span class="ident">get_active_delivery</span></span>(<span>self, driver_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_active_delivery(self, driver_id):
+    &#34;&#34;&#34;Return the driver&#39;s active delivery if one exists.
+
+    Active statuses include: &#39;pending&#39;, &#39;accepted&#39;, &#39;in_progress&#39;,
+    &#39;ready_for_pickup&#39;, &#39;in_transit&#39;.
+
+    Args:
+        driver_id: Driver&#39;s user id.
+
+    Returns:
+        Deliveries: The active delivery.
+
+    Raises:
+        ValueError: If no active delivery is found for the driver.
+    &#34;&#34;&#34;
+    driver = self.validate_driver(driver_id)
+    active_statuses = [&#39;pending&#39;, &#39;accepted&#39;, &#39;in_progress&#39;, &#39;ready_for_pickup&#39;, &#39;in_transit&#39;]
+    delivery = Deliveries.query.filter(
+        Deliveries.driver_id == driver.user_id,
+        Deliveries.delivery_status.in_(active_statuses)
+    ).first()
+    if not delivery:
+        raise ValueError(f&#34;No active delivery found for driver {driver.user_id}&#34;) 
+    return delivery</code></pre>
+</details>
+<div class="desc"><p>Return the driver's active delivery if one exists.</p>
+<p>Active statuses include: 'pending', 'accepted', 'in_progress',
+'ready_for_pickup', 'in_transit'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>driver_id</code></strong></dt>
+<dd>Driver's user id.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Deliveries</code></dt>
+<dd>The active delivery.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no active delivery is found for the driver.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.get_available_drivers"><code class="name flex">
+<span>def <span class="ident">get_available_drivers</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_available_drivers(self):
+    &#34;&#34;&#34;Return all drivers currently marked as available.
+
+    Returns:
+        list[Drivers]: Available driver records (possibly empty).
+    &#34;&#34;&#34;
+    return Drivers.query.filter(Drivers.duty_status == &#39;available&#39;).all()</code></pre>
+</details>
+<div class="desc"><p>Return all drivers currently marked as available.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Drivers]</code></dt>
+<dd>Available driver records (possibly empty).</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.get_best_available_driver"><code class="name flex">
+<span>def <span class="ident">get_best_available_driver</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_best_available_driver(self):
+    &#34;&#34;&#34;Return the highest-rated available driver.
+
+    Returns:
+        Drivers | None: The best available driver or None if none available.
+    &#34;&#34;&#34;
+    best_driver = Drivers.query.filter_by(duty_status=&#39;available&#39;).order_by(Drivers.rating.desc()).first()
+    return best_driver</code></pre>
+</details>
+<div class="desc"><p>Return the highest-rated available driver.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Drivers | None</code></dt>
+<dd>The best available driver or None if none available.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.rate_driver"><code class="name flex">
+<span>def <span class="ident">rate_driver</span></span>(<span>self, delivery_id, new_rating)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rate_driver(self, delivery_id, new_rating):
+    &#34;&#34;&#34;Rate the driver for a fulfilled delivery and update the average.
+
+    If the driver has no prior deliveries, the rating is set directly;
+    otherwise the new average is computed from the existing rating and count.
+
+    Args:
+        delivery_id: The delivery id to rate.
+        new_rating: The rating value to apply.
+
+    Returns:
+        tuple[Drivers, Deliveries]: The updated driver and delivery.
+
+    Raises:
+        ValueError: If delivery is missing, not fulfilled, already rated,
+            driver missing, or rating invalid.
+    &#34;&#34;&#34;
+    delivery = Deliveries.query.filter_by(id=delivery_id).first()
+    if not delivery:
+        raise ValueError(f&#34;Delivery {delivery_id} not found&#34;)
+    
+    if delivery.delivery_status != &#39;fulfilled&#39;: 
+        raise ValueError(&#34;Can only rate fulfilled deliveries&#34;)
+    
+    if delivery.is_rated:
+        raise ValueError(f&#34;Delivery {delivery_id} has already been rated&#34;)
+    
+    driver = self.validate_driver(user_id=delivery.driver_id)
+    if not driver:
+        raise ValueError(&#34;Driver not found for this delivery&#34;)
+    
+    new_rating = self.validate_rating(new_rating)
+
+    if driver.total_deliveries == 0:
+        driver.rating = new_rating
+    else:
+        total_rating = driver.rating * driver.total_deliveries + new_rating
+        driver.rating = total_rating / (driver.total_deliveries + 1)
+    
+    delivery.is_rated = True
+    db.session.commit()
+    return driver, delivery</code></pre>
+</details>
+<div class="desc"><p>Rate the driver for a fulfilled delivery and update the average.</p>
+<p>If the driver has no prior deliveries, the rating is set directly;
+otherwise the new average is computed from the existing rating and count.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delivery_id</code></strong></dt>
+<dd>The delivery id to rate.</dd>
+<dt><strong><code>new_rating</code></strong></dt>
+<dd>The rating value to apply.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple[Drivers, Deliveries]</code></dt>
+<dd>The updated driver and delivery.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If delivery is missing, not fulfilled, already rated,
+driver missing, or rating invalid.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.show_completed_deliveries"><code class="name flex">
+<span>def <span class="ident">show_completed_deliveries</span></span>(<span>self, driver_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_completed_deliveries(self, driver_id):
+    &#34;&#34;&#34;List all fulfilled deliveries for the given driver.
+
+    Args:
+        driver_id: Driver&#39;s user id.
+
+    Returns:
+        list[Deliveries]: Fulfilled deliveries.
+
+    Raises:
+        ValueError: If the driver has no previous fulfilled deliveries.
+    &#34;&#34;&#34;
+    driver = self.validate_driver(driver_id)
+    deliveries = Deliveries.query.filter(
+        Deliveries.driver_id == driver.user_id,
+        Deliveries.delivery_status == &#39;fulfilled&#39;
+    ).all()
+    if not deliveries:
+        raise ValueError(f&#34;No previous deliveries found for driver {driver.user_id}&#34;)
+    return deliveries</code></pre>
+</details>
+<div class="desc"><p>List all fulfilled deliveries for the given driver.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>driver_id</code></strong></dt>
+<dd>Driver's user id.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Deliveries]</code></dt>
+<dd>Fulfilled deliveries.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the driver has no previous fulfilled deliveries.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.try_assign_driver"><code class="name flex">
+<span>def <span class="ident">try_assign_driver</span></span>(<span>self, delivery)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def try_assign_driver(self, delivery):
+    &#34;&#34;&#34;Assign the best available driver to a delivery.
+
+    Sets delivery.driver_id, updates delivery_status to &#39;accepted&#39;,
+    and moves the driver&#39;s duty status to &#39;on_delivery&#39;.
+
+    Args:
+        delivery: A Deliveries model instance to be assigned.
+
+    Returns:
+        bool: True if assignment succeeded; False if no drivers available.
+
+    Raises:
+        ValueError: If the delivery reference is missing.
+    &#34;&#34;&#34;
+    if not delivery:
+        raise ValueError(&#34;Delievry not found&#34;)
+    driver = self.get_best_available_driver()
+    if not driver:
+        return False
+    delivery.driver_id = driver.user_id
+    delivery.delivery_status = &#39;accepted&#39;
+    self.update_driver_status(user_id=delivery.driver_id, new_status=&#39;on_delivery&#39;)
+    return True</code></pre>
+</details>
+<div class="desc"><p>Assign the best available driver to a delivery.</p>
+<p>Sets delivery.driver_id, updates delivery_status to 'accepted',
+and moves the driver's duty status to 'on_delivery'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delivery</code></strong></dt>
+<dd>A Deliveries model instance to be assigned.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if assignment succeeded; False if no drivers available.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the delivery reference is missing.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.update_driver_details"><code class="name flex">
+<span>def <span class="ident">update_driver_details</span></span>(<span>self, user_id, license_plate, vehicle_type, vehicle_color)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_driver_details(self, user_id, license_plate, vehicle_type, vehicle_color):
+    &#34;&#34;&#34;Update a driver&#39;s plate, vehicle type, and color.
+
+    Args:
+        user_id: Driver&#39;s user id.
+        license_plate: New plate string.
+        vehicle_type: New vehicle type.
+        vehicle_color: New color string.
+
+    Returns:
+        Drivers: The updated driver record.
+
+    Raises:
+        ValueError: If the driver doesn&#39;t exist or plate is already used.
+    &#34;&#34;&#34;
+    driver = self.validate_driver(user_id=user_id)
+    plate_owner = Drivers.query.filter_by(license_plate=license_plate).first()
+    if not plate_owner or plate_owner.user_id == driver.user_id:
+        driver.license_plate = self.validate_license_plate(license_plate=license_plate)
+        driver.vehicle_type = self.validate_vehicle_type(vehicle_type=vehicle_type)
+        driver.vehicle_color = self.validate_vehicle_color(vehicle_color=vehicle_color)
+        db.session.commit()
+        return driver
+    raise ValueError(&#34;License plate already in use&#34;)</code></pre>
+</details>
+<div class="desc"><p>Update a driver's plate, vehicle type, and color.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong></dt>
+<dd>Driver's user id.</dd>
+<dt><strong><code>license_plate</code></strong></dt>
+<dd>New plate string.</dd>
+<dt><strong><code>vehicle_type</code></strong></dt>
+<dd>New vehicle type.</dd>
+<dt><strong><code>vehicle_color</code></strong></dt>
+<dd>New color string.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Drivers</code></dt>
+<dd>The updated driver record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the driver doesn't exist or plate is already used.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.update_driver_status"><code class="name flex">
+<span>def <span class="ident">update_driver_status</span></span>(<span>self, user_id, new_status)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_driver_status(self, user_id, new_status):
+    &#34;&#34;&#34;Set the duty status for a given driver.
+
+    Args:
+        user_id: Driver&#39;s user id.
+        new_status: New duty status string.
+
+    Returns:
+        Drivers: The updated driver record.
+
+    Raises:
+        ValueError: If the driver doesn&#39;t exist or status is invalid.
+    &#34;&#34;&#34;
+    driver = self.validate_driver(user_id=user_id)
+    driver.duty_status = self.validate_duty_status(duty_status=new_status)
+    db.session.commit()
+    return driver</code></pre>
+</details>
+<div class="desc"><p>Set the duty status for a given driver.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong></dt>
+<dd>Driver's user id.</dd>
+<dt><strong><code>new_status</code></strong></dt>
+<dd>New duty status string.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Drivers</code></dt>
+<dd>The updated driver record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the driver doesn't exist or status is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_driver"><code class="name flex">
+<span>def <span class="ident">validate_driver</span></span>(<span>self, user_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_driver(self, user_id):
+    &#34;&#34;&#34;Ensure the given user_id belongs to a driver.
+
+    Args:
+        user_id: The user&#39;s id to validate.
+
+    Returns:
+        Drivers: The driver record.
+
+    Raises:
+        ValueError: If no driver exists for the provided id.
+    &#34;&#34;&#34;
+    driver = Drivers.query.filter_by(user_id=user_id).first()
+    if not driver:
+        raise ValueError(f&#34;Driver {user_id} not found&#34;)
+    return driver</code></pre>
+</details>
+<div class="desc"><p>Ensure the given user_id belongs to a driver.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong></dt>
+<dd>The user's id to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Drivers</code></dt>
+<dd>The driver record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no driver exists for the provided id.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_duty_status"><code class="name flex">
+<span>def <span class="ident">validate_duty_status</span></span>(<span>self, duty_status)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_duty_status(self, duty_status):
+    &#34;&#34;&#34;Validate driver duty status against the allowed set.
+
+    Allowed values: &#39;unavailable&#39;, &#39;available&#39;, &#39;on_delivery&#39;.
+
+    Args:
+        duty_status: The status to validate.
+
+    Returns:
+        str: The validated duty status.
+
+    Raises:
+        ValueError: If not a string or not in the allowed set.
+    &#34;&#34;&#34;
+    try:
+        str(duty_status)
+        if duty_status not in [&#39;unavailable&#39;, &#39;available&#39;, &#39;on_delivery&#39;]:
+            raise ValueError(&#34;Duty status must be &#39;unavailable&#39;, &#39;available&#39;, or &#39;on_delivery&#39;&#34;)
+        return duty_status
+    except:
+        raise ValueError(&#34;Duty status must be a string&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate driver duty status against the allowed set.</p>
+<p>Allowed values: 'unavailable', 'available', 'on_delivery'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>duty_status</code></strong></dt>
+<dd>The status to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The validated duty status.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If not a string or not in the allowed set.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_license_plate"><code class="name flex">
+<span>def <span class="ident">validate_license_plate</span></span>(<span>self, license_plate)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_license_plate(self, license_plate):
+    &#34;&#34;&#34;Validate a license plate string (non-empty, ≤16 chars).
+
+    Args:
+        license_plate: The plate value to validate.
+
+    Returns:
+        str: The normalized plate string.
+
+    Raises:
+        ValueError: If not a string, empty/whitespace, or longer than 16.
+    &#34;&#34;&#34;
+    try:
+        str(license_plate)
+        if not license_plate.strip():
+            raise ValueError(&#34;License plate is required&#34;)
+        if len(license_plate) &gt; 16:
+            raise ValueError(&#34;License plate must be 16 characters or less&#34;)
+        return license_plate.strip()
+    except:
+        raise ValueError(&#34;License plate must be a string&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate a license plate string (non-empty, ≤16 chars).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>license_plate</code></strong></dt>
+<dd>The plate value to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The normalized plate string.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If not a string, empty/whitespace, or longer than 16.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_rating"><code class="name flex">
+<span>def <span class="ident">validate_rating</span></span>(<span>self, rating)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_rating(self, rating):
+    &#34;&#34;&#34;Validate a numeric rating in the inclusive range [0.00, 5.00].
+
+    Args:
+        rating: A number (int/float/Decimal-like) to validate.
+
+    Returns:
+        Decimal: The normalized rating as Decimal.
+
+    Raises:
+        ValueError: If not numeric or out of bounds.
+    &#34;&#34;&#34;
+    try:
+        rating = decimal.Decimal(str(rating))
+        if rating &lt; decimal.Decimal(&#39;0.00&#39;) or rating &gt; decimal.Decimal(&#39;5.00&#39;):
+            raise ValueError(&#34;Rating must be between 0.00 and 5.00&#34;)
+        return rating
+    except:
+        raise ValueError(&#34;Rating must be a valid decimal number&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate a numeric rating in the inclusive range [0.00, 5.00].</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rating</code></strong></dt>
+<dd>A number (int/float/Decimal-like) to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Decimal</code></dt>
+<dd>The normalized rating as Decimal.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If not numeric or out of bounds.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_total_deliveries"><code class="name flex">
+<span>def <span class="ident">validate_total_deliveries</span></span>(<span>self, total_deliveries)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_total_deliveries(self, total_deliveries):
+    &#34;&#34;&#34;Validate total deliveries as a non-negative integer.
+
+    Args:
+        total_deliveries: The count to validate.
+
+    Returns:
+        int: The normalized deliveries count.
+
+    Raises:
+        ValueError: If not an integer or negative.
+    &#34;&#34;&#34;
+    try:
+        total_deliveries = int(total_deliveries)
+        if total_deliveries &lt; 0:
+            raise ValueError(&#34;Total deliveries cannot be negative&#34;)
+        return total_deliveries
+    except:
+        raise ValueError(&#34;Total deliveries must be an integer&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate total deliveries as a non-negative integer.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>total_deliveries</code></strong></dt>
+<dd>The count to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>The normalized deliveries count.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If not an integer or negative.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_vehicle_color"><code class="name flex">
+<span>def <span class="ident">validate_vehicle_color</span></span>(<span>self, vehicle_color)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_vehicle_color(self, vehicle_color):
+    &#34;&#34;&#34;Validate vehicle color string (non-empty, ≤16 chars).
+
+    Args:
+        vehicle_color: The color to validate.
+
+    Returns:
+        str: The normalized color string.
+
+    Raises:
+        ValueError: If not a string, empty/whitespace, or longer than 16.
+    &#34;&#34;&#34;
+    try:
+        str(vehicle_color)
+        if not vehicle_color.strip():
+            raise ValueError(&#34;Vehicle color is required&#34;)
+        if len(vehicle_color) &gt; 16:
+            raise ValueError(&#34;Vehicle color must be 16 characters or less&#34;)
+        return vehicle_color.strip()
+    except:
+        raise ValueError(&#34;Vehicle color must be a string&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate vehicle color string (non-empty, ≤16 chars).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vehicle_color</code></strong></dt>
+<dd>The color to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The normalized color string.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If not a string, empty/whitespace, or longer than 16.</dd>
+</dl></div>
+</dd>
+<dt id="services.driver_service.DriverService.validate_vehicle_type"><code class="name flex">
+<span>def <span class="ident">validate_vehicle_type</span></span>(<span>self, vehicle_type)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_vehicle_type(self, vehicle_type):
+    &#34;&#34;&#34;Validate vehicle type against the allowed set.
+
+    Allowed values: &#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, &#39;other&#39;.
+
+    Args:
+        vehicle_type: The vehicle type to validate.
+
+    Returns:
+        str: The validated vehicle type.
+
+    Raises:
+        ValueError: If not a string or not in the allowed set.
+    &#34;&#34;&#34;
+    try:
+        str(vehicle_type)
+        if vehicle_type not in [&#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, &#39;other&#39;]:
+            raise ValueError(&#34;Vehicle type must be &#39;car&#39;, &#39;bike&#39;, &#39;scooter&#39;, or &#39;other&#34;)
+        return vehicle_type
+    except:
+        raise ValueError(&#34;Vehicle type must be a string&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate vehicle type against the allowed set.</p>
+<p>Allowed values: 'car', 'bike', 'scooter', 'other'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vehicle_type</code></strong></dt>
+<dd>The vehicle type to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The validated vehicle type.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If not a string or not in the allowed set.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="services" href="index.html">services</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="services.driver_service.DriverService" href="#services.driver_service.DriverService">DriverService</a></code></h4>
+<ul class="">
+<li><code><a title="services.driver_service.DriverService.complete_delivery" href="#services.driver_service.DriverService.complete_delivery">complete_delivery</a></code></li>
+<li><code><a title="services.driver_service.DriverService.create_driver" href="#services.driver_service.DriverService.create_driver">create_driver</a></code></li>
+<li><code><a title="services.driver_service.DriverService.delete_driver" href="#services.driver_service.DriverService.delete_driver">delete_driver</a></code></li>
+<li><code><a title="services.driver_service.DriverService.get_active_delivery" href="#services.driver_service.DriverService.get_active_delivery">get_active_delivery</a></code></li>
+<li><code><a title="services.driver_service.DriverService.get_available_drivers" href="#services.driver_service.DriverService.get_available_drivers">get_available_drivers</a></code></li>
+<li><code><a title="services.driver_service.DriverService.get_best_available_driver" href="#services.driver_service.DriverService.get_best_available_driver">get_best_available_driver</a></code></li>
+<li><code><a title="services.driver_service.DriverService.rate_driver" href="#services.driver_service.DriverService.rate_driver">rate_driver</a></code></li>
+<li><code><a title="services.driver_service.DriverService.show_completed_deliveries" href="#services.driver_service.DriverService.show_completed_deliveries">show_completed_deliveries</a></code></li>
+<li><code><a title="services.driver_service.DriverService.try_assign_driver" href="#services.driver_service.DriverService.try_assign_driver">try_assign_driver</a></code></li>
+<li><code><a title="services.driver_service.DriverService.update_driver_details" href="#services.driver_service.DriverService.update_driver_details">update_driver_details</a></code></li>
+<li><code><a title="services.driver_service.DriverService.update_driver_status" href="#services.driver_service.DriverService.update_driver_status">update_driver_status</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_driver" href="#services.driver_service.DriverService.validate_driver">validate_driver</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_duty_status" href="#services.driver_service.DriverService.validate_duty_status">validate_duty_status</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_license_plate" href="#services.driver_service.DriverService.validate_license_plate">validate_license_plate</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_rating" href="#services.driver_service.DriverService.validate_rating">validate_rating</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_total_deliveries" href="#services.driver_service.DriverService.validate_total_deliveries">validate_total_deliveries</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_vehicle_color" href="#services.driver_service.DriverService.validate_vehicle_color">validate_vehicle_color</a></code></li>
+<li><code><a title="services.driver_service.DriverService.validate_vehicle_type" href="#services.driver_service.DriverService.validate_vehicle_type">validate_vehicle_type</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

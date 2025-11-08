@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify
 from app.services.customer_service import CustomerService
 
+
 # Blueprint for customer-related endpoints
 customer_bp = Blueprint('customer', __name__, url_prefix='/api')
 
+
 # CustomerService instance
 customer_service = CustomerService()
+
 
 @customer_bp.route('/customers', methods=['POST'])
 def create_customer():
@@ -51,6 +54,7 @@ def create_customer():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @customer_bp.route('/customers/<int:user_id>', methods=['GET'])
 def get_customer(user_id):
     """
@@ -81,6 +85,7 @@ def get_customer(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @customer_bp.route('/customers/<int:user_id>', methods=['DELETE'])
 def delete_customer(user_id):
     """
@@ -110,6 +115,7 @@ def delete_customer(user_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/customers/<int:user_id>/theatre', methods=['PUT'])
 def update_default_theatre(user_id):
@@ -152,6 +158,7 @@ def update_default_theatre(user_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/customers/<int:user_id>/payment-methods', methods=['POST'])
 def add_payment_method(user_id):
@@ -199,13 +206,14 @@ def add_payment_method(user_id):
     except Exception as e:
         return jsonify({'error': 'An error occurred: ' + str(e)}), 500
 
+
 @customer_bp.route('/customers/<int:customer_id>/payment-methods', methods=['GET'])
 def get_payment_methods(customer_id):
     """
     Get Customer Payment Methods
     ---
     tags: [Payment Methods]
-    description: Retrieves all saved payment methods for a customer.
+    description: Retrieves all saved payment methods for a customer; returns an empty list if none are saved.
     parameters:
       - in: path
         name: customer_id
@@ -221,7 +229,6 @@ def get_payment_methods(customer_id):
             payment_methods:
               type: array
               items: {$ref: '#/definitions/PaymentMethodDetails'}
-      404: {description: Customer not found}
     """
     try:
         payment_methods = customer_service.get_customer_payment_methods(customer_id=customer_id)
@@ -240,6 +247,7 @@ def get_payment_methods(customer_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/payment-methods/<int:payment_method_id>', methods=['DELETE'])
 def delete_payment_method(payment_method_id):
@@ -270,6 +278,7 @@ def delete_payment_method(payment_method_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/payment-methods/<int:payment_method_id>/add-funds', methods=['POST'])
 def add_funds(payment_method_id):
@@ -310,6 +319,7 @@ def add_funds(payment_method_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['POST'])
 def add_to_cart(customer_id):
@@ -353,13 +363,14 @@ def add_to_cart(customer_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @customer_bp.route('/customers/<int:customer_id>/cart', methods=['GET'])
 def get_cart(customer_id):
     """
     Get Shopping Cart
     ---
     tags: [Shopping Cart]
-    description: Retrieves all items currently in the customer's shopping cart.
+    description: Retrieves all items currently in the customer's shopping cart; returns an empty list if the cart is empty.
     parameters:
       - in: path
         name: customer_id
@@ -375,7 +386,6 @@ def get_cart(customer_id):
             items:
               type: array
               items: {$ref: '#/definitions/CartItemDetails'}
-      404: {description: Customer not found}
     """
     try:
         items = customer_service.get_cart_items(customer_id=customer_id) or []
@@ -390,6 +400,7 @@ def get_cart(customer_id):
         return jsonify({'error': str(e)}), 404
     except Exception:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
 def update_cart_item(cart_item_id):
@@ -434,6 +445,7 @@ def update_cart_item(cart_item_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @customer_bp.route('/cart/<int:cart_item_id>', methods=['DELETE'])
 def delete_cart_item(cart_item_id):
     """
@@ -463,6 +475,7 @@ def delete_cart_item(cart_item_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/customers/<int:user_id>/showings', methods=['POST'])
 def create_customer_showing(user_id):
@@ -512,7 +525,7 @@ def create_delivery():
     Create Delivery Order
     ---
     tags: [Delivery Operations (Customer)]
-    description: Places a new delivery order based on the current cart items. Cart is cleared upon creation.
+    description: Places a new delivery order based on the current cart items.
     parameters:
       - in: body
         name: delivery_creation
@@ -545,10 +558,11 @@ def create_delivery():
         }), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
-    except Exception:
+    except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/deliveries/<int:delivery_id>/cancel', methods=['POST'])
 def cancel_delivery(delivery_id):
@@ -586,6 +600,7 @@ def cancel_delivery(delivery_id):
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/deliveries/<int:delivery_id>/rate', methods=['POST'])
 def rate_delivery(delivery_id):
@@ -627,6 +642,7 @@ def rate_delivery(delivery_id):
     except Exception:
         return jsonify({'error': str(e)}), 500
 
+
 @customer_bp.route('/products/menu', methods=['GET'])
 def list_products():
     """
@@ -659,6 +675,7 @@ def list_products():
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @customer_bp.route('/customers/<int:user_id>/deliveries', methods=['GET'])
 def get_deliveries_for_customer(user_id):
@@ -710,7 +727,7 @@ def get_showings_for_customer(user_id):
     ---
     summary: List Customer Showings
     tags: [Movie Booking]
-    description: Retrieves all showings for a customer, including movie title, seat, start time, auditorium, and theatre name.
+    description: Retrieves all showings for a customer, including movie title, seat (e.g., "A 10"), start time, auditorium label (e.g., "Auditorium 2"), and theatre name.
     parameters:
       - in: path
         name: user_id
@@ -730,21 +747,9 @@ def get_showings_for_customer(user_id):
                 properties:
                   id: {type: integer}
                   movie_title: {type: string}
-                  seat:
-                    type: object
-                    nullable: true
-                    properties:
-                      id: {type: integer}
-                      aisle: {type: string}
-                      number: {type: integer}
+                  seat: {type: string, nullable: true}
                   start_time: {type: string, description: ISO 8601 datetime}
-                  auditorium:
-                    type: object
-                    nullable: true
-                    properties:
-                      id: {type: integer}
-                      number: {type: integer}
-                      theatre_id: {type: integer}
+                  auditorium: {type: string, nullable: true}
                   theatre_name: {type: string}
       404:
         description: Customer not found
@@ -765,6 +770,7 @@ def get_showings_for_customer(user_id):
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @customer_bp.route('/deliveries/<int:delivery_id>/details', methods=['GET'])
 def get_delivery_details(delivery_id):
@@ -811,3 +817,37 @@ def get_delivery_details(delivery_id):
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+  
+
+@customer_bp.route('/customers/<int:user_id>/customer_showing', methods=['GET'])
+def get_customer_showing(user_id):
+    """
+    Get Customer Showing ID
+    ---
+    tags: [Movie Booking]
+    description: Retrieves the first customer_showing id for the specified customer.
+    parameters:
+      - in: path
+        name: user_id
+        type: integer
+        required: true
+        description: The ID of the customer user.
+    responses:
+      200:
+        description: Customer showing ID retrieved successfully
+        schema:
+          type: object
+          properties:
+            id: {type: integer}
+      400:
+        description: Invalid input or no showing found for the customer
+      500:
+        description: Server error while retrieving the showing ID
+    """
+    try:
+        customer_showing = customer_service.get_customer_showing_id(user_id)
+        return jsonify(customer_showing), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>services.supplier_service API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>services.supplier_service</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="services.supplier_service.SupplierService"><code class="flex name class">
+<span>class <span class="ident">SupplierService</span></span>
+<span>(</span><span>user_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SupplierService:
+    &#34;&#34;&#34;Business logic for supplier profiles and product/catalog management.
+
+    This service validates supplier identity and provides operations to view and
+    update supplier details, manage products, and list open suppliers.
+    &#34;&#34;&#34;
+
+    def __init__(self, user_id):
+        &#34;&#34;&#34;Initialize the supplier service with acting user context.
+
+        Args:
+            user_id: The supplier&#39;s user id used for authorization and filtering.
+        &#34;&#34;&#34;
+        self.user_id = user_id
+
+    def validate_supplier(self):
+        &#34;&#34;&#34;Validate that the current user id belongs to a supplier.
+
+        Returns:
+            Suppliers: The supplier record.
+
+        Raises:
+            ValueError: If the supplier record does not exist.
+        &#34;&#34;&#34;
+        supplier = Suppliers.query.filter_by(user_id=self.user_id).first()
+        if not supplier:
+            raise ValueError(f&#34;Supplier {self.user_id} not found&#34;)
+        return supplier
+
+    def get_supplier(self):
+        &#34;&#34;&#34;Return the supplier record for the current context user.
+
+        Returns:
+            Suppliers: The supplier record associated with self.user_id.
+
+        Raises:
+            ValueError: If the supplier record does not exist.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        return supplier
+
+    def edit_supplier(self, company_name, company_address, contact_phone, is_open):
+        &#34;&#34;&#34;Update supplier profile fields.
+
+        Args:
+            company_name: New company name.
+            company_address: New company address.
+            contact_phone: New contact phone number.
+            is_open: Whether the supplier is currently open.
+
+        Returns:
+            Suppliers: The updated supplier record.
+
+        Raises:
+            ValueError: If the supplier record does not exist.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        supplier.company_name = company_name
+        supplier.company_address = company_address
+        supplier.contact_phone = contact_phone
+        supplier.is_open = is_open
+        db.session.commit()
+        return supplier
+
+    def set_is_open(self, is_open):
+        &#34;&#34;&#34;Set the supplier&#39;s open/closed status.
+
+        Args:
+            is_open: Boolean open flag to set.
+
+        Returns:
+            Suppliers: The updated supplier record.
+
+        Raises:
+            ValueError: If the supplier record does not exist.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        supplier.is_open = is_open
+        db.session.commit()
+        return supplier
+
+    def get_products(self):
+        &#34;&#34;&#34;List all products owned by the current supplier.
+
+        Returns:
+            list[Products]: All product rows for this supplier (possibly empty).
+
+        Raises:
+            ValueError: If the supplier record does not exist.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        products = Products.query.filter_by(supplier_id=self.user_id).all()
+        return products
+
+    def add_product(self, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available):
+        &#34;&#34;&#34;Create a new product for the current supplier.
+
+        Args:
+            name: Product name.
+            unit_price: Unit price as numeric/Decimal-compatible value.
+            inventory_quantity: Initial inventory quantity (non-negative).
+            size: Optional size (e.g., &#39;small&#39;, &#39;medium&#39;, &#39;large&#39; or None).
+            keywords: Optional search keywords.
+            category: Product category (must satisfy DB enum).
+            discount: Per-unit discount value (non-negative).
+            is_available: Whether the product is available for ordering.
+
+        Returns:
+            Products: The newly created product.
+
+        Raises:
+            ValueError: If the supplier record does not exist.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        product = Products(
+            supplier_id=supplier.user_id,
+            name=name,
+            unit_price=unit_price,
+            inventory_quantity=inventory_quantity,
+            size=size,
+            keywords=keywords,
+            category=category,
+            discount=discount,
+            is_available=is_available
+        )
+        db.session.add(product)
+        db.session.commit()
+        return product
+
+    def edit_product(self, product_id, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available):
+        &#34;&#34;&#34;Edit a product owned by the current supplier.
+
+        Args:
+            product_id: Product primary key.
+            name: New product name.
+            unit_price: New unit price.
+            inventory_quantity: New inventory quantity.
+            size: New size value or None.
+            keywords: New keywords string.
+            category: New category value.
+            discount: New discount value.
+            is_available: New availability flag.
+
+        Returns:
+            Products: The updated product.
+
+        Raises:
+            ValueError: If the supplier record does not exist or product is not found.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        product = Products.query.filter_by(id=product_id).first()
+        if not product:
+            raise ValueError(f&#34;Product {product_id} not found&#34;)
+
+        product.name = name
+        product.unit_price = unit_price
+        product.inventory_quantity = inventory_quantity
+        product.size = size
+        product.keywords = keywords
+        product.category = category
+        product.discount = discount
+        product.is_available = is_available
+        db.session.commit()
+        return product
+
+    def remove_product(self, product_id):
+        &#34;&#34;&#34;Delete a product by id.
+
+        Args:
+            product_id: Product primary key.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the supplier record does not exist or product is not found.
+        &#34;&#34;&#34;
+        supplier = self.validate_supplier()
+        product = Products.query.filter_by(id=product_id).first()
+        if not product:
+            raise ValueError(f&#34;Product {product_id} not found&#34;)
+
+        db.session.delete(product)
+        db.session.commit()
+
+    def get_all_suppliers(self):
+        &#34;&#34;&#34;Return all open suppliers ordered by company name.
+
+        Returns:
+            list[Suppliers]: Open suppliers sorted ascending by company name.
+        &#34;&#34;&#34;
+        suppliers = Suppliers.query.filter(Suppliers.is_open.is_(True)).order_by(Suppliers.company_name.asc()).all()
+        return suppliers</code></pre>
+</details>
+<div class="desc"><p>Business logic for supplier profiles and product/catalog management.</p>
+<p>This service validates supplier identity and provides operations to view and
+update supplier details, manage products, and list open suppliers.</p>
+<p>Initialize the supplier service with acting user context.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>user_id</code></strong></dt>
+<dd>The supplier's user id used for authorization and filtering.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="services.supplier_service.SupplierService.add_product"><code class="name flex">
+<span>def <span class="ident">add_product</span></span>(<span>self,<br>name,<br>unit_price,<br>inventory_quantity,<br>size,<br>keywords,<br>category,<br>discount,<br>is_available)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_product(self, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available):
+    &#34;&#34;&#34;Create a new product for the current supplier.
+
+    Args:
+        name: Product name.
+        unit_price: Unit price as numeric/Decimal-compatible value.
+        inventory_quantity: Initial inventory quantity (non-negative).
+        size: Optional size (e.g., &#39;small&#39;, &#39;medium&#39;, &#39;large&#39; or None).
+        keywords: Optional search keywords.
+        category: Product category (must satisfy DB enum).
+        discount: Per-unit discount value (non-negative).
+        is_available: Whether the product is available for ordering.
+
+    Returns:
+        Products: The newly created product.
+
+    Raises:
+        ValueError: If the supplier record does not exist.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    product = Products(
+        supplier_id=supplier.user_id,
+        name=name,
+        unit_price=unit_price,
+        inventory_quantity=inventory_quantity,
+        size=size,
+        keywords=keywords,
+        category=category,
+        discount=discount,
+        is_available=is_available
+    )
+    db.session.add(product)
+    db.session.commit()
+    return product</code></pre>
+</details>
+<div class="desc"><p>Create a new product for the current supplier.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>Product name.</dd>
+<dt><strong><code>unit_price</code></strong></dt>
+<dd>Unit price as numeric/Decimal-compatible value.</dd>
+<dt><strong><code>inventory_quantity</code></strong></dt>
+<dd>Initial inventory quantity (non-negative).</dd>
+<dt><strong><code>size</code></strong></dt>
+<dd>Optional size (e.g., 'small', 'medium', 'large' or None).</dd>
+<dt><strong><code>keywords</code></strong></dt>
+<dd>Optional search keywords.</dd>
+<dt><strong><code>category</code></strong></dt>
+<dd>Product category (must satisfy DB enum).</dd>
+<dt><strong><code>discount</code></strong></dt>
+<dd>Per-unit discount value (non-negative).</dd>
+<dt><strong><code>is_available</code></strong></dt>
+<dd>Whether the product is available for ordering.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Products</code></dt>
+<dd>The newly created product.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.edit_product"><code class="name flex">
+<span>def <span class="ident">edit_product</span></span>(<span>self,<br>product_id,<br>name,<br>unit_price,<br>inventory_quantity,<br>size,<br>keywords,<br>category,<br>discount,<br>is_available)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def edit_product(self, product_id, name, unit_price, inventory_quantity, size, keywords, category, discount, is_available):
+    &#34;&#34;&#34;Edit a product owned by the current supplier.
+
+    Args:
+        product_id: Product primary key.
+        name: New product name.
+        unit_price: New unit price.
+        inventory_quantity: New inventory quantity.
+        size: New size value or None.
+        keywords: New keywords string.
+        category: New category value.
+        discount: New discount value.
+        is_available: New availability flag.
+
+    Returns:
+        Products: The updated product.
+
+    Raises:
+        ValueError: If the supplier record does not exist or product is not found.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    product = Products.query.filter_by(id=product_id).first()
+    if not product:
+        raise ValueError(f&#34;Product {product_id} not found&#34;)
+
+    product.name = name
+    product.unit_price = unit_price
+    product.inventory_quantity = inventory_quantity
+    product.size = size
+    product.keywords = keywords
+    product.category = category
+    product.discount = discount
+    product.is_available = is_available
+    db.session.commit()
+    return product</code></pre>
+</details>
+<div class="desc"><p>Edit a product owned by the current supplier.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>product_id</code></strong></dt>
+<dd>Product primary key.</dd>
+<dt><strong><code>name</code></strong></dt>
+<dd>New product name.</dd>
+<dt><strong><code>unit_price</code></strong></dt>
+<dd>New unit price.</dd>
+<dt><strong><code>inventory_quantity</code></strong></dt>
+<dd>New inventory quantity.</dd>
+<dt><strong><code>size</code></strong></dt>
+<dd>New size value or None.</dd>
+<dt><strong><code>keywords</code></strong></dt>
+<dd>New keywords string.</dd>
+<dt><strong><code>category</code></strong></dt>
+<dd>New category value.</dd>
+<dt><strong><code>discount</code></strong></dt>
+<dd>New discount value.</dd>
+<dt><strong><code>is_available</code></strong></dt>
+<dd>New availability flag.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Products</code></dt>
+<dd>The updated product.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist or product is not found.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.edit_supplier"><code class="name flex">
+<span>def <span class="ident">edit_supplier</span></span>(<span>self, company_name, company_address, contact_phone, is_open)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def edit_supplier(self, company_name, company_address, contact_phone, is_open):
+    &#34;&#34;&#34;Update supplier profile fields.
+
+    Args:
+        company_name: New company name.
+        company_address: New company address.
+        contact_phone: New contact phone number.
+        is_open: Whether the supplier is currently open.
+
+    Returns:
+        Suppliers: The updated supplier record.
+
+    Raises:
+        ValueError: If the supplier record does not exist.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    supplier.company_name = company_name
+    supplier.company_address = company_address
+    supplier.contact_phone = contact_phone
+    supplier.is_open = is_open
+    db.session.commit()
+    return supplier</code></pre>
+</details>
+<div class="desc"><p>Update supplier profile fields.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>company_name</code></strong></dt>
+<dd>New company name.</dd>
+<dt><strong><code>company_address</code></strong></dt>
+<dd>New company address.</dd>
+<dt><strong><code>contact_phone</code></strong></dt>
+<dd>New contact phone number.</dd>
+<dt><strong><code>is_open</code></strong></dt>
+<dd>Whether the supplier is currently open.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Suppliers</code></dt>
+<dd>The updated supplier record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.get_all_suppliers"><code class="name flex">
+<span>def <span class="ident">get_all_suppliers</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_suppliers(self):
+    &#34;&#34;&#34;Return all open suppliers ordered by company name.
+
+    Returns:
+        list[Suppliers]: Open suppliers sorted ascending by company name.
+    &#34;&#34;&#34;
+    suppliers = Suppliers.query.filter(Suppliers.is_open.is_(True)).order_by(Suppliers.company_name.asc()).all()
+    return suppliers</code></pre>
+</details>
+<div class="desc"><p>Return all open suppliers ordered by company name.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Suppliers]</code></dt>
+<dd>Open suppliers sorted ascending by company name.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.get_products"><code class="name flex">
+<span>def <span class="ident">get_products</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_products(self):
+    &#34;&#34;&#34;List all products owned by the current supplier.
+
+    Returns:
+        list[Products]: All product rows for this supplier (possibly empty).
+
+    Raises:
+        ValueError: If the supplier record does not exist.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    products = Products.query.filter_by(supplier_id=self.user_id).all()
+    return products</code></pre>
+</details>
+<div class="desc"><p>List all products owned by the current supplier.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Products]</code></dt>
+<dd>All product rows for this supplier (possibly empty).</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.get_supplier"><code class="name flex">
+<span>def <span class="ident">get_supplier</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_supplier(self):
+    &#34;&#34;&#34;Return the supplier record for the current context user.
+
+    Returns:
+        Suppliers: The supplier record associated with self.user_id.
+
+    Raises:
+        ValueError: If the supplier record does not exist.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    return supplier</code></pre>
+</details>
+<div class="desc"><p>Return the supplier record for the current context user.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Suppliers</code></dt>
+<dd>The supplier record associated with self.user_id.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.remove_product"><code class="name flex">
+<span>def <span class="ident">remove_product</span></span>(<span>self, product_id)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_product(self, product_id):
+    &#34;&#34;&#34;Delete a product by id.
+
+    Args:
+        product_id: Product primary key.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the supplier record does not exist or product is not found.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    product = Products.query.filter_by(id=product_id).first()
+    if not product:
+        raise ValueError(f&#34;Product {product_id} not found&#34;)
+
+    db.session.delete(product)
+    db.session.commit()</code></pre>
+</details>
+<div class="desc"><p>Delete a product by id.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>product_id</code></strong></dt>
+<dd>Product primary key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist or product is not found.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.set_is_open"><code class="name flex">
+<span>def <span class="ident">set_is_open</span></span>(<span>self, is_open)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_is_open(self, is_open):
+    &#34;&#34;&#34;Set the supplier&#39;s open/closed status.
+
+    Args:
+        is_open: Boolean open flag to set.
+
+    Returns:
+        Suppliers: The updated supplier record.
+
+    Raises:
+        ValueError: If the supplier record does not exist.
+    &#34;&#34;&#34;
+    supplier = self.validate_supplier()
+    supplier.is_open = is_open
+    db.session.commit()
+    return supplier</code></pre>
+</details>
+<div class="desc"><p>Set the supplier's open/closed status.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>is_open</code></strong></dt>
+<dd>Boolean open flag to set.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Suppliers</code></dt>
+<dd>The updated supplier record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="services.supplier_service.SupplierService.validate_supplier"><code class="name flex">
+<span>def <span class="ident">validate_supplier</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_supplier(self):
+    &#34;&#34;&#34;Validate that the current user id belongs to a supplier.
+
+    Returns:
+        Suppliers: The supplier record.
+
+    Raises:
+        ValueError: If the supplier record does not exist.
+    &#34;&#34;&#34;
+    supplier = Suppliers.query.filter_by(user_id=self.user_id).first()
+    if not supplier:
+        raise ValueError(f&#34;Supplier {self.user_id} not found&#34;)
+    return supplier</code></pre>
+</details>
+<div class="desc"><p>Validate that the current user id belongs to a supplier.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Suppliers</code></dt>
+<dd>The supplier record.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the supplier record does not exist.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="services" href="index.html">services</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="services.supplier_service.SupplierService" href="#services.supplier_service.SupplierService">SupplierService</a></code></h4>
+<ul class="two-column">
+<li><code><a title="services.supplier_service.SupplierService.add_product" href="#services.supplier_service.SupplierService.add_product">add_product</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.edit_product" href="#services.supplier_service.SupplierService.edit_product">edit_product</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.edit_supplier" href="#services.supplier_service.SupplierService.edit_supplier">edit_supplier</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.get_all_suppliers" href="#services.supplier_service.SupplierService.get_all_suppliers">get_all_suppliers</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.get_products" href="#services.supplier_service.SupplierService.get_products">get_products</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.get_supplier" href="#services.supplier_service.SupplierService.get_supplier">get_supplier</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.remove_product" href="#services.supplier_service.SupplierService.remove_product">remove_product</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.set_is_open" href="#services.supplier_service.SupplierService.set_is_open">set_is_open</a></code></li>
+<li><code><a title="services.supplier_service.SupplierService.validate_supplier" href="#services.supplier_service.SupplierService.validate_supplier">validate_supplier</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

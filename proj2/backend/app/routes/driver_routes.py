@@ -2,13 +2,16 @@ from flask import Blueprint, request, jsonify
 from app.models import *
 from app.services.driver_service import DriverService
 
+
 # Blueprint for driver-related endpoints
 driver_bp = Blueprint("driver", __name__, url_prefix="/api")
+
 
 # Helper function to retrieve the current user
 def get_user_id():
     data = request.json
     return data.get('user_id')
+
 
 # Helper function to convert delivery fields into dictionary
 def delivery_to_dict(delivery):
@@ -24,6 +27,7 @@ def delivery_to_dict(delivery):
         "delivery_status": delivery.delivery_status,
     }
 
+
 # --- Admin/Staff Routes for Driver Management ---
 @driver_bp.route('/driver', methods=['POST'])
 def create_driver():
@@ -31,7 +35,7 @@ def create_driver():
     Create New Driver Account
     ---
     tags: [Driver Management (Admin)]
-    description: Creates a new driver account with vehicle details.
+    description: Creates a new driver account with vehicle details and initial duty/rating stats.
     parameters:
       - in: body
         name: driver_registration
@@ -44,7 +48,8 @@ def create_driver():
           properties:
             message: {type: string}
             user_id: {type: integer}
-      400: {description: Missing required fields}
+      400:
+        description: Missing required fields or invalid input
     """
     try:
         data = request.json
@@ -73,6 +78,7 @@ def create_driver():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
+
 
 @driver_bp.route('/driver/<int:driver_user_id>', methods=['DELETE'])
 def delete_driver(driver_user_id):
@@ -104,6 +110,7 @@ def delete_driver(driver_user_id):
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
+
 
 
 # --- Driver Information and Status Update (By Driver or Admin) ---
@@ -153,6 +160,7 @@ def get_driver_info(driver_user_id):
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
+
 @driver_bp.route('/driver/<int:driver_user_id>', methods=['PUT'])
 def update_driver_details(driver_user_id):
     """
@@ -200,13 +208,14 @@ def update_driver_details(driver_user_id):
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
+
 @driver_bp.route('/driver/<int:driver_user_id>/status', methods=['PUT'])
 def update_driver_status(driver_user_id):
     """
     Update Driver Duty Status
     ---
     tags: [Driver Profile]
-    description: Updates the driver's duty status (e.g., on_duty, off_duty, delivering).
+    description: Updates the driver's duty status. Allowed values are 'unavailable', 'available', or 'on_delivery'.
     parameters:
       - in: path
         name: driver_user_id
@@ -224,7 +233,7 @@ def update_driver_status(driver_user_id):
           properties:
             message: {type: string}
             duty_status: {type: string}
-      400: {description: Missing new_status field}
+      400: {description: Missing new_status field or invalid value}
       404: {description: Driver not found}
     """
     try:
@@ -244,6 +253,7 @@ def update_driver_status(driver_user_id):
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
 
+
 # --- Delivery Assignment and Rating ---
 @driver_bp.route('/deliveries/assign/<int:delivery_id>', methods=['PUT'])
 def assign_driver(delivery_id):
@@ -251,7 +261,7 @@ def assign_driver(delivery_id):
     Assign Driver to Delivery
     ---
     tags: [Delivery Operations]
-    description: Attempts to find and assign an available driver to a specific delivery order.
+    description: Attempts to find and assign the highest-rated available driver to a specific delivery.
     parameters:
       - in: path
         name: delivery_id
@@ -269,7 +279,8 @@ def assign_driver(delivery_id):
             assigned_driver_id: {type: integer}
             driver_duty_status: {type: string}
             delivery_status: {type: string}
-      404: {description: No available drivers found or Delivery not found}
+      400: {description: Delivery not found}
+      404: {description: No available drivers found}
     """
     try:
         service = DriverService()
@@ -295,13 +306,14 @@ def assign_driver(delivery_id):
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
+
 @driver_bp.route('/deliveries/<int:delivery_id>/complete', methods=['PUT'])
 def complete_delivery(delivery_id):
     """
     Complete Delivery Order
     ---
     tags: [Delivery Operations]
-    description: Marks the delivery order as completed by the driver.
+    description: Marks the delivery order as completed by the driver (transitions to 'delivered').
     parameters:
       - in: path
         name: delivery_id
@@ -334,13 +346,14 @@ def complete_delivery(delivery_id):
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
+
 @driver_bp.route('/deliveries/<int:delivery_id>/rate', methods=['PUT'])
 def rate_driver(delivery_id):
     """
     Rate Driver
     ---
     tags: [Delivery Operations]
-    description: Allows a customer to rate the driver after the delivery is complete.
+    description: Allows a customer to rate the driver after the delivery is fulfilled.
     parameters:
       - in: path
         name: delivery_id
@@ -359,7 +372,7 @@ def rate_driver(delivery_id):
             message: {type: string}
             delivery_id: {type: integer}
             new_rating: {type: number, format: float}
-      400: {description: Missing rating field or invalid value}
+      400: {description: Missing rating field, invalid rating, or delivery not fulfilled}
       404: {description: Delivery or Driver not found}
     """
     try:
@@ -381,6 +394,7 @@ def rate_driver(delivery_id):
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
 
+
 # --- Driver Delivery Views ---
 @driver_bp.route('/driver/<int:driver_id>/active-delivery', methods=['GET'])
 def get_active_delivery(driver_id):
@@ -388,7 +402,7 @@ def get_active_delivery(driver_id):
     Get Active Delivery
     ---
     tags: [Driver Views]
-    description: Retrieves the single delivery currently assigned to and being worked on by the driver.
+    description: Retrieves the currently active delivery for the driver, or a message if none is active.
     parameters:
       - in: path
         name: driver_id
@@ -397,12 +411,16 @@ def get_active_delivery(driver_id):
         description: The ID of the driver's user account.
     responses:
       200:
-        description: Active delivery retrieved successfully
+        description: Active delivery retrieved or no active delivery
         schema:
           type: object
           properties:
-            active_delivery: {$ref: '#/definitions/DeliveryHistoryItem'}
-      404: {description: Driver not found or no active delivery}
+            active_delivery:
+              $ref: '#/definitions/DeliveryHistoryItem'
+            message:
+              type: string
+              description: Present when there is no active delivery.
+      404: {description: Driver not found}
     """
     try:
         service = DriverService()
@@ -434,13 +452,14 @@ def get_active_delivery(driver_id):
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {e}'}), 500
 
+
 @driver_bp.route('/driver/<int:driver_id>/history', methods=['GET'])
 def show_completed_deliveries(driver_id):
     """
     Get Delivery History
     ---
     tags: [Driver Views]
-    description: Retrieves a history of all completed delivery orders for a specific driver.
+    description: Retrieves a history of fulfilled delivery orders for a specific driver. Returns an informational message when none are found.
     parameters:
       - in: path
         name: driver_id
@@ -449,13 +468,16 @@ def show_completed_deliveries(driver_id):
         description: The ID of the driver's user account.
     responses:
       200:
-        description: Delivery history retrieved successfully
+        description: Delivery history retrieved or none found
         schema:
           type: object
           properties:
             history:
               type: array
               items: {$ref: '#/definitions/DeliveryHistoryItem'}
+            message:
+              type: string
+              description: Present when no previous deliveries exist.
       404: {description: Driver not found}
     """
     try:
