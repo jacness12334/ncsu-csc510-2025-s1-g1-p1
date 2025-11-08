@@ -66,7 +66,6 @@ https://drive.google.com/drive/folders/1tsO8Q6qzF6KXDPT4G35aEQn0aarRmzRl?usp=sha
 - Tracking:  Customers can track their delivery.
 - Staff: Staff can manage orders.
 - Profiles: Users can view and edit their profiles.
-- Drivers: Drivers can manage active and past deliveries, update duty/vehicle details, and finalize orders.
 
 ## Future Milestones
 - Snack Bundles: Create an interface for custom snack bundles.
