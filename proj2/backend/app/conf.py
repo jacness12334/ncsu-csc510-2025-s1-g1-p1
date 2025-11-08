@@ -36,12 +36,9 @@ autodoc_mock_imports = [
     # **CRITICAL FIX:** Mocking the base library
     "sqlalchemy",
     "sqlalchemy.orm", 
-    # Add 'app' as it's an internal package dependency 
-    # which you don't need to actually run during doc generation
-    "app"
-    # Add any other third-party libraries your services rely on
+    # The 'app' package has been removed from this list so Sphinx will attempt
+    # to resolve 'from app.models' and 'from app.app'.
 ]
-
 
 
 # -- Options for HTML output -------------------------------------------------
