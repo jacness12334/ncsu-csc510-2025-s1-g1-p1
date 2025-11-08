@@ -44,8 +44,8 @@ type IDtoSupplier = {
 type PaymentMethod = {
   id: string;
   card_number: number;
-  exp_month: number;
-  exp_year: number;
+  expiration_month: number;
+  expiration_year: number;
   balance: number;
   is_default: boolean;
   billing_address: string;
@@ -392,8 +392,8 @@ export default function CheckoutPage() {
     const cardNumberStr = String(method.card_number);
     const lastFour = cardNumberStr.slice(-4).padStart(4, '0');
     const balance = method.balance || 0;
-    const expMonth = String(method.exp_month).padStart(2, '0');
-    const expYear = method.exp_year;
+    const expMonth = String(method.expiration_month).padStart(2, '0');
+    const expYear = method.expiration_year;
 
     return { lastFour, balance, expMonth, expYear };
   };
