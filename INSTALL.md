@@ -13,45 +13,85 @@ cd ncsu-csc510-2025-s1-g1-p1
 ```
 
 ### 2. Backend Setup (Flask)
+
+#### Switch to backend branch and navigate to backend directory:
 ```bash
-cd backend
+cd proj2/backend
+```
+
+#### Set up Python environment:
+```bash
 python -m venv venv
-source venv/bin/activate     # On Windows: venv\Scripts\activate
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
+
+#### Install Python dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-Create a `.env` file in `backend/`:
-```
-DATABASE_URL=mysql+pymysql://<user>:<password>@localhost/moviemunchers
-FLASK_ENV=development
+#### Database Setup:
+1. Create MySQL database:
+```bash
+python database.py
 ```
 
-Start the backend:
+2. Import Dummy data for usage:
 ```bash
-flask run
+python load_database.pu
+``` 
+
+3. The backend uses MySQL connection with these credentials (update in `app/app.py` if needed):
+   - User: `root`
+   - Password: `` (empty)
+   - Host: `localhost`
+
+#### Start the backend:
+```bash
+python run.py
 ```
 Backend runs on `http://localhost:5000`
 
 ### 3. Frontend Setup (Next.js)
+
+#### Switch to frontend branch and navigate to frontend directory:
 ```bash
-cd ../frontend
+cd proj2/frontend
+```
+
+#### Install dependencies and start:
+```bash
 npm install
 npm run dev
 ```
 Frontend runs on `http://localhost:3000`
 
 ### 4. Run Tests
+**Note**: Test configurations may need verification
 Frontend:
 ```bash
+cd proj2/frontend
 npm test
 ```
 Backend:
 ```bash
-pytest
+cd proj2/backend
+python -m pytest
 ```
 
-### 5. Build for Production (optional)
+### 5. Build for Production (Frontend only)
 ```bash
+cd proj2/frontend
 npm run build
 npm start
 ```
+
+### 6. Generate Documentation (Frontend)
+```bash
+cd proj2/frontend
+npm run docs:serve
+```
+Documentation available at `http://localhost:3000`

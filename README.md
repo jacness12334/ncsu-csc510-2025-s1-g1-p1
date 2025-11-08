@@ -12,6 +12,7 @@
 
 
 [![🎨 Style Checks](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/actions/workflows/style-check.yml/badge.svg)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/actions/workflows/style-check.yml)
+
 [![codecov](https://codecov.io/gh/jacness12334/ncsu-csc510-2025-s1-g1-p1/graph/badge.svg?token=95QLVABM82)](https://codecov.io/gh/jacness12334/ncsu-csc510-2025-s1-g1-p1)
 
 [![GitHub issues](https://img.shields.io/github/issues/jacness12334/ncsu-csc510-2025-s1-g1-p1)](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/issues) 
@@ -35,6 +36,9 @@
 
 ## Mission Statement
 Movie Munchers brings the joy of dining and entertainment together by letting you order food straight to your theater seat. Partnering with local restaurants and nonprofits, the app delivers convenience, community, and care, all in one experience. Future updates will add personalization and expanded partnerships for an even smoother movie night.
+
+## Intro Video
+[Watch our animated intro video!](https://github.com/jacness12334/ncsu-csc510-2025-s1-g1-p1/blob/6733a8cf9e97786f32a1665a16e24be5748fbed6/movie_munchers_intro.mp4)
 
 ## Stakeholders
 - Moviegoers
@@ -74,6 +78,7 @@ https://drive.google.com/drive/folders/1tsO8Q6qzF6KXDPT4G35aEQn0aarRmzRl?usp=sha
 - Restaurant Partners: Allow local restaurants to join via secure endpoints.
 - Donations: Each purchase adds 1% of earnings to our donation program. 
 - Nutritional Info: Meals have Nutritional Info. 
+- Drivers: Drivers can view and select deliveries
 
 ## Software use cases
 1. Moviegoer – Order Food During a Movie
