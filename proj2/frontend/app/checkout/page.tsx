@@ -1,56 +1,55 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from 'react';
 import Cookies from 'js-cookie';
 
 // --- Configuration ---
 // Note: Keeping API_BASE_URL pointing to the local backend for all non-ed operations (load/update cart, add funds).
 const API_BASE_URL = 'http://localhost:5000/api';
 const TAX_RATE = 0.08;
-const DELIVERY_FEE = 5.00;
+const DELIVERY_FEE = 5.0;
 
 // --- TYPE DEFINITIONS ---
 type Item = {
-  item_id: string,
-  quantity: string,
-  product: Product
+  item_id: string;
+  quantity: string;
+  product: Product;
 };
 
 type Product = {
-  id: string,
-  name: string,
-  unit_price: number,
-  inventory_quantity: number,
-  size: number,
-  keywords: string,
-  category: string,
-  discount: number,
-  is_available: boolean,
-  supplier: IDtoSupplier
-}
-
-type Supplier = {
-  company_name: string,
-  company_address: string,
-  contact_phone: string,
-  is_open: string
-}
-
-type IDtoSupplier = {
-  id: string,
-  supplier: Supplier
-}
-
-type PaymentMethod = {
-  id: string,
-  card_number: number,
-  exp_month: number,
-  exp_year: number,
-  balance: number,
-  is_default: boolean,
-  billing_address: string
+  id: string;
+  name: string;
+  unit_price: number;
+  inventory_quantity: number;
+  size: number;
+  keywords: string;
+  category: string;
+  discount: number;
+  is_available: boolean;
+  supplier: IDtoSupplier;
 };
 
+type Supplier = {
+  company_name: string;
+  company_address: string;
+  contact_phone: string;
+  is_open: string;
+};
+
+type IDtoSupplier = {
+  id: string;
+  supplier: Supplier;
+};
+
+type PaymentMethod = {
+  id: string;
+  card_number: number;
+  exp_month: number;
+  exp_year: number;
+  balance: number;
+  is_default: boolean;
+  billing_address: string;
+};
 
 export default function CheckoutPage() {
   // --- STATE ---
@@ -59,7 +58,9 @@ export default function CheckoutPage() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [suppliers, setSuppliers] = useState<IDtoSupplier[]>([]);
 
-  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<
+    string | null
+  >(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,45 +70,71 @@ export default function CheckoutPage() {
    *  CHECKOUT FUNCTION: Simulates successful delivery and clears the cart state, then redirects.
    */
   const checkoutPay = async (selectedPaymentMethodId: string) => {
+    if (!selectedPaymentMethodId) {
+      setError('Please select a payment method.');
+      return;
+    }
+
+    if (!hasSufficientFunds) {
+      setError('Insufficient funds for this transaction.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log(`: Initiating payment for total: $${total.toFixed(2)} using method ID: ${selectedPaymentMethodId}`);
+      const customerId = Cookies.get('user_id');
+      const showRes = await fetch(
+        `${API_BASE_URL}/customers/${customerId}/customer_showing`
+      );
+      let showingId = 0;
+      if (showRes.ok) {
+        const data = await showRes.json();
+        showingId = data.id;
 
-      // 1. Simulate API delay for processing time
-      await new Promise(resolve => setTimeout(resolve, 1500));
+        console.log('Showing ID:', showingId);
+      } else {
+        console.error('Failed to fetch showings.');
+      }
+      const response = await fetch(`${API_BASE_URL}/deliveries`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customer_showing_id: showingId,
+          payment_method_id: selectedPaymentMethodId,
+        }),
+        credentials: 'include',
+      });
 
-      // 2.  successful delivery processing (NO ACTUAL API CALL TO /deliveries)
-      console.log(': Delivery successfully processed and order placed.');
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.message || 'Checkout failed.');
+      }
 
-      // 3. Clear local cart state immediately (simulating backend cart clear after success)
+      // Clear the cart if the order was successful
       setItems([]);
-
-      // 4. Show success message (using alert as implemented in previous versions)
-      alert('Order Placed Successfully!  delivery completed.');
-
-      // 5. Redirect to the main page or menu
-      window.location.href = '/menu';
-
-    } catch (e) {
-      // Catching potential errors during the  process (e.g., alert failure, though unlikely)
-      const errorMessage = e instanceof Error ? e.message : "An unexpected  checkout error occurred.";
-      console.error(" Checkout error:", e);
-      setError(" Checkout failed: " + errorMessage);
+      alert('Order placed successfully!');
+    } catch (error) {
+      console.error('Checkout error:', error);
+      setError('Checkout failed: ' + error.message);
     } finally {
-      // This will run briefly before the redirect, ensuring the loading spinner disappears if an error occurs
       setIsLoading(false);
     }
   };
 
   const removeCartItem = async (itemId: string) => {
     try {
-      await fetch(`${API_BASE_URL}/cart/${itemId}`, { method: 'DELETE', credentials: 'include' });
+      await fetch(`${API_BASE_URL}/cart/${itemId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
       await loadItems();
     } catch (error) {
-      console.error("Error removing cart item:", error);
-      setError("Failed to remove item.");
+      console.error('Error removing cart item:', error);
+      setError('Failed to remove item.');
     }
   };
 
@@ -129,24 +156,30 @@ export default function CheckoutPage() {
       });
       await loadItems();
     } catch (error) {
-      console.error("Error updating cart item:", error);
-      setError("Failed to update quantity.");
+      console.error('Error updating cart item:', error);
+      setError('Failed to update quantity.');
     }
   };
 
-  const addFundsToPaymentMethod = async (paymentMethodId: string, amount: number) => {
+  const addFundsToPaymentMethod = async (
+    paymentMethodId: string,
+    amount: number
+  ) => {
     if (isLoading) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/payment-methods/${paymentMethodId}/add-funds`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amount }),
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/payment-methods/${paymentMethodId}/add-funds`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: amount }),
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -154,42 +187,51 @@ export default function CheckoutPage() {
       }
 
       const data = await response.json();
-      alert(`Successfully added $${amount.toFixed(2)}. New balance: $${data.new_balance.toFixed(2)}`);
+      alert(
+        `Successfully added $${amount.toFixed(
+          2
+        )}. New balance: $${data.new_balance.toFixed(2)}`
+      );
       await loadPaymentMethods();
-
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred while adding funds.";
-      console.error("Add funds error:", e);
+      const errorMessage =
+        e instanceof Error
+          ? e.message
+          : 'An unexpected error occurred while adding funds.';
+      console.error('Add funds error:', e);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-
   // --- LOAD IMPLEMENTATIONS (Unchanged - still use real API to load data) ---
 
   const loadSuppliers = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/suppliers/all`, { credentials: 'include' });
+      const response = await fetch(`${API_BASE_URL}/suppliers/all`, {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch suppliers.');
       const data = await response.json();
       setSuppliers(data.suppliers);
     } catch (error) {
-      console.error("Error loading suppliers:", error);
-      setError("Could not load supplier data.");
+      console.error('Error loading suppliers:', error);
+      setError('Could not load supplier data.');
     }
   };
 
   const loadProducts = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/menu`, { credentials: 'include' });
+      const response = await fetch(`${API_BASE_URL}/products/menu`, {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch products.');
       const data = await response.json();
       setProducts(data.products);
     } catch (error) {
-      console.error("Error loading products:", error);
-      setError("Could not load product data.");
+      console.error('Error loading products:', error);
+      setError('Could not load product data.');
     }
   };
 
@@ -200,12 +242,17 @@ export default function CheckoutPage() {
     const currentProducts = products;
 
     if (currentProducts.length === 0) {
-      console.warn("Attempted to load cart items before products list was populated.");
+      console.warn(
+        'Attempted to load cart items before products list was populated.'
+      );
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/customers/${customerId}/cart`, { credentials: 'include' });
+      const response = await fetch(
+        `${API_BASE_URL}/customers/${customerId}/cart`,
+        { credentials: 'include' }
+      );
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -219,10 +266,14 @@ export default function CheckoutPage() {
       const mappedItems: Item[] = data.items
         .map((cartItem: any) => {
           const cartProductIdString = String(cartItem.product_id);
-          const productDetail = currentProducts.find(p => String(p.id) === cartProductIdString);
+          const productDetail = currentProducts.find(
+            (p) => String(p.id) === cartProductIdString
+          );
 
           if (!productDetail) {
-            console.warn(`Product ID ${cartItem.product_id} not found in product list. Skipping item.`);
+            console.warn(
+              `Product ID ${cartItem.product_id} not found in product list. Skipping item.`
+            );
             return null;
           }
 
@@ -236,8 +287,8 @@ export default function CheckoutPage() {
 
       setItems(mappedItems);
     } catch (error) {
-      console.error("Error loading cart items:", error);
-      setError("Could not load shopping cart items.");
+      console.error('Error loading cart items:', error);
+      setError('Could not load shopping cart items.');
     }
   };
 
@@ -246,24 +297,27 @@ export default function CheckoutPage() {
     if (!customerId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/customers/${customerId}/payment-methods`, { credentials: 'include' });
+      const response = await fetch(
+        `${API_BASE_URL}/customers/${customerId}/payment-methods`,
+        { credentials: 'include' }
+      );
       if (!response.ok) throw new Error('Failed to fetch payment methods.');
       const data = await response.json();
       setPaymentMethods(data.payment_methods);
 
-      const defaultMethod = data.payment_methods.find((pm: PaymentMethod) => pm.is_default);
+      const defaultMethod = data.payment_methods.find(
+        (pm: PaymentMethod) => pm.is_default
+      );
       if (defaultMethod) {
         setSelectedPaymentMethodId(defaultMethod.id);
       } else if (data.payment_methods.length > 0) {
         setSelectedPaymentMethodId(data.payment_methods[0].id);
       }
-
     } catch (error) {
-      console.error("Error loading payment methods:", error);
-      setError("Could not load payment methods.");
+      console.error('Error loading payment methods:', error);
+      setError('Could not load payment methods.');
     }
   };
-
 
   // --- EFFECTS (Unchanged) ---
   useEffect(() => {
@@ -281,20 +335,16 @@ export default function CheckoutPage() {
   }, [products]);
 
   // --- COMPUTED VALUES (Unchanged) ---
-  const subtotal = useMemo(() => {
+  const total = useMemo(() => {
     return items.reduce((acc, item) => {
       const price = item.product?.unit_price || 0;
       const quantity = parseInt(item.quantity) || 0;
-      return acc + (price * quantity);
+      return acc + price * quantity;
     }, 0);
   }, [items]);
 
-  const tax = useMemo(() => subtotal * TAX_RATE, [subtotal]);
-
-  const total = useMemo(() => subtotal + tax + DELIVERY_FEE, [subtotal, tax]);
-
   const selectedPaymentMethod = useMemo(() => {
-    return paymentMethods.find(pm => pm.id === selectedPaymentMethodId);
+    return paymentMethods.find((pm) => pm.id === selectedPaymentMethodId);
   }, [paymentMethods, selectedPaymentMethodId]);
 
   const hasSufficientFunds = useMemo(() => {
@@ -304,7 +354,7 @@ export default function CheckoutPage() {
 
   // --- HELPER FUNCTIONS (Unchanged) ---
   const getProductData = (item: Item) => {
-    const name = item.product?.name || "Unknown Product";
+    const name = item.product?.name || 'Unknown Product';
     const unitPrice = item.product?.unit_price || 0;
     const quantity = parseInt(item.quantity) || 0;
     const itemId = item.item_id;
@@ -330,19 +380,38 @@ export default function CheckoutPage() {
           href="/menu"
           className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 transition"
         >
-          <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          <svg
+            className="h-4 w-4 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            ></path>
+          </svg>
           Back to Menu
         </a>
       </div>
 
-      <h1 className="text-4xl font-extrabold text-gray-900 mb-8">Shopping Cart</h1>
+      <h1 className="text-4xl font-extrabold text-gray-900 mb-8">
+        Shopping Cart
+      </h1>
 
       {/* Error Message Display */}
       {error && (
-        <div className="mb-6 rounded-xl bg-red-50 border border-red-300 p-4 shadow-sm" role="alert">
+        <div
+          className="mb-6 rounded-xl bg-red-50 border border-red-300 p-4 shadow-sm"
+          role="alert"
+        >
           <p className="text-red-800 font-medium">Error: {error}</p>
           <p className="text-red-700 text-sm mt-1">
-            **Check API:** Ensure your backend service is running and accessible for cart/payment data.
+            **Check API:** Ensure your backend service is running and accessible
+            for cart/payment data.
           </p>
         </div>
       )}
@@ -352,23 +421,59 @@ export default function CheckoutPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Cart Management Section */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 pb-2 border-b">Your Items ({items.length})</h2>
+            <h2 className="text-2xl font-semibold mb-6 pb-2 border-b">
+              Your Items ({items.length})
+            </h2>
 
             {/* Display loading state for a better UX */}
             {isLoading && items.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                <svg className="mx-auto h-8 w-8 animate-spin text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg
+                  className="mx-auto h-8 w-8 animate-spin text-indigo-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
                 <p className="mt-2">Loading cart and product data...</p>
               </div>
             ) : items.length === 0 ? (
               <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
-                <p className="text-gray-600 mb-4 font-medium">Your cart is empty.</p>
+                <p className="text-gray-600 mb-4 font-medium">
+                  Your cart is empty.
+                </p>
                 <a
                   href="/menu"
                   className="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700 transition"
                 >
                   Start Shopping
-                  <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  <svg
+                    className="h-4 w-4 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    ></path>
+                  </svg>
                 </a>
               </div>
             ) : (
@@ -376,25 +481,44 @@ export default function CheckoutPage() {
                 {items.map((item) => {
                   const data = getProductData(item);
                   return (
-                    <div key={item.item_id} className="flex items-center justify-between p-4 border border-gray-100 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-200">
+                    <div
+                      key={item.item_id}
+                      className="flex items-center justify-between p-4 border border-gray-100 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-200"
+                    >
                       <div className="flex-1 min-w-0 pr-4">
-                        <p className="font-semibold text-gray-900 truncate">{data.name}</p>
-                        <p className="text-sm text-gray-500">${data.unitPrice.toFixed(2)} each</p>
+                        <p className="font-semibold text-gray-900 truncate">
+                          {data.name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          ${data.unitPrice.toFixed(2)} each
+                        </p>
                       </div>
 
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-0.5">
                           <button
-                            onClick={() => changeCartItemCount(data.itemId, data.quantity - 1)}
+                            onClick={() =>
+                              changeCartItemCount(
+                                data.itemId,
+                                data.quantity - 1
+                              )
+                            }
                             className="h-7 w-7 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition disabled:opacity-50"
                             disabled={data.quantity <= 1 || isLoading}
                             title="Decrease quantity"
                           >
                             −
                           </button>
-                          <span className="w-6 text-center text-sm font-medium">{data.quantity}</span>
+                          <span className="w-6 text-center text-sm font-medium">
+                            {data.quantity}
+                          </span>
                           <button
-                            onClick={() => changeCartItemCount(data.itemId, data.quantity + 1)}
+                            onClick={() =>
+                              changeCartItemCount(
+                                data.itemId,
+                                data.quantity + 1
+                              )
+                            }
                             className="h-7 w-7 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
                             disabled={isLoading}
                             title="Increase quantity"
@@ -404,7 +528,9 @@ export default function CheckoutPage() {
                         </div>
 
                         <div className="text-right min-w-[5rem]">
-                          <p className="font-bold text-gray-900">${(data.unitPrice * data.quantity).toFixed(2)}</p>
+                          <p className="font-bold text-gray-900">
+                            ${(data.unitPrice * data.quantity).toFixed(2)}
+                          </p>
                         </div>
 
                         <button
@@ -413,7 +539,20 @@ export default function CheckoutPage() {
                           disabled={isLoading}
                           title="Remove item"
                         >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                          </svg>
                         </button>
                       </div>
                     </div>
@@ -426,13 +565,21 @@ export default function CheckoutPage() {
           {/* Step 2: Payment Method Selection */}
           {items.length > 0 && (
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
-              <h2 className="text-2xl font-semibold mb-6 pb-2 border-b">2. Select Payment</h2>
+              <h2 className="text-2xl font-semibold mb-6 pb-2 border-b">
+                2. Select Payment
+              </h2>
 
               {paymentMethods.length === 0 ? (
                 <div className="text-center py-6 text-gray-600">
-                  <p className="mb-3">No payment methods found. Please add one to continue.</p>
+                  <p className="mb-3">
+                    No payment methods found. Please add one to continue.
+                  </p>
                   <button
-                    onClick={() => setError("Feature: Adding new payment methods not yet implemented.")}
+                    onClick={() =>
+                      setError(
+                        'Feature: Adding new payment methods not yet implemented.'
+                      )
+                    }
                     className="rounded-lg bg-indigo-500 px-6 py-2 font-semibold text-white hover:bg-indigo-600 transition"
                   >
                     + Add New Card
@@ -448,7 +595,11 @@ export default function CheckoutPage() {
                       <div
                         key={method.id}
                         onClick={() => setSelectedPaymentMethodId(method.id)}
-                        className={`cursor-pointer rounded-xl border-2 p-4 transition ${isSelected ? 'border-indigo-500 ring-4 ring-indigo-100 shadow-md' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`cursor-pointer rounded-xl border-2 p-4 transition ${
+                          isSelected
+                            ? 'border-indigo-500 ring-4 ring-indigo-100 shadow-md'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
@@ -456,7 +607,9 @@ export default function CheckoutPage() {
                               type="radio"
                               name="paymentMethod"
                               checked={isSelected}
-                              onChange={() => setSelectedPaymentMethodId(method.id)}
+                              onChange={() =>
+                                setSelectedPaymentMethodId(method.id)
+                              }
                               className="h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                               aria-label={`Select payment method ending in ${data.lastFour}`}
                             />
@@ -469,7 +622,13 @@ export default function CheckoutPage() {
                               </p>
                             </div>
                           </div>
-                          <p className={`text-sm font-medium ${data.balance < total ? 'text-red-500' : 'text-green-600'}`}>
+                          <p
+                            className={`text-sm font-medium ${
+                              data.balance < total
+                                ? 'text-red-500'
+                                : 'text-green-600'
+                            }`}
+                          >
                             Balance: ${data.balance.toFixed(2)}
                           </p>
                         </div>
@@ -483,7 +642,11 @@ export default function CheckoutPage() {
               {selectedPaymentMethod && !hasSufficientFunds && (
                 <div className="mt-4 rounded-xl bg-red-100 border border-red-300 p-4">
                   <p className="text-red-800 text-sm font-medium">
-                    <strong className="mr-1">Insufficient funds:</strong> Selected card balance (${selectedPaymentMethod.balance.toFixed(2)}) is less than the total order amount (${total.toFixed(2)}). Please select another method or add funds.
+                    <strong className="mr-1">Insufficient funds:</strong>{' '}
+                    Selected card balance ($
+                    {selectedPaymentMethod.balance.toFixed(2)}) is less than the
+                    total order amount (${total.toFixed(2)}). Please select
+                    another method or add funds.
                   </p>
                 </div>
               )}
@@ -492,17 +655,35 @@ export default function CheckoutPage() {
               {selectedPaymentMethodId && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <button
-                    onClick={() => addFundsToPaymentMethod(selectedPaymentMethodId, 100)} // Hardcoded $100
+                    onClick={() =>
+                      addFundsToPaymentMethod(selectedPaymentMethodId, 100)
+                    } // Hardcoded $100
                     disabled={isLoading}
                     className="w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    {isLoading ? 'Adding Funds...' : 'Add $100 Funds to Selected Card'}
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    {isLoading
+                      ? 'Adding Funds...'
+                      : 'Add $100 Funds to Selected Card'}
                   </button>
-                  <p className="mt-2 text-xs text-gray-500 text-center">Use this to test the checkout process when funds are low.</p>
+                  <p className="mt-2 text-xs text-gray-500 text-center">
+                    Use this to test the checkout process when funds are low.
+                  </p>
                 </div>
               )}
-
             </div>
           )}
         </div>
@@ -511,21 +692,11 @@ export default function CheckoutPage() {
         {items.length > 0 && (
           <div className="lg:col-span-1">
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg sticky top-6">
-              <h3 className="text-xl font-bold mb-4 border-b pb-2">Order Summary</h3>
+              <h3 className="text-xl font-bold mb-4 border-b pb-2">
+                Order Summary
+              </h3>
 
               <div className="space-y-3">
-                <div className="flex justify-between text-base text-gray-700">
-                  <span>Subtotal ({items.length} items)</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-base text-gray-700">
-                  <span>Tax ({TAX_RATE * 100}%)</span>
-                  <span>${tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-base text-gray-700">
-                  <span>Delivery Fee</span>
-                  <span>${DELIVERY_FEE.toFixed(2)}</span>
-                </div>
                 <div className="flex justify-between font-extrabold text-2xl pt-4 border-t border-gray-200 mt-4">
                   <span>Total Due</span>
                   <span className="text-indigo-600">${total.toFixed(2)}</span>
@@ -535,22 +706,34 @@ export default function CheckoutPage() {
               {/* Place Order Button - Now uses the  checkout */}
               <div className="mt-8">
                 <button
-                  onClick={() => selectedPaymentMethodId && checkoutPay(selectedPaymentMethodId)}
-                  disabled={!selectedPaymentMethodId || !hasSufficientFunds || isLoading}
-                  className={`w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md ${!selectedPaymentMethodId || !hasSufficientFunds || isLoading
-                    ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                    : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg' // Changed color to red to indicate 
-                    }`}
+                  onClick={() =>
+                    selectedPaymentMethodId &&
+                    checkoutPay(selectedPaymentMethodId)
+                  }
+                  disabled={
+                    !selectedPaymentMethodId || !hasSufficientFunds || isLoading
+                  }
+                  className={`w-full rounded-xl px-4 py-3 font-bold transition duration-200 shadow-md ${
+                    !selectedPaymentMethodId || !hasSufficientFunds || isLoading
+                      ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                      : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg' // Changed color to red to indicate
+                  }`}
                 >
-                  {isLoading ? ' Processing Order...' : ` Pay $${total.toFixed(2)} Now`}
+                  {isLoading
+                    ? ' Processing Order...'
+                    : ` Pay $${total.toFixed(2)} Now`}
                 </button>
 
                 {/* Status messages for disabled state */}
                 {!selectedPaymentMethodId && (
-                  <p className="mt-3 text-sm text-center text-red-500 font-medium">Please select a payment method.</p>
+                  <p className="mt-3 text-sm text-center text-red-500 font-medium">
+                    Please select a payment method.
+                  </p>
                 )}
                 {selectedPaymentMethodId && !hasSufficientFunds && (
-                  <p className="mt-3 text-sm text-center text-red-500 font-medium">Insufficient funds on selected card.</p>
+                  <p className="mt-3 text-sm text-center text-red-500 font-medium">
+                    Insufficient funds on selected card.
+                  </p>
                 )}
               </div>
               <p className="mt-3 text-xs text-center text-red-600 font-semibold">
