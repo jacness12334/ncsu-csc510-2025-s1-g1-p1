@@ -68,6 +68,7 @@ def create_app(config_name):
     from app.routes.staff_routes import staff_bp
     from app.routes.supplier_routes import supplier_bp
     from app.routes.driver_routes import driver_bp
+    from app.routes.coupon_routes import coupon_bp
 
     # Attach blueprints; url_prefix is defined inside each blueprint.
     app.register_blueprint(customer_bp)
@@ -75,6 +76,7 @@ def create_app(config_name):
     app.register_blueprint(staff_bp)
     app.register_blueprint(supplier_bp)
     app.register_blueprint(driver_bp)
+    app.register_blueprint(coupon_bp)
 
     # Return the configured application instance.
     return app

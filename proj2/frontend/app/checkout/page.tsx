@@ -63,6 +63,16 @@ export default function CheckoutPage() {
   >(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [couponCode, setCouponCode] = useState<string>('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{code: string; discount_percent: number; new_total: number} | null>(null);
+  const [availableCoupons, setAvailableCoupons] = useState<{id:number;code:string;difficulty:number;discount_percent:number}[]>([]);
+  const [showPuzzleModal, setShowPuzzleModal] = useState(false);
+  const [puzzleToken, setPuzzleToken] = useState<string | null>(null);
+  const [puzzleQuestion, setPuzzleQuestion] = useState<string | null>(null);
+  const [puzzleScript, setPuzzleScript] = useState<string | null>(null);
+  const [puzzleAnswer, setPuzzleAnswer] = useState<string>('');
+  const [skipPuzzle, setSkipPuzzle] = useState<boolean>(false);
+  const [showManualCode, setShowManualCode] = useState<boolean>(false);
 
   // --- API HANDLERS ---
 
@@ -115,7 +125,7 @@ export default function CheckoutPage() {
       }
 
       // Clear the cart if the order was successful
-      setItems([]);
+  setItems([]);
       alert('Order placed successfully!');
     } catch (error) {
       console.error('Checkout error:', error);
@@ -123,6 +133,82 @@ export default function CheckoutPage() {
       setIsLoading(false);
     }
   };
+
+  const applyCouponCode = async () => {
+    if (!couponCode) return setError('Enter a coupon code');
+    setIsLoading(true);
+    setError(null);
+    try {
+      // If user opted to skip puzzle, call apply directly with skip_puzzle
+      if (skipPuzzle) {
+        const res = await fetch(`${API_BASE_URL}/coupons/apply`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ code: couponCode, total, skip_puzzle: true }),
+          credentials: 'include'
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Invalid coupon');
+        }
+        const data = await res.json();
+        setAppliedCoupon({ code: data.code, discount_percent: data.discount_percent, new_total: data.new_total });
+        return;
+      }
+
+      // Otherwise request a puzzle for this coupon
+      const puzzleRes = await fetch(`${API_BASE_URL}/coupons/${encodeURIComponent(couponCode)}/puzzle`, { credentials: 'include' });
+      if (!puzzleRes.ok) {
+        const err = await puzzleRes.json();
+        throw new Error(err.error || 'Failed to fetch puzzle');
+      }
+  const puzzleData = await puzzleRes.json();
+  // backend may return puzzle_script (python code) or legacy puzzle text
+  setPuzzleScript(puzzleData.puzzle_script || null);
+  setPuzzleQuestion(puzzleData.puzzle || null);
+  setPuzzleToken(puzzleData.token);
+      setShowPuzzleModal(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to apply coupon');
+      setAppliedCoupon(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const submitPuzzleAnswer = async () => {
+    if (!puzzleToken) return setError('Missing puzzle token');
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/coupons/apply`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ code: couponCode, total, answer: puzzleAnswer, token: puzzleToken }),
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to verify puzzle');
+      }
+      const data = await res.json();
+      setAppliedCoupon({ code: data.code, discount_percent: data.discount_percent, new_total: data.new_total });
+      setShowPuzzleModal(false);
+      setPuzzleAnswer('');
+      setPuzzleToken(null);
+      setPuzzleQuestion(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to verify puzzle');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const removeAppliedCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+  };
+
 
   /**
    * item to remove
@@ -350,6 +436,17 @@ export default function CheckoutPage() {
     setIsLoading(true);
     loadSuppliers();
     loadProducts();
+    // load available coupons
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE_URL}/coupons`, { credentials: 'include' });
+        if (!r.ok) return;
+        const d = await r.json();
+        setAvailableCoupons(d.coupons || []);
+      } catch (e) {
+        // ignore
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -368,6 +465,7 @@ export default function CheckoutPage() {
       return acc + price * quantity;
     }, 0);
   }, [items]);
+  const effectiveTotal = appliedCoupon ? appliedCoupon.new_total : total;
 
   const selectedPaymentMethod = useMemo(() => {
     return paymentMethods.find((pm) => pm.id === selectedPaymentMethodId);
@@ -375,8 +473,8 @@ export default function CheckoutPage() {
 
   const hasSufficientFunds = useMemo(() => {
     if (!selectedPaymentMethod) return false;
-    return selectedPaymentMethod.balance >= total;
-  }, [selectedPaymentMethod, total]);
+    return selectedPaymentMethod.balance >= effectiveTotal;
+  }, [selectedPaymentMethod, effectiveTotal]);
 
   // --- HELPER FUNCTIONS (Unchanged) ---
   const getProductData = (item: Item) => {
@@ -648,7 +746,7 @@ export default function CheckoutPage() {
                             </div>
                           </div>
                           <p
-                            className={`text-sm font-medium ${data.balance < total
+                            className={`text-sm font-medium ${data.balance < effectiveTotal
                               ? 'text-red-500'
                               : 'text-green-600'
                               }`}
@@ -669,7 +767,7 @@ export default function CheckoutPage() {
                     <strong className="mr-1">Insufficient funds:</strong>{' '}
                     Selected card balance ($
                     {selectedPaymentMethod.balance.toFixed(2)}) is less than the
-                    total order amount (${total.toFixed(2)}). Please select
+                    total order amount (${effectiveTotal.toFixed(2)}). Please select
                     another method or add funds.
                   </p>
                 </div>
@@ -723,12 +821,90 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 <div className="flex justify-between font-extrabold text-2xl pt-4 border-t border-gray-200 mt-4">
                   <span>Total Due</span>
-                  <span className="text-indigo-600">${total.toFixed(2)}</span>
+                  <span className="text-indigo-600">${(appliedCoupon ? appliedCoupon.new_total : total).toFixed(2)}</span>
                 </div>
               </div>
 
+              {/* Coupon input */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">Coupon Code</label>
+                {/* Manual input on top */}
+                <div className="mt-2">
+                  <input
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="w-full rounded-md border p-2"
+                    placeholder="Enter coupon code or select below"
+                  />
+                </div>
+
+                {/* Dropdown below manual input */}
+                <div className="mt-2">
+                  <select className="w-full rounded-md border p-2" value={couponCode} onChange={(e)=>setCouponCode(e.target.value)}>
+                    <option value="">-- Select coupon --</option>
+                    {availableCoupons.map(c => (
+                      <option key={c.id} value={c.code}>{c.code} — {c.discount_percent}% (difficulty {c.difficulty})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Apply button below dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={applyCouponCode}
+                    disabled={isLoading}
+                    className="w-full rounded-md bg-indigo-600 text-white px-4 py-2"
+                  >
+                    {isLoading ? 'Applying...' : 'Apply Coupon'}
+                  </button>
+                </div>
+                
+                {appliedCoupon && (
+                  <div className="mt-2">
+                    <p className="text-sm text-green-700">Applied {appliedCoupon.code}: {appliedCoupon.discount_percent}% off</p>
+                    <button onClick={removeAppliedCoupon} className="text-xs text-red-600 underline mt-1">Remove coupon</button>
+                  </div>
+                )}
+              </div>
+
               {/* Place Order Button - Now uses the  checkout */}
-              <div className="mt-8">
+                <div className="mt-8">
+                {/* Puzzle Modal */}
+                {showPuzzleModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black opacity-40" onClick={() => { setShowPuzzleModal(false); setPuzzleToken(null); setPuzzleQuestion(null); setPuzzleAnswer(''); }} />
+                    <div className="relative z-10 w-full max-w-md bg-white rounded-lg p-6 shadow-lg">
+                      <h4 className="text-lg font-semibold mb-3">Verify Coupon</h4>
+                      {puzzleScript ? (
+                        <pre className="bg-gray-100 rounded-md p-3 text-sm overflow-auto mb-4"><code>{puzzleScript}</code></pre>
+                      ) : (
+                        <p className="text-sm text-gray-700 mb-4">{puzzleQuestion}</p>
+                      )}
+                      <input
+                        type="text"
+                        value={puzzleAnswer}
+                        onChange={(e) => setPuzzleAnswer(e.target.value)}
+                        className="w-full rounded-md border p-2 mb-4"
+                        placeholder="Enter puzzle answer"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => { setShowPuzzleModal(false); setPuzzleToken(null); setPuzzleQuestion(null); setPuzzleAnswer(''); }}
+                          className="rounded-md px-4 py-2 border"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={submitPuzzleAnswer}
+                          disabled={isLoading}
+                          className="rounded-md bg-indigo-600 text-white px-4 py-2"
+                        >
+                          {isLoading ? 'Verifying...' : 'Submit'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <button
                   onClick={() =>
                     selectedPaymentMethodId &&
@@ -744,7 +920,7 @@ export default function CheckoutPage() {
                 >
                   {isLoading
                     ? ' Processing Order...'
-                    : ` Pay $${total.toFixed(2)} Now`}
+                    : ` Pay $${effectiveTotal.toFixed(2)} Now`}
                 </button>
 
                 {/* Status messages for disabled state */}

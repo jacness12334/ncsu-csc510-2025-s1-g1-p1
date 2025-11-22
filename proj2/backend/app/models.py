@@ -226,3 +226,33 @@ class CartItems(db.Model):
 
     def __repr__(self):
         return f'<Cart Items id = {self.id} customer_id = {self.customer_id} product id = {self.product_id} quantity = {self.quantity}>'
+
+
+class Coupons(db.Model):
+    __tablename__ = 'coupons'
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    code = db.Column(db.String(64), unique=True, nullable=False)
+    # Difficulty indicates how hard the puzzle is to unlock this coupon (e.g., 1..10)
+    difficulty = db.Column(db.Integer, nullable=False, server_default='1')
+    # Discount percentage applied to the order total (0.00 - 100.00)
+    discount_percent = db.Column(DECIMAL(5,2), nullable=False, server_default='0.00')
+    is_active = db.Column(db.Boolean, nullable=False, server_default=expression.true())
+    date_added = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.current_timestamp())
+
+    def __repr__(self):
+        return f'<Coupons id={self.id} code={self.code!r} difficulty={self.difficulty} discount_percent={self.discount_percent} active={self.is_active}>'
+
+
+class CodePuzzles(db.Model):
+    __tablename__ = 'code_puzzles'
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    folder = db.Column(db.String(64), nullable=False)
+    name = db.Column(db.String(128), nullable=False)  # filename without extension
+    difficulty = db.Column(db.Integer, nullable=False, server_default='1')
+    script = db.Column(db.Text, nullable=False)
+    answer = db.Column(db.Text, nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, server_default=expression.true())
+    date_added = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.current_timestamp())
+
+    def __repr__(self):
+        return f'<CodePuzzles id={self.id} folder={self.folder!r} name={self.name!r} difficulty={self.difficulty} active={self.is_active}>'

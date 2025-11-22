@@ -138,5 +138,75 @@ def populate_db():
          [(1, 1),
             (2, 2)])
 
+   # Coupons seed data (unlocked by puzzles with difficulty levels)
+   insert("""INSERT INTO coupons (code, difficulty, discount_percent, is_active) VALUES (%s, %s, %s, %s)""",
+               [('PUZZLE10', 1, 10.00, True),
+                ('MASTER50', 8, 50.00, True)])
+
+   # Scan code_puzzle folders and insert into code_puzzles table
+   base_dir = os.path.join(os.path.dirname(__file__), 'app', 'code_puzzle')
+   puzzles_to_insert = []
+   if os.path.exists(base_dir):
+      for folder in ['easy', 'medium', 'hard']:
+         folder_path = os.path.join(base_dir, folder)
+         if not os.path.isdir(folder_path):
+            continue
+         for fname in os.listdir(folder_path):
+            if not fname.endswith('.py'):
+               continue
+            name = os.path.splitext(fname)[0]
+            py_path = os.path.join(folder_path, fname)
+            txt_path = os.path.join(folder_path, name + '.txt')
+            try:
+               with open(py_path, 'r', encoding='utf-8') as f:
+                  script = f.read()
+               answer = ''
+               if os.path.exists(txt_path):
+                  with open(txt_path, 'r', encoding='utf-8') as f:
+                     answer = f.read().strip()
+               # map folder difficulty to integer (simple mapping)
+               if folder == 'easy':
+                  diff = 1
+               elif folder == 'medium':
+                  diff = 5
+               else:
+                  diff = 8
+               puzzles_to_insert.append((folder, name, diff, script, answer, True))
+            except Exception:
+               continue
+
+   if puzzles_to_insert:
+      insert("""INSERT INTO code_puzzles (folder, name, difficulty, script, answer, is_active) VALUES (%s, %s, %s, %s, %s, %s)""",
+           puzzles_to_insert)
+
+      # After inserting puzzles, create a coupon per puzzle (avoid duplicates)
+      try:
+         cursor_object.execute("SELECT code FROM coupons")
+         existing_codes = set(r[0] for r in cursor_object.fetchall())
+
+         cursor_object.execute("SELECT id, folder, name, difficulty FROM code_puzzles")
+         rows = cursor_object.fetchall()
+         coupons_for_puzzles = []
+         for r in rows:
+            pid, folder, name, diff = r[0], r[1], r[2], r[3]
+            code = f"PUZ{pid}_{folder}_{name}".upper()
+            if code in existing_codes:
+               continue
+            # map difficulty to discount: easy->10, medium->25, hard->50
+            if diff <= 3:
+               discount = 10.00
+            elif diff <= 6:
+               discount = 25.00
+            else:
+               discount = 50.00
+            coupons_for_puzzles.append((code, diff, discount, True))
+
+         if coupons_for_puzzles:
+            insert("""INSERT INTO coupons (code, difficulty, discount_percent, is_active) VALUES (%s, %s, %s, %s)""",
+                   coupons_for_puzzles)
+      except Exception:
+         # non-fatal; continue
+         pass
+
 # Call function to populate database
 populate_db()

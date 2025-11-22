@@ -4,7 +4,7 @@ import os
 # Schema table names
 tables = ['theatres', 'auditoriums', 'seats', 'users', 'staff', 'movies', 'movie_showings',
           'customers', 'customer_showings', 'payment_methods', 'drivers', 'suppliers',
-          'products', 'deliveries', 'cart_items', 'delivery_items']
+          'products', 'deliveries', 'cart_items', 'delivery_items', 'coupons']
 
 
 # Drop a single table with foreign key checks temporarily disabled 
@@ -283,6 +283,28 @@ def create_tables(db):
                 CONSTRAINT unique_delivery_item UNIQUE (delivery_id, cart_item_id)
                 )"""
 
+    # Coupons: discount codes unlocked by puzzles; difficulty represents puzzle difficulty
+    coupons = """CREATE TABLE IF NOT EXISTS coupons (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                code VARCHAR(64) NOT NULL UNIQUE,
+                difficulty INT NOT NULL DEFAULT 1,
+                discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )"""
+
+    # Code puzzles: store puzzle scripts and answers
+    code_puzzles = """CREATE TABLE IF NOT EXISTS code_puzzles (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    folder VARCHAR(64) NOT NULL,
+                    name VARCHAR(128) NOT NULL,
+                    difficulty INT NOT NULL DEFAULT 1,
+                    script TEXT NOT NULL,
+                    answer TEXT NOT NULL,
+                    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                    date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )"""
+
     # Execute DDL statements in dependency order
     cursor_object.execute(theatres)
     cursor_object.execute(auditoriums)
@@ -300,6 +322,8 @@ def create_tables(db):
     cursor_object.execute(deliveries)
     cursor_object.execute(cart_items)
     cursor_object.execute(delivery_items)
+    cursor_object.execute(coupons)
+    cursor_object.execute(code_puzzles)
 
     # Persist schema changes and close the connection
     db.commit()
