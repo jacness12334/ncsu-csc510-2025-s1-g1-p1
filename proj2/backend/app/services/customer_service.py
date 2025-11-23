@@ -4,9 +4,14 @@ from app.services.user_service import UserService
 from app.services.staff_service import StaffService
 from app.services.driver_service import DriverService
 import decimal
+import base64
+import os
+from app.models import Coupons, CodePuzzles
+from flask import current_app
 
 class CustomerService:
-    """Customer service layer for accounts, payment methods, carts, showings, products, and deliveries.
+    """
+    Customer service layer for accounts, payment methods, carts, showings, products, and deliveries.
 
     This module centralizes customer-facing business logic on top of SQLAlchemy models,
     and coordinates with user, staff, and driver services.
@@ -354,106 +359,6 @@ class CustomerService:
             return None
         return cart_items
 
-    def charge_payment_method(self, payment_method_id, total_price):
-        """Charge a payment method for the given amount if sufficient funds exist.
-
-        Args:
-            payment_method_id: Payment method id to charge.
-            total_price: Decimal total amount to charge.
-
-        Returns:
-            bool: True if charged; False if insufficient funds.
-
-        Raises:
-            ValueError: If the payment method is not found.
-        """
-        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
-        if not payment_method:
-            raise ValueError(f"Payment Method {payment_method_id} not found")
-
-        self.validate_customer(payment_method.customer_id)
-
-        if payment_method.balance < total_price:
-            return False
-
-        payment_method.balance -= total_price
-        db.session.commit()
-        return True
-
-    def create_delivery(self, customer_showing_id, payment_method_id):
-        """Create a delivery for a booked showing after validating ownership and charging.
-
-        This links the delivery to the customer's showing, verifies the payment method
-        belongs to the same customer, creates delivery items from the cart, charges the
-        payment method, decrements inventory, and attempts to assign a driver and staff.
-
-        Args:
-            customer_showing_id: CustomerShowings id for the booking.
-            payment_method_id: PaymentMethods id to charge.
-
-        Returns:
-            Deliveries: The created delivery.
-
-        Raises:
-            ValueError: If duplicates exist, any referenced record is missing,
-                the cart is empty, or funds are insufficient.
-        """
-        customer_showing = CustomerShowings.query.filter_by(id=customer_showing_id).first()
-        if not customer_showing:
-            raise ValueError(f"Customer showing {customer_showing_id} not found")
-        self.validate_customer(customer_showing.customer_id)
-
-        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
-        if not payment_method:
-            raise ValueError(f"Payment method {payment_method_id} not found")
-        if payment_method.customer_id != customer_showing.customer_id:
-            raise ValueError("Payment method does not belong to this customer")
-
-        seat = Seats.query.filter_by(id=customer_showing.seat_id).first()
-        if not seat:
-            raise ValueError(f"Seat {customer_showing.seat_id} not found")
-
-        auditorium = Auditoriums.query.filter_by(id=seat.auditorium_id).first()
-        if not auditorium:
-            raise ValueError(f"Auditorium {seat.auditorium_id} not found")
-
-        cart_items = self.get_cart_items(customer_id=customer_showing.customer_id)
-        if not cart_items:
-            raise ValueError(f"Cart for {customer_showing.customer_id} is empty")
-
-        total_price = self.calculate_total_price(cart_items=cart_items)
-
-        delivery = Deliveries(
-            driver_id=None,
-            customer_showing_id=customer_showing.id,
-            payment_method_id=payment_method.id,
-            staff_id=None,
-            total_price=total_price
-        )
-        db.session.add(delivery)
-        db.session.flush()
-
-        for item in cart_items:
-            self.create_delivery_item(cart_item_id=item.id, delivery_id=delivery.id)
-
-        was_charged = self.charge_payment_method(payment_method_id=payment_method.id, total_price=total_price)
-        if not was_charged:
-            db.session.rollback()
-            raise ValueError("Insufficient funds")
-
-        delivery.payment_status = 'completed'
-
-        for item in cart_items:
-            product = Products.query.filter_by(id=item.product_id).first()
-            product.inventory_quantity -= item.quantity
-
-        # Attempt to assign driver and staff member (no-op if none available)
-        self.driver_service.try_assign_driver(delivery=delivery)
-        self.staff_service.try_assign_staff(theatre_id=auditorium.theatre_id, delivery=delivery)
-
-        db.session.commit()
-        return delivery
-
     def calculate_total_price(self, cart_items):
         """Compute the total price for a list of cart items.
 
@@ -478,6 +383,172 @@ class CustomerService:
             else:
                 raise ValueError("Invalid cart item")
         return total_price
+
+    def charge_payment_method(self, payment_method_id, total_price):
+        """Charge a payment method by reducing its stored balance.
+
+        Args:
+            payment_method_id: PaymentMethods.id to charge.
+            total_price: Decimal or numeric amount to subtract from balance.
+
+        Returns:
+            bool: True if charged successfully, False if insufficient funds.
+
+        Raises:
+            ValueError: If payment method not found or does not belong to a customer.
+        """
+        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
+        if not payment_method:
+            raise ValueError(f"Payment Method {payment_method_id} not found")
+
+        # Ensure caller is a customer owner for safety
+        self.validate_customer(payment_method.customer_id)
+
+        # Normalize to Decimal
+        try:
+            needed = decimal.Decimal(total_price)
+        except Exception:
+            needed = decimal.Decimal(str(total_price))
+
+        current_balance = payment_method.balance if isinstance(payment_method.balance, decimal.Decimal) else decimal.Decimal(str(payment_method.balance))
+
+        if current_balance < needed:
+            return False
+
+        payment_method.balance = current_balance - needed
+        db.session.commit()
+        return True
+
+    def create_delivery(self, customer_showing_id, payment_method_id, coupon_code=None, puzzle_token=None, puzzle_answer=None, skip_puzzle=False):
+        """Create a delivery from a customer's cart, optionally applying a coupon.
+
+        This verifies puzzles (DB-backed or filesystem), computes discount_amount,
+        persists coupon metadata on the Delivery, charges the post-discount total
+        from the payment method (using Decimal arithmetic), then finalizes the
+        delivery by decrementing inventory and assigning driver/staff.
+
+        Args:
+            customer_showing_id: CustomerShowings id for whom the delivery is made.
+            payment_method_id: PaymentMethods id to charge.
+            coupon_code: Optional coupon code string to apply.
+            puzzle_token: Optional base64 token referencing a puzzle (db:<id> or path).
+            puzzle_answer: Optional answer string for the puzzle.
+            skip_puzzle: If True, bypass puzzle verification for this coupon.
+
+        Returns:
+            Deliveries: The created and committed delivery record.
+
+        Raises:
+            ValueError: On invalid input, insufficient funds, or verification failures.
+        """
+        customer_showing = CustomerShowings.query.filter_by(id=customer_showing_id).first()
+        if not customer_showing:
+            raise ValueError(f"Customer showing {customer_showing_id} not found")
+        self.validate_customer(customer_showing.customer_id)
+
+        payment_method = PaymentMethods.query.filter_by(id=payment_method_id).first()
+        if not payment_method:
+            raise ValueError(f"Payment method {payment_method_id} not found")
+        if payment_method.customer_id != customer_showing.customer_id:
+            raise ValueError("Payment method does not belong to this customer")
+
+        seat = Seats.query.filter_by(id=customer_showing.seat_id).first()
+        if not seat:
+            raise ValueError(f"Seat {customer_showing.seat_id} not found")
+
+        auditorium = Auditoriums.query.filter_by(id=seat.auditorium_id).first()
+        if not auditorium:
+            raise ValueError(f"Auditorium {seat.auditorium_id} not found")
+
+        cart_items = CartItems.query.filter_by(customer_id=customer_showing.customer_id).all()
+        if not cart_items:
+            raise ValueError(f"Cart for {customer_showing.customer_id} is empty")
+
+        total_price = self.calculate_total_price(cart_items=cart_items)
+        total_price = decimal.Decimal(total_price)
+
+        applied_coupon_id = None
+        applied_coupon_code = None
+        discount_amount = decimal.Decimal('0.00')
+
+        # Debug: log incoming coupon/puzzle payload so we can verify what the UI sent
+        current_app.logger.debug(f"create_delivery called with coupon_code={coupon_code} puzzle_token_present={bool(puzzle_token)} puzzle_answer_provided={puzzle_answer is not None} skip_puzzle={skip_puzzle}")
+
+        if coupon_code:
+            c = Coupons.query.filter_by(code=coupon_code, is_active=True).first()
+            if not c:
+                raise ValueError('Invalid coupon code')
+
+            if not skip_puzzle:
+                if not puzzle_token or puzzle_answer is None:
+                    raise ValueError('Puzzle token and answer required to apply coupon')
+                try:
+                    decoded = base64.b64decode(puzzle_token.encode()).decode()
+                    if decoded.startswith('db:'):
+                        pid = int(decoded.split(':', 1)[1])
+                        puzzle = CodePuzzles.query.get(pid)
+                        if not puzzle or not puzzle.is_active:
+                            raise ValueError('Puzzle not found')
+                        expected = (puzzle.answer or '').strip()
+                        if str(puzzle_answer).strip() != expected:
+                            raise ValueError('Incorrect puzzle answer')
+                    else:
+                        rel = decoded
+                        puzzle_dir = os.path.join(current_app.root_path, 'code_puzzle')
+                        answer_path = os.path.join(puzzle_dir, rel + '.txt')
+                        if not os.path.exists(answer_path):
+                            raise ValueError('Puzzle answer file not found')
+                        with open(answer_path, 'r', encoding='utf-8') as f:
+                            expected = f.read().strip()
+                        if str(puzzle_answer).strip() != expected:
+                            raise ValueError('Incorrect puzzle answer')
+                except Exception as e:
+                    raise ValueError('Puzzle verification failed: ' + str(e))
+
+            percent = decimal.Decimal(str(float(c.discount_percent)))
+            discount_amount = (total_price * percent) / decimal.Decimal('100.00')
+            # Cap discount to the total price
+            if discount_amount > total_price:
+                discount_amount = total_price
+
+            applied_coupon_id = c.id
+            applied_coupon_code = c.code
+            current_app.logger.debug(f"Coupon {c.code} found: percent={percent} discount_amount={discount_amount}")
+
+        delivery = Deliveries(
+            driver_id=None,
+            customer_showing_id=customer_showing.id,
+            payment_method_id=payment_method.id,
+            staff_id=None,
+            total_price=total_price,
+            coupon_id=applied_coupon_id,
+            coupon_code=applied_coupon_code,
+            discount_amount=discount_amount,
+        )
+        db.session.add(delivery)
+        db.session.flush()
+
+        for item in cart_items:
+            delivery_item = DeliveryItems(cart_item_id=item.id, delivery_id=delivery.id)
+            db.session.add(delivery_item)
+        post_total = decimal.Decimal(total_price) - decimal.Decimal(discount_amount)
+        current_app.logger.debug(f"Post-discount total to charge: {post_total}")
+        was_charged = self.charge_payment_method(payment_method_id=payment_method.id, total_price=post_total)
+        if not was_charged:
+            db.session.rollback()
+            raise ValueError("Insufficient funds")
+
+        delivery.payment_status = 'completed'
+
+        for item in cart_items:
+            product = Products.query.filter_by(id=item.product_id).first()
+            product.inventory_quantity -= item.quantity
+
+        self.driver_service.try_assign_driver(delivery=delivery)
+        self.staff_service.try_assign_staff(theatre_id=auditorium.theatre_id, delivery=delivery)
+
+        db.session.commit()
+        return delivery
 
     def create_delivery_item(self, cart_item_id, delivery_id):
         """Create a DeliveryItems entry from a cart item for a pending delivery.
@@ -510,7 +581,8 @@ class CustomerService:
 
         delivery_item = DeliveryItems(cart_item_id=cart_item.id, delivery_id=delivery.id)
         db.session.add(delivery_item)
-        db.session.commit()
+        # Do not commit here. Leave commits to the caller to keep the delivery
+        # creation and charging in a single atomic transaction.
         return delivery_item
 
     def cancel_delivery(self, delivery_id):
@@ -536,7 +608,10 @@ class CustomerService:
         if not payment_method:
             raise ValueError(f"Payment method not found for {delivery.id}")
 
-        payment_method.balance += delivery.total_price
+        # Refund only the charged amount (post-discount). Use Decimal for safety.
+        charged = (delivery.total_price or decimal.Decimal('0.00')) - (delivery.discount_amount or decimal.Decimal('0.00'))
+        current_balance = payment_method.balance if isinstance(payment_method.balance, decimal.Decimal) else decimal.Decimal(str(payment_method.balance))
+        payment_method.balance = current_balance + decimal.Decimal(charged)
         self.driver_service.update_driver_status(user_id=delivery.driver_id, new_status='available')
         delivery.delivery_status = 'cancelled'
         db.session.commit()
@@ -685,3 +760,7 @@ class CustomerService:
         return {
             "id": customer_showing.id,
         }
+
+    def get_customer_showing_id(self, user_id):
+        customer_showing = CustomerShowings.query.filter_by(customer_id=user_id).first()
+        return {"id": customer_showing.id}

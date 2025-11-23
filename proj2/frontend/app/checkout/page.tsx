@@ -107,7 +107,8 @@ export default function CheckoutPage() {
       } else {
         console.error('Failed to fetch showings.');
       }
-      const response = await fetch(`${API_BASE_URL}/deliveries`, {
+  console.debug('checkoutPay -> payload', { appliedCoupon, couponCode, puzzleToken, puzzleAnswer, skipPuzzle });
+  const response = await fetch(`${API_BASE_URL}/deliveries`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,6 +116,13 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           customer_showing_id: showingId,
           payment_method_id: selectedPaymentMethodId,
+          // coupon/puzzle fields
+          coupon_code: appliedCoupon?.code || couponCode || null,
+          puzzle_token: puzzleToken || null,
+          puzzle_answer: puzzleAnswer || null,
+          // If a coupon was already applied/verified via the coupon flow,
+          // instruct the backend to skip puzzle verification when creating the delivery.
+          skip_puzzle: appliedCoupon ? true : !!skipPuzzle,
         }),
         credentials: 'include',
       });
@@ -167,6 +175,7 @@ export default function CheckoutPage() {
   setPuzzleScript(puzzleData.puzzle_script || null);
   setPuzzleQuestion(puzzleData.puzzle || null);
   setPuzzleToken(puzzleData.token);
+  console.debug('applyCouponCode -> received puzzle token and question', { token: puzzleData.token, puzzle: puzzleData.puzzle, puzzle_script: puzzleData.puzzle_script });
       setShowPuzzleModal(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to apply coupon');
@@ -181,6 +190,7 @@ export default function CheckoutPage() {
     setIsLoading(true);
     setError(null);
     try {
+      console.debug('submitPuzzleAnswer -> submitting', { couponCode, puzzleToken, puzzleAnswer });
       const res = await fetch(`${API_BASE_URL}/coupons/apply`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -819,9 +829,23 @@ export default function CheckoutPage() {
               </h3>
 
               <div className="space-y-3">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Subtotal</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+
+                {appliedCoupon && (
+                  <>
+                    <div className="flex justify-between text-sm text-green-700">
+                      <span>Coupon ({appliedCoupon.code}) — {appliedCoupon.discount_percent}%</span>
+                      <span>- ${Math.max(0, (total - effectiveTotal)).toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+
                 <div className="flex justify-between font-extrabold text-2xl pt-4 border-t border-gray-200 mt-4">
                   <span>Total Due</span>
-                  <span className="text-indigo-600">${(appliedCoupon ? appliedCoupon.new_total : total).toFixed(2)}</span>
+                  <span className="text-indigo-600">${effectiveTotal.toFixed(2)}</span>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from app.services.customer_service import CustomerService
 
 
@@ -12,47 +12,33 @@ customer_service = CustomerService()
 
 @customer_bp.route('/customers', methods=['POST'])
 def create_customer():
-    """
-    Create Customer Account
-    ---
-    tags: [Customer Management]
-    description: Registers a new customer user account.
-    parameters:
-      - in: body
-        name: customer_registration
-        schema: {$ref: '#/definitions/CustomerRegistration'}
-    responses:
-      201:
-        description: Customer created successfully
-        schema:
-          type: object
-          properties:
-            message: {type: string}
-            customer: {$ref: '#/definitions/CustomerProfile'}
-      400: {description: Invalid input}
-    """
-    try:
-        data = request.get_json()
-        customer = customer_service.create_customer(
-            name=data.get('name'), 
-            email=data.get('email'),
-            phone=data.get('phone'),
-            birthday=data.get('birthday'),
-            password=data.get('password'),
-            role=data.get('role', 'customer'),
-            default_theatre_id=data.get('default_theatre_id')
-        )
-        return jsonify({
-            'message': 'Customer created successfully',
-            'customer': {
-                'user_id': customer.user_id,
-                'default_theatre_id': customer.default_theatre_id
-            }
-        }), 201
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+  """
+  Create Customer Account
+
+  Register a new customer user account.
+  """
+  try:
+    data = request.get_json()
+    customer = customer_service.create_customer(
+      name=data.get('name'),
+      email=data.get('email'),
+      phone=data.get('phone'),
+      birthday=data.get('birthday'),
+      password=data.get('password'),
+      role=data.get('role', 'customer'),
+      default_theatre_id=data.get('default_theatre_id')
+    )
+    return jsonify({
+      'message': 'Customer created successfully',
+      'customer': {
+        'user_id': customer.user_id,
+        'default_theatre_id': customer.default_theatre_id
+      }
+    }), 201
+  except ValueError as e:
+    return jsonify({'error': str(e)}), 400
+  except Exception as e:
+    return jsonify({'error': str(e)}), 500
 
 
 @customer_bp.route('/customers/<int:user_id>', methods=['GET'])
@@ -521,47 +507,45 @@ def create_customer_showing(user_id):
 
 @customer_bp.route('/deliveries', methods=['POST'])
 def create_delivery():
-    """
-    Create Delivery Order
-    ---
-    tags: [Delivery Operations (Customer)]
-    description: Places a new delivery order based on the current cart items.
-    parameters:
-      - in: body
-        name: delivery_creation
-        schema: {$ref: '#/definitions/DeliveryCreate'}
-    responses:
-      201:
-        description: Delivery created successfully
-        schema:
-          type: object
-          properties:
-            message: {type: string}
-            delivery_id: {type: integer}
-            total_price: {type: number, format: float}
-            delivery_status: {type: string}
-            payment_status: {type: string}
-      400: {description: Invalid input, empty cart, or payment failure}
-    """
-    try:
-        data = request.get_json()
-        delivery = customer_service.create_delivery(
-            customer_showing_id=data.get('customer_showing_id'),
-            payment_method_id=data.get('payment_method_id')
-        )
-        return jsonify({
-            'message': 'Delivery created successfully',
-            'delivery_id': delivery.id,
-            'total_price': float(delivery.total_price),
-            'delivery_status': delivery.delivery_status,
-            'payment_status': delivery.payment_status
-        }), 201
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 400
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+  """
+  Create Delivery Order
+
+  Places a new delivery order based on the current cart items. Accepts optional
+  coupon information (coupon_code + puzzle_token/answer) and applies it when present.
+  """
+  try:
+    data = request.get_json()
+    current_app.logger.debug(f"create_delivery payload: {data}")
+    delivery = customer_service.create_delivery(
+      customer_showing_id=data.get('customer_showing_id'),
+      payment_method_id=data.get('payment_method_id'),
+      coupon_code=data.get('coupon_code'),
+      puzzle_token=data.get('puzzle_token'),
+      puzzle_answer=data.get('puzzle_answer'),
+      skip_puzzle=bool(data.get('skip_puzzle', False))
+    )
+    return jsonify({
+      'message': 'Delivery created successfully',
+      'delivery_id': delivery.id,
+      'total_price': float(delivery.total_price),
+      'delivery_status': delivery.delivery_status,
+      'payment_status': delivery.payment_status,
+      # Echo what the UI sent for debugging
+      'coupon_code_received': data.get('coupon_code'),
+      'puzzle_token_received': bool(data.get('puzzle_token')),
+      'puzzle_answer_provided': data.get('puzzle_answer') is not None,
+      # Show applied coupon metadata from the saved delivery
+      'applied_coupon_code': delivery.coupon_code,
+      'discount_amount': float(delivery.discount_amount or 0.0)
+    }), 201
+  except ValueError as e:
+    current_app.logger.debug(f"create_delivery error payload: {data}")
+    return jsonify({'error': str(e), 'payload': data}), 400
+  except Exception as e:
+    import traceback
+    traceback.print_exc()
+    current_app.logger.debug(f"create_delivery exception payload: {data}")
+    return jsonify({'error': str(e), 'payload': data}), 500
 
 
 @customer_bp.route('/deliveries/<int:delivery_id>/cancel', methods=['POST'])
